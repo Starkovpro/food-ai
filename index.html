@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food AI — калории и рецепты</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f6f2;
+      --surface: #ffffff;
+      --surface2: #f0efe9;
+      --border: #e0ddd5;
+      --border2: #c8c5bc;
+      --text: #1a1916;
+      --text2: #6b6860;
+      --text3: #9e9c97;
+      --green-bg: #eaf3de;
+      --green-text: #3b6d11;
+      --red-bg: #fceaea;
+      --red-text: #a32d2d;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .app {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      font-size: 15px;
+      color: var(--text2);
+      margin-top: 6px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--surface2);
+      padding: 4px;
+      border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 9px;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .upload-zone {
+      border: 1.5px dashed var(--border2);
+      border-radius: var(--radius);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      background: var(--surface);
+      transition: all 0.2s;
+    }
+
+    .upload-zone:hover {
+      border-color: var(--text3);
+      background: var(--surface2);
+    }
+
+    .upload-zone input { display: none; }
+
+    .upload-icon { font-size: 40px; margin-bottom: 12px; display: block; }
+
+    .upload-zone p { font-size: 15px; color: var(--text); font-weight: 500; }
+    .upload-zone span { font-size: 13px; color: var(--text3); display: block; margin-top: 4px; }
+
+    .preview-wrap {
+      position: relative;
+      margin-top: 1rem;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .preview-wrap img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+    }
+
+    .btn {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 13px;
+      background: var(--text);
+      border: none;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 500;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .result-card {
+      margin-top: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+
+    .result-card h3 {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text2);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .kcal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--green-bg);
+      color: var(--green-text);
+      padding: 7px 16px;
+      border-radius: 20px;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    .result-text {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.75;
+      white-space: pre-wrap;
+    }
+
+    .ingredients-label {
+      font-size: 14px;
+      color: var(--text2);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 130px;
+      padding: 14px;
+      font-size: 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      resize: vertical;
+      background: var(--surface);
+      color: var(--text);
+      font-family: inherit;
+      line-height: 1.6;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--border2);
+    }
+
+    .loader {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 0;
+      color: var(--text2);
+      font-size: 14px;
+    }
+
+    .dots span {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text3);
+      animation: bounce 1.2s infinite;
+    }
+
+    .dots span:nth-child(2) { animation-delay: 0.2s; }
+    .dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-7px); }
+    }
+
+    .error-msg {
+      color: var(--red-text);
+      font-size: 13px;
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: var(--red-bg);
+      border-radius: var(--radius-sm);
+    }
+
+    @media (max-width: 480px) {
+      .header h1 { font-size: 22px; }
+      .tab { font-size: 13px; padding: 9px 6px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>🍽 Food AI</h1>
+    <p>Анализ калорий по фото и рецепты из ваших продуктов</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('calories')">📷 Калории по фото</button>
+    <button class="tab" onclick="switchTab('recipe')">🛒 Рецепт из продуктов</button>
+  </div>
+
+  <!-- CALORIES TAB -->
+  <div id="panel-calories" class="panel active">
+    <div class="upload-zone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+      <input type="file" id="fileInput" accept="image/*" onchange="handleFile(this.files[0])">
+      <span class="upload-icon">📷</span>
+      <p>Загрузите фото блюда</p>
+      <span>JPG, PNG, WEBP — нажмите или перетащите файл</span>
+    </div>
+
+    <div id="preview-wrap" class="preview-wrap" style="display:none">
+      <img id="preview-img" src="" alt="Preview">
+      <button class="remove-btn" onclick="removeImage()">✕ Удалить</button>
+    </div>
+
+    <button class="btn" id="btn-cal" onclick="analyzeCalories()" disabled>Подсчитать калории</button>
+
+    <div id="cal-loader" class="loader" style="display:none">
+      <div class="dots"><span></span><span></span><span></span></div>
+      Анализирую фото...
+    </div>
+
+    <div id="cal-result" style="display:none" class="result-card">
+      <h3>Результат анализа</h3>
+      <div id="cal-badge"></div>
+      <div class="result-text" id="cal-text"></div>
+    </div>
+
+    <div id="cal-error" class="error-msg" style="display:none"></div>
+  </div>
+
+  <!-- RECIPE TAB -->
+  <div id="panel-recipe" class="panel">
+    <span class="ingredients-label">Перечислите продукты, которые есть у вас:</span>
+    <textarea id="ingredients" placeholder="Например: яйца, картошка, лук, морковь, сметана, укроп, сливочное масло..."></textarea>
+
+    <button class="btn" id="btn-rec" onclick="getRecipe()">Найти рецепт</button>
+
+    <div id="rec-loader" class="loader" style="display:none">
+      <div class="dots"><span></span><span></span><span></span></div>
+      Подбираю рецепт...
+    </div>
+
+    <div id="rec-result" style="display:none" class="result-card">
+      <h3>Рецепт</h3>
+      <div class="result-text" id="rec-text"></div>
+    </div>
+
+    <div id="rec-error" class="error-msg" style="display:none"></div>
+  </div>
+</div>
+
+<script>
+  let imageBase64 = null;
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach((t, i) =>
+      t.classList.toggle('active', (i === 0 && tab === 'calories') || (i === 1 && tab === 'recipe'))
+    );
+    document.getElementById('panel-calories').classList.toggle('active', tab === 'calories');
+    document.getElementById('panel-recipe').classList.toggle('active', tab === 'recipe');
+  }
+
+  function handleFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const result = e.target.result;
+      imageBase64 = result.split(',')[1];
+      document.getElementById('preview-img').src = result;
+      document.getElementById('preview-wrap').style.display = 'block';
+      document.getElementById('dropzone').style.display = 'none';
+      document.getElementById('btn-cal').disabled = false;
+      document.getElementById('cal-result').style.display = 'none';
+      document.getElementById('cal-error').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeImage() {
+    imageBase64 = null;
+    document.getElementById('preview-wrap').style.display = 'none';
+    document.getElementById('dropzone').style.display = 'block';
+    document.getElementById('btn-cal').disabled = true;
+    document.getElementById('fileInput').value = '';
+    document.getElementById('cal-result').style.display = 'none';
+  }
+
+  const dropzone = document.getElementById('dropzone');
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); });
+  dropzone.addEventListener('drop', e => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); });
+
+  async function analyzeCalories() {
+    if (!imageBase64) return;
+    document.getElementById('btn-cal').disabled = true;
+    document.getElementById('cal-loader').style.display = 'flex';
+    document.getElementById('cal-result').style.display = 'none';
+    document.getElementById('cal-error').style.display = 'none';
+
+    try {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'calories', imageBase64 })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
+
+      const text = data.text || '';
+      const kcalMatch = text.match(/ККАЛ:\s*(\d+)/i);
+      const kcal = kcalMatch ? kcalMatch[1] : null;
+      const body = text.replace(/ККАЛ:\s*\d+/i, '').trim();
+
+      document.getElementById('cal-badge').innerHTML = kcal
+        ? `<div class="kcal-badge">🔥 ~${kcal} ккал</div>` : '';
+      document.getElementById('cal-text').textContent = body;
+      document.getElementById('cal-result').style.display = 'block';
+    } catch (e) {
+      document.getElementById('cal-error').textContent = 'Ошибка: ' + e.message;
+      document.getElementById('cal-error').style.display = 'block';
+    } finally {
+      document.getElementById('cal-loader').style.display = 'none';
+      document.getElementById('btn-cal').disabled = false;
+    }
+  }
+
+  async function getRecipe() {
+    const ingredients = document.getElementById('ingredients').value.trim();
+    if (!ingredients) return;
+    document.getElementById('btn-rec').disabled = true;
+    document.getElementById('rec-loader').style.display = 'flex';
+    document.getElementById('rec-result').style.display = 'none';
+    document.getElementById('rec-error').style.display = 'none';
+
+    try {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'recipe', ingredients })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
+
+      document.getElementById('rec-text').textContent = data.text || '';
+      document.getElementById('rec-result').style.display = 'block';
+    } catch (e) {
+      document.getElementById('rec-error').textContent = 'Ошибка: ' + e.message;
+      document.getElementById('rec-error').style.display = 'block';
+    } finally {
+      document.getElementById('rec-loader').style.display = 'none';
+      document.getElementById('btn-rec').disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
