@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers,
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens, messages })
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens, messages })
     });
     const d = await r.json();
     if (!r.ok) throw new Error(d.error?.message || 'Ошибка API');
