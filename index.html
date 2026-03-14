@@ -3,31 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Food AI — калории и рецепты</title>
+  <title>Нейро Шеф Повар</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #f7f6f2;
-      --surface: #ffffff;
-      --surface2: #f0efe9;
-      --border: #e0ddd5;
-      --border2: #c8c5bc;
-      --text: #1a1916;
-      --text2: #6b6860;
-      --text3: #9e9c97;
-      --green-bg: #eaf3de;
-      --green-text: #3b6d11;
-      --red-bg: #fceaea;
-      --red-text: #a32d2d;
+      --yellow: #F5C800;
+      --yellow-dark: #D4A900;
+      --yellow-light: #FFF5B8;
+      --black: #0F0F0F;
+      --black2: #1A1A1A;
+      --black3: #242424;
+      --black4: #2E2E2E;
+      --gray: #888880;
+      --gray2: #555550;
+      --white: #FFFFFF;
       --radius: 12px;
       --radius-sm: 8px;
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      background: var(--black);
+      color: var(--white);
       min-height: 100vh;
       padding: 2rem 1rem;
     }
@@ -40,27 +38,53 @@
     .header {
       text-align: center;
       margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--black4);
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--yellow);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
     }
 
     .header h1 {
-      font-size: 28px;
-      font-weight: 600;
+      font-size: 26px;
+      font-weight: 700;
       letter-spacing: -0.5px;
+      color: var(--white);
+    }
+
+    .header h1 span {
+      color: var(--yellow);
     }
 
     .header p {
-      font-size: 15px;
-      color: var(--text2);
+      font-size: 14px;
+      color: var(--gray);
       margin-top: 6px;
     }
 
     .tabs {
       display: flex;
       gap: 6px;
-      background: var(--surface2);
+      background: var(--black2);
       padding: 4px;
       border-radius: var(--radius);
       margin-bottom: 1.5rem;
+      border: 1px solid var(--black4);
     }
 
     .tab {
@@ -73,47 +97,56 @@
       border-radius: 9px;
       border: none;
       background: transparent;
-      color: var(--text2);
+      color: var(--gray);
       transition: all 0.2s;
     }
 
     .tab.active {
-      background: var(--surface);
-      color: var(--text);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      background: var(--yellow);
+      color: var(--black);
+      font-weight: 600;
     }
 
     .panel { display: none; }
     .panel.active { display: block; }
 
     .upload-zone {
-      border: 1.5px dashed var(--border2);
+      border: 1.5px dashed var(--black4);
       border-radius: var(--radius);
       padding: 2.5rem 1.5rem;
       text-align: center;
       cursor: pointer;
-      background: var(--surface);
+      background: var(--black2);
       transition: all 0.2s;
     }
 
     .upload-zone:hover {
-      border-color: var(--text3);
-      background: var(--surface2);
+      border-color: var(--yellow);
+      background: var(--black3);
     }
 
     .upload-zone input { display: none; }
-
     .upload-icon { font-size: 40px; margin-bottom: 12px; display: block; }
 
-    .upload-zone p { font-size: 15px; color: var(--text); font-weight: 500; }
-    .upload-zone span { font-size: 13px; color: var(--text3); display: block; margin-top: 4px; }
+    .upload-zone p {
+      font-size: 15px;
+      color: var(--white);
+      font-weight: 500;
+    }
+
+    .upload-zone span {
+      font-size: 13px;
+      color: var(--gray);
+      display: block;
+      margin-top: 4px;
+    }
 
     .preview-wrap {
       position: relative;
       margin-top: 1rem;
       border-radius: var(--radius);
       overflow: hidden;
-      border: 1px solid var(--border);
+      border: 1px solid var(--black4);
     }
 
     .preview-wrap img {
@@ -127,73 +160,104 @@
       position: absolute;
       top: 10px;
       right: 10px;
-      background: rgba(255,255,255,0.92);
-      border: 1px solid var(--border);
-      color: var(--text2);
+      background: rgba(15,15,15,0.85);
+      border: 1px solid var(--black4);
+      color: var(--gray);
       border-radius: 6px;
       padding: 5px 12px;
       font-size: 12px;
       cursor: pointer;
-      backdrop-filter: blur(4px);
     }
 
     .btn {
       width: 100%;
       margin-top: 1rem;
       padding: 13px;
-      background: var(--text);
+      background: var(--yellow);
       border: none;
       border-radius: var(--radius);
       font-size: 15px;
-      font-weight: 500;
-      color: #fff;
+      font-weight: 600;
+      color: var(--black);
       cursor: pointer;
       transition: all 0.2s;
     }
 
-    .btn:hover { opacity: 0.85; }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn:hover { background: var(--yellow-dark); }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
     .result-card {
       margin-top: 1rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
+      background: var(--black2);
+      border: 1px solid var(--black4);
       border-radius: var(--radius);
       padding: 1.25rem;
     }
 
-    .result-card h3 {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text2);
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       margin-bottom: 12px;
+    }
+
+    .result-card h3 {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
+    }
+
+    .copy-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--black3);
+      border: 1px solid var(--black4);
+      color: var(--gray);
+      border-radius: var(--radius-sm);
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      border-color: var(--yellow);
+      color: var(--yellow);
+    }
+
+    .copy-btn.copied {
+      border-color: #3b6d11;
+      color: #97c459;
+      background: #1a2a0a;
     }
 
     .kcal-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: var(--green-bg);
-      color: var(--green-text);
+      background: var(--yellow);
+      color: var(--black);
       padding: 7px 16px;
       border-radius: 20px;
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 14px;
     }
 
     .result-text {
       font-size: 14px;
-      color: var(--text2);
+      color: #b0b0a8;
       line-height: 1.75;
       white-space: pre-wrap;
     }
 
     .ingredients-label {
       font-size: 14px;
-      color: var(--text2);
+      color: var(--gray);
       margin-bottom: 8px;
       display: block;
     }
@@ -203,19 +267,21 @@
       min-height: 130px;
       padding: 14px;
       font-size: 14px;
-      border: 1.5px solid var(--border);
+      border: 1.5px solid var(--black4);
       border-radius: var(--radius);
       resize: vertical;
-      background: var(--surface);
-      color: var(--text);
+      background: var(--black2);
+      color: var(--white);
       font-family: inherit;
       line-height: 1.6;
       transition: border-color 0.2s;
     }
 
+    textarea::placeholder { color: var(--gray2); }
+
     textarea:focus {
       outline: none;
-      border-color: var(--border2);
+      border-color: var(--yellow);
     }
 
     .loader {
@@ -223,7 +289,7 @@
       align-items: center;
       gap: 10px;
       padding: 18px 0;
-      color: var(--text2);
+      color: var(--gray);
       font-size: 14px;
     }
 
@@ -232,7 +298,7 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--text3);
+      background: var(--yellow);
       animation: bounce 1.2s infinite;
     }
 
@@ -245,16 +311,28 @@
     }
 
     .error-msg {
-      color: var(--red-text);
       font-size: 13px;
       margin-top: 10px;
       padding: 10px 14px;
-      background: var(--red-bg);
+      background: #2a0a0a;
+      border: 1px solid #501313;
+      color: #f09595;
       border-radius: var(--radius-sm);
     }
 
+    .frau-tag {
+      display: inline-block;
+      background: var(--black3);
+      border: 1px solid var(--black4);
+      color: var(--gray);
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-top: 8px;
+    }
+
     @media (max-width: 480px) {
-      .header h1 { font-size: 22px; }
+      .header h1 { font-size: 20px; }
       .tab { font-size: 13px; padding: 9px 6px; }
     }
   </style>
@@ -262,8 +340,12 @@
 <body>
 <div class="app">
   <div class="header">
-    <h1>🍽 Food AI</h1>
-    <p>Анализ калорий по фото и рецепты из ваших продуктов</p>
+    <div class="logo">
+      <div class="logo-icon">👨‍🍳</div>
+      <h1><span>Нейро</span> Шеф Повар</h1>
+    </div>
+    <p>Считает калории по фото и придумывает рецепты из того, что есть дома</p>
+    <span class="frau-tag">Фрау Фитнес</span>
   </div>
 
   <div class="tabs">
@@ -293,7 +375,10 @@
     </div>
 
     <div id="cal-result" style="display:none" class="result-card">
-      <h3>Результат анализа</h3>
+      <div class="result-header">
+        <h3>Результат анализа</h3>
+        <button class="copy-btn" onclick="copyText('cal-text', this)">📋 Скопировать</button>
+      </div>
       <div id="cal-badge"></div>
       <div class="result-text" id="cal-text"></div>
     </div>
@@ -314,7 +399,10 @@
     </div>
 
     <div id="rec-result" style="display:none" class="result-card">
-      <h3>Рецепт</h3>
+      <div class="result-header">
+        <h3>Рецепт</h3>
+        <button class="copy-btn" onclick="copyText('rec-text', this)">📋 Скопировать</button>
+      </div>
       <div class="result-text" id="rec-text"></div>
     </div>
 
@@ -361,6 +449,18 @@
   const dropzone = document.getElementById('dropzone');
   dropzone.addEventListener('dragover', e => { e.preventDefault(); });
   dropzone.addEventListener('drop', e => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); });
+
+  function copyText(id, btn) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Скопировано!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.innerHTML = '📋 Скопировать';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
 
   async function analyzeCalories() {
     if (!imageBase64) return;
