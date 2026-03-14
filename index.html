@@ -262,6 +262,20 @@
 
     .ingredients-label { font-size: 14px; color: var(--gray); margin-bottom: 8px; display: block; }
 
+    .portions-btn {
+      padding: 8px 16px;
+      border: 1.5px solid var(--black4);
+      border-radius: 20px;
+      background: var(--black2);
+      color: var(--gray);
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .portions-btn:hover { border-color: var(--yellow); color: var(--yellow); }
+    .portions-btn.active { background: var(--yellow); border-color: var(--yellow); color: var(--black); font-weight: 600; }
+
     textarea {
       width: 100%; min-height: 130px; padding: 14px; font-size: 14px;
       border: 1.5px solid var(--black4); border-radius: var(--radius);
@@ -310,10 +324,10 @@
       <div class="logo-icon">👨‍🍳</div>
       <h1><span>Нейро</span> Шеф Повар</h1>
     </div>
-    <p>Считает калории по фото и придумывает рецепты из того, что есть </p>
+    <p>Считает калории по фото и придумывает рецепты из того, что есть</p>
     <div class="powered-badge">
       <span class="powered-dot"></span>
-      Работает на самых умных AI в мире
+      Работает на Claude — самой умной AI-модели в мире
     </div>
   </div>
 
@@ -346,6 +360,12 @@
     </div>
 
     <div class="weight-wrap" id="weight-wrap">
+      <div style="margin-bottom: 1rem;">
+        <label class="field-label" for="dish-name">Название блюда (необязательно, но повысит точность):</label>
+        <input type="text" id="dish-name" placeholder="Например: борщ, греческий салат, куриная грудка..."
+          style="width:100%; padding: 12px 14px; font-size: 14px; border: 1.5px solid var(--black4); border-radius: var(--radius); background: var(--black2); color: var(--white); font-family: inherit; outline: none; transition: border-color 0.2s;"
+          onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='var(--black4)'">
+      </div>
       <label class="field-label" for="weight">Вес блюда (необязательно, но повысит точность):</label>
       <div class="weight-row">
         <input type="number" id="weight" min="1" max="9999" placeholder="Например: 350">
@@ -394,6 +414,17 @@
     <span class="ingredients-label">Перечислите продукты, которые есть у вас:</span>
     <textarea id="ingredients" placeholder="Например: яйца, картошка, лук, морковь, сметана, укроп, сливочное масло..."></textarea>
 
+    <div style="margin-top: 1rem;">
+      <label class="field-label">Количество порций:</label>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="portions-btn active" onclick="selectPortions(this, 1)">1 порция</button>
+        <button class="portions-btn" onclick="selectPortions(this, 2)">2 порции</button>
+        <button class="portions-btn" onclick="selectPortions(this, 3)">3 порции</button>
+        <button class="portions-btn" onclick="selectPortions(this, 4)">4 порции</button>
+        <button class="portions-btn" onclick="selectPortions(this, 6)">6 порций</button>
+      </div>
+    </div>
+
     <button class="btn" id="btn-rec" onclick="getRecipe()">Найти рецепт</button>
 
     <div id="rec-loader" class="loader" style="display:none">
@@ -415,6 +446,13 @@
 
 <script>
   let imageBase64 = null;
+  let selectedPortions = 1;
+
+  function selectPortions(btn, count) {
+    selectedPortions = count;
+    document.querySelectorAll('.portions-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
 
   function switchTab(tab) {
     document.querySelectorAll('.tab').forEach((t, i) =>
@@ -512,7 +550,7 @@
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'calories', imageBase64, weight })
+        body: JSON.stringify({ type: 'calories', imageBase64, weight, dishName: document.getElementById('dish-name').value })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
@@ -556,7 +594,7 @@
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'recipe', ingredients })
+        body: JSON.stringify({ type: 'recipe', ingredients, portions: selectedPortions })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
