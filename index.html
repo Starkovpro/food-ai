@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Нейро Шеф Повар</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#F5C800">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="НейроШеф">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -327,7 +333,7 @@
     <p>Считает калории по фото и придумывает рецепты из того, что есть дома</p>
     <div class="powered-badge">
       <span class="powered-dot"></span>
-      Работает на самых умных AI-моделях в мире
+      Работает на Claude — самой умной AI-модели в мире
     </div>
   </div>
 
@@ -609,5 +615,12 @@
     }
   }
 </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js');
+      });
+    }
+  </script>
 </body>
 </html>
