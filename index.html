@@ -367,6 +367,16 @@
       <button class="remove-btn" onclick="removeImage()">✕ Удалить</button>
     </div>
 
+    <div id="weight-wrap" style="display:none; margin-top: 1rem;">
+      <label class="ingredients-label" for="weight">Вес блюда (необязательно, но повысит точность):</label>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <input type="number" id="weight" min="1" max="9999" placeholder="Например: 350"
+          style="flex:1; padding: 12px 14px; font-size: 15px; border: 1.5px solid var(--black4); border-radius: var(--radius); background: var(--black2); color: var(--white); font-family: inherit; outline: none; transition: border-color 0.2s;"
+          onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='var(--black4)'">
+        <span style="font-size: 15px; color: var(--gray); white-space: nowrap;">г (граммы)</span>
+      </div>
+    </div>
+
     <button class="btn" id="btn-cal" onclick="analyzeCalories()" disabled>Подсчитать калории</button>
 
     <div id="cal-loader" class="loader" style="display:none">
@@ -431,6 +441,7 @@
       document.getElementById('preview-wrap').style.display = 'block';
       document.getElementById('dropzone').style.display = 'none';
       document.getElementById('btn-cal').disabled = false;
+      document.getElementById('weight-wrap').style.display = 'block';
       document.getElementById('cal-result').style.display = 'none';
       document.getElementById('cal-error').style.display = 'none';
     };
@@ -439,6 +450,7 @@
 
   function removeImage() {
     imageBase64 = null;
+    document.getElementById('weight-wrap').style.display = 'none';
     document.getElementById('preview-wrap').style.display = 'none';
     document.getElementById('dropzone').style.display = 'block';
     document.getElementById('btn-cal').disabled = true;
@@ -470,10 +482,11 @@
     document.getElementById('cal-error').style.display = 'none';
 
     try {
+      const weight = document.getElementById('weight').value;
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'calories', imageBase64 })
+        body: JSON.stringify({ type: 'calories', imageBase64, weight })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
