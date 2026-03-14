@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
-  const { type, imageBase64, ingredients, weight } = req.body;
+  const { type, imageBase64, ingredients, weight, dishName, portions } = req.body;
 
   const headers = {
     'Content-Type': 'application/json',
@@ -32,12 +32,13 @@ export default async function handler(req, res) {
       const weightNote = weight
         ? `Вес блюда: ${weight} граммов — используй для точного расчёта.`
         : 'Вес не указан — оцени визуально.';
+      const dishNote = dishName ? `Пользователь уточняет: это "${dishName}". Используй это для точного расчёта.` : '';
 
       const text = await callClaude([{
         role: 'user',
         content: [
           { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 } },
-          { type: 'text', text: `Ты диетолог. ${weightNote}\n\nОтветь строго в формате:\n\nБЛЮДО: [название]\nККАЛ: [число]\n\nЗатем:\n1. Белки / жиры / углеводы\n2. Заметка о пищевой ценности (2-3 предложения)\n\nЕсли на фото нет еды — напиши об этом.` }
+          { type: 'text', text: `Ты диетолог. ${weightNote} ${dishNote}\n\nОтветь строго в формате:\n\nБЛЮДО: [название]\nККАЛ: [число]\n\nЗатем:\n1. Белки / жиры / углеводы\n2. Заметка о пищевой ценности (2-3 предложения)\n\nЕсли на фото нет еды — напиши об этом.` }
         ]
       }]);
 
@@ -56,9 +57,10 @@ export default async function handler(req, res) {
     } else if (type === 'recipe') {
       if (!ingredients) return res.status(400).json({ error: 'No ingredients provided' });
 
+      const servings = portions || 1;
       const text = await callClaude([{
         role: 'user',
-        content: `Ты шеф-повар. Продукты: ${ingredients}\n\nПредложи одно блюдо и дай рецепт:\n1. Название\n2. Время приготовления\n3. Ингредиенты с количеством\n4. Пошаговый рецепт (5-8 шагов)\n5. Совет по подаче\n\nПиши чётко, по-русски.`
+        content: `Ты шеф-повар. Продукты: ${ingredients}\n\nПриготовь рецепт строго на ${servings} ${servings === 1 ? 'порцию' : servings < 5 ? 'порции' : 'порций'}. Рассчитай количество ингредиентов точно под это число порций — не больше и не меньше.\n\nДай рецепт:\n1. Название блюда\n2. Время приготовления\n3. Ингредиенты с точным количеством на ${servings} ${servings === 1 ? 'порцию' : servings < 5 ? 'порции' : 'порций'}\n4. Пошаговый рецепт (5-8 шагов)\n5. Совет по подаче\n\nПиши чётко, по-русски.`
       }]);
 
       return res.status(200).json({ text });
