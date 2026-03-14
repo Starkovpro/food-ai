@@ -10,7 +10,6 @@
     :root {
       --yellow: #F5C800;
       --yellow-dark: #D4A900;
-      --yellow-light: #FFF5B8;
       --black: #0F0F0F;
       --black2: #1A1A1A;
       --black3: #242424;
@@ -27,13 +26,10 @@
       background: var(--black);
       color: var(--white);
       min-height: 100vh;
-      padding: 2rem 1rem;
+      padding: 2rem 1rem 4rem;
     }
 
-    .app {
-      max-width: 680px;
-      margin: 0 auto;
-    }
+    .app { max-width: 680px; margin: 0 auto; }
 
     .header {
       text-align: center;
@@ -42,263 +38,228 @@
       border-bottom: 1px solid var(--black4);
     }
 
-    .logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
+    .logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 
     .logo-icon {
-      width: 44px;
-      height: 44px;
-      background: var(--yellow);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 44px; height: 44px;
+      background: var(--yellow); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
       font-size: 22px;
     }
 
-    .header h1 {
-      font-size: 26px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      color: var(--white);
-    }
+    .header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+    .header h1 span { color: var(--yellow); }
+    .header p { font-size: 14px; color: var(--gray); margin-top: 6px; }
 
-    .header h1 span {
-      color: var(--yellow);
-    }
-
-    .header p {
-      font-size: 14px;
-      color: var(--gray);
-      margin-top: 6px;
+    .frau-tag {
+      display: inline-block;
+      background: var(--black3); border: 1px solid var(--black4);
+      color: var(--gray); font-size: 11px;
+      padding: 3px 10px; border-radius: 20px; margin-top: 8px;
     }
 
     .tabs {
-      display: flex;
-      gap: 6px;
-      background: var(--black2);
-      padding: 4px;
-      border-radius: var(--radius);
-      margin-bottom: 1.5rem;
+      display: flex; gap: 6px;
+      background: var(--black2); padding: 4px;
+      border-radius: var(--radius); margin-bottom: 1.5rem;
       border: 1px solid var(--black4);
     }
 
     .tab {
-      flex: 1;
-      padding: 10px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      border-radius: 9px;
-      border: none;
-      background: transparent;
-      color: var(--gray);
-      transition: all 0.2s;
+      flex: 1; padding: 10px; text-align: center;
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      border-radius: 9px; border: none;
+      background: transparent; color: var(--gray); transition: all 0.2s;
     }
 
-    .tab.active {
-      background: var(--yellow);
-      color: var(--black);
-      font-weight: 600;
-    }
+    .tab.active { background: var(--yellow); color: var(--black); font-weight: 600; }
 
     .panel { display: none; }
     .panel.active { display: block; }
 
-    .upload-zone {
+    .upload-buttons { display: flex; gap: 10px; }
+
+    .upload-btn {
+      flex: 1; padding: 1.5rem 1rem;
       border: 1.5px dashed var(--black4);
       border-radius: var(--radius);
-      padding: 2.5rem 1.5rem;
-      text-align: center;
-      cursor: pointer;
-      background: var(--black2);
-      transition: all 0.2s;
+      background: var(--black2); color: var(--white);
+      cursor: pointer; text-align: center;
+      transition: all 0.2s; font-family: inherit; font-size: 14px;
     }
 
-    .upload-zone:hover {
-      border-color: var(--yellow);
-      background: var(--black3);
-    }
-
-    .upload-zone input { display: none; }
-    .upload-icon { font-size: 40px; margin-bottom: 12px; display: block; }
-
-    .upload-zone p {
-      font-size: 15px;
-      color: var(--white);
-      font-weight: 500;
-    }
-
-    .upload-zone span {
-      font-size: 13px;
-      color: var(--gray);
-      display: block;
-      margin-top: 4px;
-    }
+    .upload-btn:hover { border-color: var(--yellow); background: var(--black3); }
+    .upload-btn .btn-icon { font-size: 28px; display: block; margin-bottom: 8px; }
+    .upload-btn .btn-label { font-weight: 500; font-size: 14px; display: block; }
+    .upload-btn .btn-hint { font-size: 12px; color: var(--gray); margin-top: 3px; display: block; }
 
     .preview-wrap {
-      position: relative;
-      margin-top: 1rem;
-      border-radius: var(--radius);
-      overflow: hidden;
+      position: relative; margin-top: 0;
+      border-radius: var(--radius); overflow: hidden;
       border: 1px solid var(--black4);
     }
 
-    .preview-wrap img {
-      width: 100%;
-      max-height: 300px;
-      object-fit: cover;
-      display: block;
-    }
+    .preview-wrap img { width: 100%; max-height: 300px; object-fit: cover; display: block; }
 
     .remove-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(15,15,15,0.85);
-      border: 1px solid var(--black4);
-      color: var(--gray);
-      border-radius: 6px;
-      padding: 5px 12px;
-      font-size: 12px;
-      cursor: pointer;
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(15,15,15,0.85); border: 1px solid var(--black4);
+      color: var(--gray); border-radius: 6px;
+      padding: 5px 12px; font-size: 12px; cursor: pointer;
     }
 
+    .weight-wrap { display: none; margin-top: 1rem; }
+    .field-label { font-size: 13px; color: var(--gray); margin-bottom: 8px; display: block; }
+    .weight-row { display: flex; align-items: center; gap: 10px; }
+
+    input[type=number] {
+      flex: 1; padding: 12px 14px; font-size: 15px;
+      border: 1.5px solid var(--black4); border-radius: var(--radius);
+      background: var(--black2); color: var(--white);
+      font-family: inherit; outline: none; transition: border-color 0.2s;
+    }
+
+    input[type=number]:focus { border-color: var(--yellow); }
+    .unit-label { font-size: 15px; color: var(--gray); white-space: nowrap; }
+
     .btn {
-      width: 100%;
-      margin-top: 1rem;
-      padding: 13px;
-      background: var(--yellow);
-      border: none;
-      border-radius: var(--radius);
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--black);
-      cursor: pointer;
-      transition: all 0.2s;
+      width: 100%; margin-top: 1rem; padding: 13px;
+      background: var(--yellow); border: none; border-radius: var(--radius);
+      font-size: 15px; font-weight: 600; color: var(--black);
+      cursor: pointer; transition: all 0.2s;
     }
 
     .btn:hover { background: var(--yellow-dark); }
     .btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
     .result-card {
-      margin-top: 1rem;
-      background: var(--black2);
-      border: 1px solid var(--black4);
-      border-radius: var(--radius);
+      margin-top: 1rem; background: var(--black2);
+      border: 1px solid var(--black4); border-radius: var(--radius);
       padding: 1.25rem;
     }
 
     .result-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 12px;
     }
 
     .result-card h3 {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--gray);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
+      font-size: 12px; font-weight: 600; color: var(--gray);
+      text-transform: uppercase; letter-spacing: 0.8px;
     }
 
     .copy-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--black3);
-      border: 1px solid var(--black4);
-      color: var(--gray);
-      border-radius: var(--radius-sm);
-      padding: 5px 12px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
+      background: var(--black3); border: 1px solid var(--black4);
+      color: var(--gray); border-radius: var(--radius-sm);
+      padding: 5px 12px; font-size: 12px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
     }
 
-    .copy-btn:hover {
-      border-color: var(--yellow);
-      color: var(--yellow);
-    }
-
-    .copy-btn.copied {
-      border-color: #3b6d11;
-      color: #97c459;
-      background: #1a2a0a;
-    }
+    .copy-btn:hover { border-color: var(--yellow); color: var(--yellow); }
+    .copy-btn.copied { border-color: #3b6d11; color: #97c459; background: #1a2a0a; }
 
     .kcal-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--yellow);
-      color: var(--black);
-      padding: 7px 16px;
-      border-radius: 20px;
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 14px;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--yellow); color: var(--black);
+      padding: 7px 16px; border-radius: 20px;
+      font-size: 16px; font-weight: 700; margin-bottom: 14px;
     }
 
     .result-text {
-      font-size: 14px;
-      color: #b0b0a8;
-      line-height: 1.75;
-      white-space: pre-wrap;
+      font-size: 14px; color: #b0b0a8;
+      line-height: 1.75; white-space: pre-wrap;
     }
 
-    .ingredients-label {
-      font-size: 14px;
-      color: var(--gray);
-      margin-bottom: 8px;
-      display: block;
+    .trainer-card {
+      margin-top: 1rem;
+      background: #1a1a0a; border: 1px solid #3a3010;
+      border-radius: var(--radius); padding: 1rem 1.25rem;
+      display: flex; gap: 12px; align-items: flex-start;
     }
+
+    .trainer-avatar {
+      width: 36px; height: 36px; min-width: 36px;
+      background: var(--yellow); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    .trainer-name { font-size: 11px; color: var(--yellow); font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .trainer-text { font-size: 14px; color: #d0cfa8; line-height: 1.6; }
+
+    .diary-section {
+      margin-top: 2.5rem; padding-top: 2rem;
+      border-top: 1px solid var(--black4);
+    }
+
+    .diary-header {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 1rem;
+    }
+
+    .diary-title { font-size: 14px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.8px; }
+
+    .diary-clear {
+      font-size: 12px; color: var(--gray2);
+      background: none; border: none; cursor: pointer;
+      padding: 4px 8px; border-radius: 6px; transition: color 0.2s;
+    }
+
+    .diary-clear:hover { color: #f09595; }
+
+    .diary-empty {
+      text-align: center; padding: 2rem;
+      color: var(--gray2); font-size: 14px;
+      background: var(--black2); border: 1px solid var(--black4);
+      border-radius: var(--radius);
+    }
+
+    .diary-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .diary-item {
+      display: flex; align-items: center;
+      background: var(--black2); border: 1px solid var(--black4);
+      border-radius: var(--radius-sm); padding: 10px 14px; gap: 12px;
+    }
+
+    .diary-num {
+      width: 22px; height: 22px; min-width: 22px;
+      background: var(--black3); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: var(--gray);
+    }
+
+    .diary-info { flex: 1; min-width: 0; }
+    .diary-dish { font-size: 14px; color: var(--white); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .diary-meta { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+    .diary-kcal {
+      background: var(--yellow); color: var(--black);
+      font-size: 12px; font-weight: 700;
+      padding: 3px 10px; border-radius: 12px; white-space: nowrap;
+    }
+
+    .ingredients-label { font-size: 14px; color: var(--gray); margin-bottom: 8px; display: block; }
 
     textarea {
-      width: 100%;
-      min-height: 130px;
-      padding: 14px;
-      font-size: 14px;
-      border: 1.5px solid var(--black4);
-      border-radius: var(--radius);
-      resize: vertical;
-      background: var(--black2);
-      color: var(--white);
-      font-family: inherit;
-      line-height: 1.6;
-      transition: border-color 0.2s;
+      width: 100%; min-height: 130px; padding: 14px; font-size: 14px;
+      border: 1.5px solid var(--black4); border-radius: var(--radius);
+      resize: vertical; background: var(--black2); color: var(--white);
+      font-family: inherit; line-height: 1.6; transition: border-color 0.2s;
     }
 
     textarea::placeholder { color: var(--gray2); }
-
-    textarea:focus {
-      outline: none;
-      border-color: var(--yellow);
-    }
+    textarea:focus { outline: none; border-color: var(--yellow); }
 
     .loader {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 18px 0;
-      color: var(--gray);
-      font-size: 14px;
+      display: flex; align-items: center; gap: 10px;
+      padding: 18px 0; color: var(--gray); font-size: 14px;
     }
 
     .dots span {
-      display: inline-block;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--yellow);
+      display: inline-block; width: 6px; height: 6px;
+      border-radius: 50%; background: var(--yellow);
       animation: bounce 1.2s infinite;
     }
 
@@ -311,29 +272,14 @@
     }
 
     .error-msg {
-      font-size: 13px;
-      margin-top: 10px;
-      padding: 10px 14px;
-      background: #2a0a0a;
-      border: 1px solid #501313;
-      color: #f09595;
-      border-radius: var(--radius-sm);
-    }
-
-    .frau-tag {
-      display: inline-block;
-      background: var(--black3);
-      border: 1px solid var(--black4);
-      color: var(--gray);
-      font-size: 11px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      margin-top: 8px;
+      font-size: 13px; margin-top: 10px; padding: 10px 14px;
+      background: #2a0a0a; border: 1px solid #501313;
+      color: #f09595; border-radius: var(--radius-sm);
     }
 
     @media (max-width: 480px) {
       .header h1 { font-size: 20px; }
-      .tab { font-size: 13px; padding: 9px 6px; }
+      .tab { font-size: 12px; padding: 9px 4px; }
     }
   </style>
 </head>
@@ -355,11 +301,20 @@
 
   <!-- CALORIES TAB -->
   <div id="panel-calories" class="panel active">
-    <div class="upload-zone" id="dropzone" onclick="document.getElementById('fileInput').click()">
-      <input type="file" id="fileInput" accept="image/*" onchange="handleFile(this.files[0])">
-      <span class="upload-icon">📷</span>
-      <p>Загрузите фото блюда</p>
-      <span>JPG, PNG, WEBP — нажмите или перетащите файл</span>
+
+    <div class="upload-buttons" id="upload-buttons">
+      <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(this.files[0])">
+        <span class="btn-icon">🖼</span>
+        <span class="btn-label">Загрузить фото</span>
+        <span class="btn-hint">из галереи</span>
+      </button>
+      <button class="upload-btn" onclick="document.getElementById('cameraInput').click()">
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleFile(this.files[0])">
+        <span class="btn-icon">📷</span>
+        <span class="btn-label">Сфотографировать</span>
+        <span class="btn-hint">открыть камеру</span>
+      </button>
     </div>
 
     <div id="preview-wrap" class="preview-wrap" style="display:none">
@@ -367,13 +322,11 @@
       <button class="remove-btn" onclick="removeImage()">✕ Удалить</button>
     </div>
 
-    <div id="weight-wrap" style="display:none; margin-top: 1rem;">
-      <label class="ingredients-label" for="weight">Вес блюда (необязательно, но повысит точность):</label>
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <input type="number" id="weight" min="1" max="9999" placeholder="Например: 350"
-          style="flex:1; padding: 12px 14px; font-size: 15px; border: 1.5px solid var(--black4); border-radius: var(--radius); background: var(--black2); color: var(--white); font-family: inherit; outline: none; transition: border-color 0.2s;"
-          onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='var(--black4)'">
-        <span style="font-size: 15px; color: var(--gray); white-space: nowrap;">г (граммы)</span>
+    <div class="weight-wrap" id="weight-wrap">
+      <label class="field-label" for="weight">Вес блюда (необязательно, но повысит точность):</label>
+      <div class="weight-row">
+        <input type="number" id="weight" min="1" max="9999" placeholder="Например: 350">
+        <span class="unit-label">г (граммы)</span>
       </div>
     </div>
 
@@ -393,7 +346,24 @@
       <div class="result-text" id="cal-text"></div>
     </div>
 
+    <div id="trainer-card" class="trainer-card" style="display:none">
+      <div class="trainer-avatar">💪</div>
+      <div>
+        <div class="trainer-name">СОВЕТ ТРЕНЕРА</div>
+        <div class="trainer-text" id="trainer-text"></div>
+      </div>
+    </div>
+
     <div id="cal-error" class="error-msg" style="display:none"></div>
+
+    <div class="diary-section">
+      <div class="diary-header">
+        <span class="diary-title">📋 Дневник питания сегодня</span>
+        <button class="diary-clear" onclick="clearDiary()">Очистить</button>
+      </div>
+      <div id="diary-content"></div>
+    </div>
+
   </div>
 
   <!-- RECIPE TAB -->
@@ -435,14 +405,14 @@
     if (!file) return;
     const reader = new FileReader();
     reader.onload = e => {
-      const result = e.target.result;
-      imageBase64 = result.split(',')[1];
-      document.getElementById('preview-img').src = result;
+      imageBase64 = e.target.result.split(',')[1];
+      document.getElementById('preview-img').src = e.target.result;
       document.getElementById('preview-wrap').style.display = 'block';
-      document.getElementById('dropzone').style.display = 'none';
+      document.getElementById('upload-buttons').style.display = 'none';
       document.getElementById('btn-cal').disabled = false;
       document.getElementById('weight-wrap').style.display = 'block';
       document.getElementById('cal-result').style.display = 'none';
+      document.getElementById('trainer-card').style.display = 'none';
       document.getElementById('cal-error').style.display = 'none';
     };
     reader.readAsDataURL(file);
@@ -450,35 +420,68 @@
 
   function removeImage() {
     imageBase64 = null;
-    document.getElementById('weight-wrap').style.display = 'none';
     document.getElementById('preview-wrap').style.display = 'none';
-    document.getElementById('dropzone').style.display = 'block';
+    document.getElementById('upload-buttons').style.display = 'flex';
     document.getElementById('btn-cal').disabled = true;
+    document.getElementById('weight-wrap').style.display = 'none';
     document.getElementById('fileInput').value = '';
+    document.getElementById('cameraInput').value = '';
     document.getElementById('cal-result').style.display = 'none';
+    document.getElementById('trainer-card').style.display = 'none';
   }
-
-  const dropzone = document.getElementById('dropzone');
-  dropzone.addEventListener('dragover', e => { e.preventDefault(); });
-  dropzone.addEventListener('drop', e => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); });
 
   function copyText(id, btn) {
-    const text = document.getElementById(id).textContent;
-    navigator.clipboard.writeText(text).then(() => {
+    navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
       btn.textContent = '✓ Скопировано!';
       btn.classList.add('copied');
-      setTimeout(() => {
-        btn.innerHTML = '📋 Скопировать';
-        btn.classList.remove('copied');
-      }, 2000);
+      setTimeout(() => { btn.innerHTML = '📋 Скопировать'; btn.classList.remove('copied'); }, 2000);
     });
   }
+
+  function getDiary() {
+    try { return JSON.parse(localStorage.getItem('nsp_diary') || '[]'); } catch { return []; }
+  }
+
+  function saveToDiary(dish, kcal) {
+    let diary = getDiary();
+    const time = new Date().toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
+    diary.unshift({ dish, kcal, time });
+    if (diary.length > 5) diary = diary.slice(0, 5);
+    localStorage.setItem('nsp_diary', JSON.stringify(diary));
+    renderDiary();
+  }
+
+  function clearDiary() {
+    localStorage.removeItem('nsp_diary');
+    renderDiary();
+  }
+
+  function renderDiary() {
+    const diary = getDiary();
+    const el = document.getElementById('diary-content');
+    if (!diary.length) {
+      el.innerHTML = '<div class="diary-empty">Пока пусто — отсканируй первое блюдо 🍽</div>';
+      return;
+    }
+    el.innerHTML = '<div class="diary-list">' + diary.map((item, i) => `
+      <div class="diary-item">
+        <div class="diary-num">${i + 1}</div>
+        <div class="diary-info">
+          <div class="diary-dish">${item.dish}</div>
+          <div class="diary-meta">${item.time}</div>
+        </div>
+        ${item.kcal ? `<div class="diary-kcal">🔥 ${item.kcal} ккал</div>` : ''}
+      </div>`).join('') + '</div>';
+  }
+
+  renderDiary();
 
   async function analyzeCalories() {
     if (!imageBase64) return;
     document.getElementById('btn-cal').disabled = true;
     document.getElementById('cal-loader').style.display = 'flex';
     document.getElementById('cal-result').style.display = 'none';
+    document.getElementById('trainer-card').style.display = 'none';
     document.getElementById('cal-error').style.display = 'none';
 
     try {
@@ -493,13 +496,22 @@
 
       const text = data.text || '';
       const kcalMatch = text.match(/ККАЛ:\s*(\d+)/i);
+      const dishMatch = text.match(/БЛЮДО:\s*([^\n]+)/i);
       const kcal = kcalMatch ? kcalMatch[1] : null;
-      const body = text.replace(/ККАЛ:\s*\d+/i, '').trim();
+      const dish = dishMatch ? dishMatch[1].trim() : 'Блюдо';
+      const body = text.replace(/ККАЛ:\s*\d+/i, '').replace(/БЛЮДО:[^\n]+/i, '').trim();
 
-      document.getElementById('cal-badge').innerHTML = kcal
-        ? `<div class="kcal-badge">🔥 ~${kcal} ккал</div>` : '';
+      document.getElementById('cal-badge').innerHTML = kcal ? `<div class="kcal-badge">🔥 ~${kcal} ккал</div>` : '';
       document.getElementById('cal-text').textContent = body;
       document.getElementById('cal-result').style.display = 'block';
+
+      if (data.tip) {
+        document.getElementById('trainer-text').textContent = data.tip;
+        document.getElementById('trainer-card').style.display = 'flex';
+      }
+
+      if (kcal) saveToDiary(dish, kcal);
+
     } catch (e) {
       document.getElementById('cal-error').textContent = 'Ошибка: ' + e.message;
       document.getElementById('cal-error').style.display = 'block';
@@ -525,7 +537,6 @@
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
-
       document.getElementById('rec-text').textContent = data.text || '';
       document.getElementById('rec-result').style.display = 'block';
     } catch (e) {
