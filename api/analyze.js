@@ -1,4 +1,33 @@
 export default async function handler(req, res) {
+  // Check auth token
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Необходима авторизация' });
+  }
+
+  // Verify token with Supabase
+  const token = authHeader.split(' ')[1];
+  const supabaseRes = await fetch('https://siwibqrykqlyxiwtukst.supabase.co/auth/v1/user', {
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpd2licXJ5a3FseXhpd3R1a3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNzMwODEsImV4cCI6MjA4OTY0OTA4MX0.hACYQJs1Il0IykGGvbJKisFxvSYukHB0a3Mtnh2I-T4'
+    }
+  });
+
+  if (!supabaseRes.ok) {
+    return res.status(401).json({ error: 'Сессия истекла, войдите снова' });
+  }
+
+  const userData = await supabaseRes.json();
+
+  // Check trial period (7 days)
+  const registeredAt = new Date(userData.created_at);
+  const now = new Date();
+  const daysPassed = Math.floor((now - registeredAt) / (1000 * 60 * 60 * 24));
+
+  if (daysPassed >= 7) {
+    return res.status(403).json({ error: 'trial_expired' });
+  }
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
