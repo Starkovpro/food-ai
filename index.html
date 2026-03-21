@@ -10,6 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="НейроШеф">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -56,6 +57,130 @@
     .header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
     .header h1 span { color: var(--yellow); }
     .header p { font-size: 14px; color: var(--gray); margin-top: 6px; }
+
+    /* AUTH SCREEN */
+    .auth-screen {
+      position: fixed; inset: 0;
+      background: var(--black);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; padding: 2rem;
+    }
+
+    .auth-card {
+      background: var(--black2);
+      border: 1px solid var(--black4);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      max-width: 380px; width: 100%;
+      text-align: center;
+    }
+
+    .auth-logo {
+      width: 64px; height: 64px;
+      background: var(--yellow);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; margin: 0 auto 1.25rem;
+    }
+
+    .auth-title {
+      font-size: 22px; font-weight: 700;
+      color: var(--white); margin-bottom: 6px;
+    }
+
+    .auth-title span { color: var(--yellow); }
+
+    .auth-subtitle {
+      font-size: 14px; color: var(--gray);
+      line-height: 1.6; margin-bottom: 2rem;
+    }
+
+    .auth-btn {
+      width: 100%; padding: 13px 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--black4);
+      background: var(--black3);
+      color: var(--white);
+      font-size: 15px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center;
+      justify-content: center; gap: 10px;
+      margin-bottom: 10px; font-family: inherit;
+    }
+
+    .auth-btn:hover { border-color: var(--yellow); background: var(--black4); }
+
+    .auth-btn-google { }
+
+    .auth-divider {
+      font-size: 12px; color: var(--gray2);
+      margin: 1rem 0; position: relative;
+    }
+
+    .auth-trial {
+      font-size: 12px; color: var(--gray);
+      margin-top: 1.5rem; line-height: 1.6;
+    }
+
+    .auth-trial strong { color: var(--yellow); }
+
+    /* USER BAR */
+    .user-bar {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: var(--black2);
+      border-bottom: 1px solid var(--black4);
+      margin-bottom: 1.5rem;
+      border-radius: var(--radius);
+    }
+
+    .user-info { display: flex; align-items: center; gap: 10px; }
+
+    .user-avatar {
+      width: 32px; height: 32px;
+      background: var(--yellow);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: var(--black);
+    }
+
+    .user-email { font-size: 13px; color: var(--gray); }
+
+    .user-trial {
+      font-size: 11px; color: var(--yellow);
+      background: #1a1a0a; border: 1px solid #3a3010;
+      padding: 3px 8px; border-radius: 10px;
+    }
+
+    .logout-btn {
+      font-size: 12px; color: var(--gray2);
+      background: none; border: none;
+      cursor: pointer; padding: 4px 8px;
+      border-radius: 6px; transition: color 0.2s;
+      font-family: inherit;
+    }
+
+    .logout-btn:hover { color: #f09595; }
+
+    /* TRIAL EXPIRED */
+    .expired-screen {
+      text-align: center; padding: 3rem 1rem;
+    }
+
+    .expired-icon {
+      font-size: 48px; margin-bottom: 1rem; display: block;
+    }
+
+    .expired-title {
+      font-size: 20px; font-weight: 700;
+      color: var(--white); margin-bottom: 8px;
+    }
+
+    .expired-text {
+      font-size: 14px; color: var(--gray);
+      line-height: 1.7; margin-bottom: 2rem;
+    }
 
     .powered-badge {
       display: inline-flex;
@@ -317,6 +442,69 @@
       color: #f09595; border-radius: var(--radius-sm);
     }
 
+
+    /* POPUP */
+    .popup-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(0,0,0,0.85);
+      align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .popup-overlay.show { display: flex; }
+    .popup-box {
+      background: var(--black2); border: 1px solid var(--black4);
+      border-radius: 16px; padding: 1.75rem;
+      width: 100%; max-width: 420px;
+    }
+    .popup-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .popup-sub { font-size: 13px; color: var(--gray); margin-bottom: 1.5rem; }
+    .popup-row { margin-bottom: 1rem; }
+    .popup-row label { font-size: 13px; color: var(--gray); display: block; margin-bottom: 6px; }
+    .popup-row input, .popup-row select {
+      width: 100%; padding: 10px 12px; font-size: 14px;
+      border: 1.5px solid var(--black4); border-radius: var(--radius-sm);
+      background: var(--black3); color: var(--white);
+      font-family: inherit; outline: none; transition: border-color 0.2s;
+    }
+    .popup-row input:focus, .popup-row select:focus { border-color: var(--yellow); }
+    .popup-row select option { background: var(--black3); }
+    .popup-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .goal-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .goal-btn {
+      flex: 1; padding: 8px 10px; font-size: 13px; font-weight: 500;
+      border: 1.5px solid var(--black4); border-radius: 20px;
+      background: var(--black3); color: var(--gray);
+      cursor: pointer; font-family: inherit; transition: all 0.2s; text-align: center;
+    }
+    .goal-btn.active { background: var(--yellow); border-color: var(--yellow); color: var(--black); font-weight: 600; }
+
+    /* NORM BAR */
+    .norm-card {
+      background: var(--black2); border: 1px solid var(--black4);
+      border-radius: var(--radius); padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .norm-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .norm-label { font-size: 13px; color: var(--gray); }
+    .norm-numbers { font-size: 13px; }
+    .norm-eaten { font-weight: 700; color: var(--white); }
+    .norm-total { color: var(--gray); }
+    .norm-track {
+      height: 8px; background: var(--black4); border-radius: 4px; overflow: hidden;
+    }
+    .norm-fill {
+      height: 100%; border-radius: 4px;
+      background: var(--yellow);
+      transition: width 0.6s ease, background 0.3s;
+    }
+    .norm-rest { font-size: 12px; color: var(--gray); margin-top: 8px; text-align: right; }
+    .norm-edit {
+      font-size: 11px; color: var(--gray2); background: none; border: none;
+      cursor: pointer; padding: 0; text-decoration: underline;
+    }
+    .norm-edit:hover { color: var(--yellow); }
+
     @media (max-width: 480px) {
       .header h1 { font-size: 20px; }
       .tab { font-size: 12px; padding: 9px 4px; }
@@ -324,7 +512,38 @@
   </style>
 </head>
 <body>
-<div class="app">
+<!-- AUTH SCREEN -->
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">👨‍🍳</div>
+    <div class="auth-title"><span>Нейро</span> Шеф Повар</div>
+    <div class="auth-subtitle">Считает калории по фото и придумывает рецепты из того, что есть дома</div>
+
+    <button class="auth-btn auth-btn-google" onclick="signInGoogle()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2.04a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.5 10.48A4.8 4.8 0 0 1 4.5 7.5V5.43H1.83a8 8 0 0 0 0 7.12l2.67-2.07z"/><path fill="#EA4335" d="M8.98 3.58c1.32 0 2.5.45 3.44 1.35l2.54-2.54A8 8 0 0 0 1.83 5.43L4.5 7.5a4.77 4.77 0 0 1 4.48-3.92z"/></svg>
+      Войти через Google
+    </button>
+
+    <div class="auth-trial">
+      <strong>7 дней бесплатно</strong> — без карты и обязательств.<br>
+      После пробного периода — 1000 руб/мес.
+    </div>
+  </div>
+</div>
+
+<div class="app" id="main-app" style="display:none">
+  <!-- USER BAR -->
+  <div class="user-bar" id="user-bar">
+    <div class="user-info">
+      <div class="user-avatar" id="user-avatar">?</div>
+      <span class="user-email" id="user-email">загрузка...</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="user-trial" id="trial-badge">7 дней бесплатно</span>
+      <button class="logout-btn" onclick="signOut()">Выйти</button>
+    </div>
+  </div>
+
   <div class="header">
     <div class="logo">
       <div class="logo-icon">👨‍🍳</div>
@@ -335,6 +554,23 @@
       <span class="powered-dot"></span>
       Работает на Claude — самой умной AI-модели в мире
     </div>
+  </div>
+
+
+  <!-- NORM BAR -->
+  <div class="norm-card" id="norm-card" style="display:none">
+    <div class="norm-top">
+      <span class="norm-label">Норма калорий сегодня</span>
+      <button class="norm-edit" onclick="openProfile()">изменить</button>
+    </div>
+    <div style="display:flex; align-items:baseline; gap:4px; margin-bottom:8px;">
+      <span class="norm-eaten" id="norm-eaten">0</span>
+      <span class="norm-total" id="norm-total">/ 1800 ккал</span>
+    </div>
+    <div class="norm-track">
+      <div class="norm-fill" id="norm-fill" style="width:0%"></div>
+    </div>
+    <div class="norm-rest" id="norm-rest">осталось 1800 ккал</div>
   </div>
 
   <div class="tabs">
@@ -451,6 +687,91 @@
 </div>
 
 <script>
+  // SUPABASE INIT
+  const SUPABASE_URL = 'https://siwibqrykqlyxiwtukst.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpd2licXJ5a3FseXhpd3R1a3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNzMwODEsImV4cCI6MjA4OTY0OTA4MX0.hACYQJs1Il0IykGGvbJKisFxvSYukHB0a3Mtnh2I-T4';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let currentUser = null;
+
+  // Check auth on load
+  async function initAuth() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      showApp(session.user);
+    } else {
+      showAuthScreen();
+    }
+
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        showApp(session.user);
+      } else {
+        showAuthScreen();
+      }
+    });
+  }
+
+  function showAuthScreen() {
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('main-app').style.display = 'none';
+    currentUser = null;
+  }
+
+  function showApp(user) {
+    currentUser = user;
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+
+    // Set user info
+    const email = user.email || 'пользователь';
+    const avatar = email[0].toUpperCase();
+    document.getElementById('user-email').textContent = email;
+    document.getElementById('user-avatar').textContent = avatar;
+
+    // Check trial
+    const registeredAt = new Date(user.created_at);
+    const now = new Date();
+    const daysPassed = Math.floor((now - registeredAt) / (1000 * 60 * 60 * 24));
+    const daysLeft = 7 - daysPassed;
+    const badge = document.getElementById('trial-badge');
+
+    if (daysLeft > 0) {
+      badge.textContent = 'Пробный период: ' + daysLeft + ' дн.';
+      badge.style.display = 'inline-block';
+    } else {
+      badge.textContent = 'Подписка нужна';
+      badge.style.background = '#2a0a0a';
+      badge.style.borderColor = '#501313';
+      badge.style.color = '#f09595';
+    }
+  }
+
+  async function signInGoogle() {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin
+      }
+    });
+    if (error) alert('Ошибка входа: ' + error.message);
+  }
+
+  async function signOut() {
+    await supabase.auth.signOut();
+  }
+
+  function isTrialActive() {
+    if (!currentUser) return false;
+    const registeredAt = new Date(currentUser.created_at);
+    const now = new Date();
+    const daysPassed = Math.floor((now - registeredAt) / (1000 * 60 * 60 * 24));
+    return daysPassed < 7;
+  }
+
+  // Init on load
+  initAuth();
+
   let imageBase64 = null;
   let selectedPortions = 1;
 
@@ -565,9 +886,10 @@
 
     try {
       const weight = document.getElementById('weight').value;
+      const session1 = (await supabase.auth.getSession()).data.session;
       const res = await fetch('/api/analyze', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session1?.access_token },
         body: JSON.stringify({ type: 'calories', imageBase64, weight, dishName: document.getElementById('dish-name').value })
       });
       const data = await res.json();
@@ -609,9 +931,10 @@
     document.getElementById('rec-error').style.display = 'none';
 
     try {
+      const session2 = (await supabase.auth.getSession()).data.session;
       const res = await fetch('/api/analyze', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session2?.access_token },
         body: JSON.stringify({ type: 'recipe', ingredients, portions: selectedPortions })
       });
       const data = await res.json();
@@ -634,5 +957,59 @@
       });
     }
   </script>
+
+<!-- PROFILE POPUP -->
+<div class="popup-overlay" id="profile-popup">
+  <div class="popup-box">
+    <div class="popup-title">👋 Привет!</div>
+    <div class="popup-sub">Введи данные один раз — и я буду считать твою личную норму калорий</div>
+
+    <div class="popup-row">
+      <label>Пол</label>
+      <div class="goal-btns">
+        <button class="goal-btn active" id="sex-f" onclick="selectSex('female', this)">Женский</button>
+        <button class="goal-btn" id="sex-m" onclick="selectSex('male', this)">Мужской</button>
+      </div>
+    </div>
+
+    <div class="popup-two">
+      <div class="popup-row">
+        <label>Возраст (лет)</label>
+        <input type="number" id="p-age" min="10" max="100" placeholder="30">
+      </div>
+      <div class="popup-row">
+        <label>Вес (кг)</label>
+        <input type="number" id="p-weight" min="30" max="300" placeholder="65">
+      </div>
+    </div>
+
+    <div class="popup-row">
+      <label>Рост (см)</label>
+      <input type="number" id="p-height" min="100" max="250" placeholder="168">
+    </div>
+
+    <div class="popup-row">
+      <label>Активность</label>
+      <select id="p-activity">
+        <option value="1.2">Минимальная (сидячий образ жизни)</option>
+        <option value="1.375" selected>Лёгкая (1-3 тренировки в неделю)</option>
+        <option value="1.55">Средняя (3-5 тренировок в неделю)</option>
+        <option value="1.725">Высокая (6-7 тренировок в неделю)</option>
+      </select>
+    </div>
+
+    <div class="popup-row">
+      <label>Цель</label>
+      <div class="goal-btns">
+        <button class="goal-btn" onclick="selectGoal(-300, this)">Похудеть</button>
+        <button class="goal-btn active" onclick="selectGoal(0, this)">Держать вес</button>
+        <button class="goal-btn" onclick="selectGoal(300, this)">Набрать</button>
+      </div>
+    </div>
+
+    <button class="btn" style="margin-top:0.5rem" onclick="saveProfile()">Сохранить и начать</button>
+  </div>
+</div>
+
 </body>
 </html>
