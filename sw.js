@@ -1,4 +1,4 @@
-const CACHE = 'neyro-shef-v1';
+const CACHE = 'neyro-shef-v2';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
