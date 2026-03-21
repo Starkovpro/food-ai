@@ -687,15 +687,20 @@
 </div>
 
 <script>
-  // SUPABASE INIT
   const SUPABASE_URL = 'https://siwibqrykqlyxiwtukst.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpd2licXJ5a3FseXhpd3R1a3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNzMwODEsImV4cCI6MjA4OTY0OTA4MX0.hACYQJs1Il0IykGGvbJKisFxvSYukHB0a3Mtnh2I-T4';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+  let _supabase = null;
   let currentUser = null;
 
-  // Check auth on load
+  function getSupabase() {
+    if (!_supabase) {
+      _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
+    return _supabase;
+  }
+
   async function initAuth() {
+    const supabase = getSupabase();
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
       showApp(session.user);
@@ -703,7 +708,7 @@
       showAuthScreen();
     }
 
-    supabase.auth.onAuthStateChange((event, session) => {
+    getSupabase().auth.onAuthStateChange((event, session) => {
       if (session) {
         showApp(session.user);
       } else {
@@ -748,6 +753,7 @@
   }
 
   async function signInGoogle() {
+    const supabase = getSupabase();
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -758,7 +764,7 @@
   }
 
   async function signOut() {
-    await supabase.auth.signOut();
+    await getSupabase().auth.signOut();
   }
 
   function isTrialActive() {
@@ -886,7 +892,7 @@
 
     try {
       const weight = document.getElementById('weight').value;
-      const session1 = (await supabase.auth.getSession()).data.session;
+      const session1 = (await getSupabase().auth.getSession()).data.session;
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session1?.access_token },
@@ -931,7 +937,7 @@
     document.getElementById('rec-error').style.display = 'none';
 
     try {
-      const session2 = (await supabase.auth.getSession()).data.session;
+      const session2 = (await getSupabase().auth.getSession()).data.session;
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session2?.access_token },
