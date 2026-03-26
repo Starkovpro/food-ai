@@ -509,9 +509,177 @@
       .header h1 { font-size: 20px; }
       .tab { font-size: 12px; padding: 9px 4px; }
     }
+
+    /* ONBOARDING */
+    .onboarding-screen {
+      position: fixed; inset: 0;
+      background: var(--black);
+      display: none; align-items: center; justify-content: center;
+      z-index: 999; padding: 2rem 1rem;
+    }
+
+    .onboarding-card {
+      background: var(--black2);
+      border: 1px solid var(--black4);
+      border-radius: 20px;
+      padding: 2rem 1.5rem;
+      max-width: 400px; width: 100%;
+      text-align: center;
+    }
+
+    .onboarding-steps {
+      display: flex; gap: 6px; justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .onboarding-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--black4);
+      transition: all 0.3s;
+    }
+
+    .onboarding-dot.active { background: var(--yellow); width: 24px; border-radius: 4px; }
+    .onboarding-dot.done { background: var(--gray2); }
+
+    .onboarding-icon { font-size: 48px; margin-bottom: 1rem; display: block; }
+    .onboarding-title { font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+    .onboarding-title span { color: var(--yellow); }
+    .onboarding-sub { font-size: 14px; color: var(--gray); line-height: 1.6; margin-bottom: 1.5rem; }
+
+    .onboarding-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.5rem; }
+
+    .onboarding-option {
+      padding: 12px 16px;
+      border: 1.5px solid var(--black4);
+      border-radius: var(--radius);
+      background: var(--black3);
+      color: var(--white);
+      font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
+      text-align: left; font-family: inherit;
+      display: flex; align-items: center; gap: 12px;
+    }
+
+    .onboarding-option:hover { border-color: var(--yellow); }
+    .onboarding-option.selected { border-color: var(--yellow); background: #1a1a0a; color: var(--yellow); }
+    .onboarding-option .opt-icon { font-size: 20px; }
+    .onboarding-option .opt-text { flex: 1; }
+    .onboarding-option .opt-sub { font-size: 12px; color: var(--gray); font-weight: 400; display: block; margin-top: 2px; }
+
+    .onboarding-name-input {
+      width: 100%; padding: 14px;
+      font-size: 18px; text-align: center;
+      border: 1.5px solid var(--black4);
+      border-radius: var(--radius);
+      background: var(--black3); color: var(--white);
+      font-family: inherit; outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 1rem;
+    }
+
+    .onboarding-name-input:focus { border-color: var(--yellow); }
+    .onboarding-name-input::placeholder { color: var(--gray2); font-size: 15px; }
+
+    .onboarding-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 1.5rem; }
+
+    .onboarding-tag {
+      padding: 6px 14px;
+      border: 1px solid var(--black4);
+      border-radius: 20px;
+      background: var(--black3);
+      color: var(--gray);
+      font-size: 13px; cursor: pointer;
+      transition: all 0.2s; font-family: inherit;
+    }
+
+    .onboarding-tag:hover { border-color: var(--yellow); color: var(--yellow); }
+
+    .onboarding-btn {
+      width: 100%; padding: 13px;
+      background: var(--yellow); border: none;
+      border-radius: var(--radius);
+      font-size: 15px; font-weight: 600;
+      color: var(--black); cursor: pointer;
+      transition: all 0.2s; font-family: inherit;
+    }
+
+    .onboarding-btn:hover { background: var(--yellow-dark); }
+    .onboarding-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .onboarding-skip {
+      display: block; margin-top: 12px;
+      font-size: 12px; color: var(--gray2);
+      background: none; border: none;
+      cursor: pointer; font-family: inherit;
+    }
+
+    .onboarding-skip:hover { color: var(--gray); }
+
+    /* PRIVACY CONSENT */
+    .consent-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--black2);
+      border-top: 1px solid var(--black4);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 1rem;
+      z-index: 998; flex-wrap: wrap;
+    }
+
+    .consent-text { font-size: 12px; color: var(--gray); flex: 1; min-width: 200px; }
+    .consent-text a { color: var(--yellow); }
+    .consent-btn {
+      padding: 8px 20px;
+      background: var(--yellow); border: none;
+      border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 600;
+      color: var(--black); cursor: pointer;
+      white-space: nowrap; font-family: inherit;
+    }
+
+    /* WELCOME SCREEN after onboarding */
+    .welcome-features {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-bottom: 1.5rem; text-align: left;
+    }
+
+    .welcome-feature {
+      background: var(--black3);
+      border: 1px solid var(--black4);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+    }
+
+    .welcome-feature .feat-icon { font-size: 22px; display: block; margin-bottom: 6px; }
+    .welcome-feature .feat-title { font-size: 13px; font-weight: 600; color: var(--white); }
+    .welcome-feature .feat-sub { font-size: 11px; color: var(--gray); margin-top: 2px; }
   </style>
 </head>
 <body>
+<!-- CONSENT BAR -->
+<div class="consent-bar" id="consent-bar" style="display:none">
+  <span class="consent-text">
+    Используя сервис, вы соглашаетесь с нашей
+    <a href="/privacy.html" target="_blank">политикой конфиденциальности</a>.
+    Данные аккаунта хранятся на защищённых серверах.
+  </span>
+  <button class="consent-btn" onclick="acceptConsent()">Принять и продолжить</button>
+</div>
+
+<!-- ONBOARDING SCREEN -->
+<div class="onboarding-screen" id="onboarding-screen">
+  <div class="onboarding-card">
+    <div class="onboarding-steps" id="onboarding-steps">
+      <div class="onboarding-dot active" id="dot-0"></div>
+      <div class="onboarding-dot" id="dot-1"></div>
+      <div class="onboarding-dot" id="dot-2"></div>
+      <div class="onboarding-dot" id="dot-3"></div>
+    </div>
+    <div id="onboarding-content"></div>
+  </div>
+</div>
+
 <!-- AUTH SCREEN -->
 <div class="auth-screen" id="auth-screen">
   <div class="auth-card">
@@ -640,7 +808,7 @@
     <div id="trainer-card" class="trainer-card" style="display:none">
       <div class="trainer-avatar">💪</div>
       <div>
-        <div class="trainer-name">СОВЕТ ТРЕНЕРА</div>
+        <div class="trainer-name" id="trainer-name">СОВЕТ ТРЕНЕРА</div>
         <div class="trainer-text" id="trainer-text"></div>
       </div>
     </div>
@@ -693,6 +861,169 @@
 </div>
 
 <script>
+  // ONBOARDING
+  let onboardingStep = 0;
+  let companion = { name: '', gender: '', character: '', goals: [] };
+
+  const onboardingScreens = [
+    {
+      icon: '👋',
+      title: 'Привет! Я <span>Нейро Шеф Повар</span>',
+      sub: 'Прежде чем начать — позволь мне стать твоим. Создай своего ИИ-помощника за 1 минуту.',
+      render: () => `
+        <span class="onboarding-icon">👋</span>
+        <div class="onboarding-title">Привет! Я <span>Нейро Шеф Повар</span></div>
+        <div class="onboarding-sub">Прежде чем начать — создай своего персонального ИИ-помощника. Это займёт 1 минуту.</div>
+        <div class="welcome-features">
+          <div class="welcome-feature">
+            <span class="feat-icon">📷</span>
+            <div class="feat-title">Калории по фото</div>
+            <div class="feat-sub">Сфотографируй еду</div>
+          </div>
+          <div class="welcome-feature">
+            <span class="feat-icon">🍳</span>
+            <div class="feat-title">Рецепты</div>
+            <div class="feat-sub">Из того что есть дома</div>
+          </div>
+          <div class="welcome-feature">
+            <span class="feat-icon">💪</span>
+            <div class="feat-title">Совет тренера</div>
+            <div class="feat-sub">После каждого анализа</div>
+          </div>
+          <div class="welcome-feature">
+            <span class="feat-icon">📋</span>
+            <div class="feat-title">Дневник питания</div>
+            <div class="feat-sub">История и прогресс</div>
+          </div>
+        </div>
+        <button class="onboarding-btn" onclick="nextOnboarding()">Создать помощника →</button>
+      `
+    },
+    {
+      render: () => `
+        <span class="onboarding-icon">✨</span>
+        <div class="onboarding-title">Как меня назвать?</div>
+        <div class="onboarding-sub">Придумай имя для своего помощника</div>
+        <input class="onboarding-name-input" id="companion-name" placeholder="Например: Саша, Лея, Макс..." maxlength="20" oninput="companion.name = this.value">
+        <div class="onboarding-tags">
+          ${['Саша','Лея','Соня','Макс','Ника','Арт'].map(n => `<button class="onboarding-tag" onclick="setName('${n}')">${n}</button>`).join('')}
+        </div>
+        <button class="onboarding-btn" id="btn-name" onclick="nextOnboarding()" disabled>Это моё имя →</button>
+      `
+    },
+    {
+      render: () => `
+        <span class="onboarding-icon">🌟</span>
+        <div class="onboarding-title">Каким я буду?</div>
+        <div class="onboarding-sub">Выбери образ своего помощника</div>
+        <div class="onboarding-options">
+          <button class="onboarding-option" onclick="selectGender('female', this)">
+            <span class="opt-icon">👩</span>
+            <span class="opt-text">Подруга<span class="opt-sub">Тёплая и женственная</span></span>
+          </button>
+          <button class="onboarding-option" onclick="selectGender('male', this)">
+            <span class="opt-icon">👨</span>
+            <span class="opt-text">Друг<span class="opt-sub">Надёжный и мужской</span></span>
+          </button>
+          <button class="onboarding-option" onclick="selectGender('neutral', this)">
+            <span class="opt-icon">🌟</span>
+            <span class="opt-text">Свой<span class="opt-sub">Нейтральный и современный</span></span>
+          </button>
+        </div>
+        <button class="onboarding-btn" id="btn-gender" onclick="nextOnboarding()" disabled>Отлично →</button>
+      `
+    },
+    {
+      render: () => `
+        <span class="onboarding-icon">💫</span>
+        <div class="onboarding-title">Какой характер?</div>
+        <div class="onboarding-sub">Выбери как ${companion.name || 'помощник'} будет с тобой общаться</div>
+        <div class="onboarding-options">
+          <button class="onboarding-option" onclick="selectChar('warm', this)">
+            <span class="opt-icon">🤗</span>
+            <span class="opt-text">Тёплый и заботливый<span class="opt-sub">Всегда поддержу и пойму</span></span>
+          </button>
+          <button class="onboarding-option" onclick="selectChar('sharp', this)">
+            <span class="opt-icon">⚡</span>
+            <span class="opt-text">Чёткий и мотивирующий<span class="opt-sub">Скажу правду и помогу действовать</span></span>
+          </button>
+          <button class="onboarding-option" onclick="selectChar('fun', this)">
+            <span class="opt-icon">😄</span>
+            <span class="opt-text">Весёлый и с юмором<span class="opt-sub">Даже сложное сделаю лёгким</span></span>
+          </button>
+          <button class="onboarding-option" onclick="selectChar('wise', this)">
+            <span class="opt-icon">🧘</span>
+            <span class="opt-text">Мудрый и спокойный<span class="opt-sub">Помогу найти ответы внутри себя</span></span>
+          </button>
+        </div>
+        <button class="onboarding-btn" id="btn-char" onclick="finishOnboarding()" disabled>Готово! →</button>
+      `
+    }
+  ];
+
+  function renderOnboarding() {
+    document.getElementById('onboarding-content').innerHTML = onboardingScreens[onboardingStep].render();
+    for (let i = 0; i < 4; i++) {
+      const dot = document.getElementById('dot-' + i);
+      dot.className = 'onboarding-dot' + (i === onboardingStep ? ' active' : i < onboardingStep ? ' done' : '');
+    }
+    if (onboardingStep === 1) {
+      const input = document.getElementById('companion-name');
+      if (input) {
+        input.addEventListener('input', () => {
+          document.getElementById('btn-name').disabled = input.value.trim().length < 1;
+        });
+      }
+    }
+  }
+
+  function nextOnboarding() {
+    onboardingStep++;
+    renderOnboarding();
+  }
+
+  function setName(name) {
+    companion.name = name;
+    document.getElementById('companion-name').value = name;
+    document.getElementById('btn-name').disabled = false;
+  }
+
+  function selectGender(gender, btn) {
+    companion.gender = gender;
+    document.querySelectorAll('#onboarding-content .onboarding-option').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('btn-gender').disabled = false;
+  }
+
+  function selectChar(char, btn) {
+    companion.character = char;
+    document.querySelectorAll('#onboarding-content .onboarding-option').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('btn-char').disabled = false;
+  }
+
+  function finishOnboarding() {
+    localStorage.setItem('companion', JSON.stringify(companion));
+    localStorage.setItem('onboarding_done', '1');
+    document.getElementById('onboarding-screen').style.display = 'none';
+    updateCompanionInUI();
+  }
+
+  function updateCompanionInUI() {
+    const saved = localStorage.getItem('companion');
+    if (!saved) return;
+    const c = JSON.parse(saved);
+    if (c.name) {
+      const trainerName = document.getElementById('trainer-name');
+      if (trainerName) trainerName.textContent = c.name.toUpperCase();
+    }
+  }
+
+  function acceptConsent() {
+    localStorage.setItem('consent_accepted', '1');
+    document.getElementById('consent-bar').style.display = 'none';
+  }
+
   const SUPABASE_URL = 'https://siwibqrykqlyxiwtukst.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpd2licXJ5a3FseXhpd3R1a3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNzMwODEsImV4cCI6MjA4OTY0OTA4MX0.hACYQJs1Il0IykGGvbJKisFxvSYukHB0a3Mtnh2I-T4';
   let _supabase = null;
@@ -742,7 +1073,21 @@
   function showApp(user) {
     currentUser = user;
     document.getElementById('auth-screen').style.display = 'none';
+
+    // Show consent bar if not accepted
+    if (!localStorage.getItem('consent_accepted')) {
+      document.getElementById('consent-bar').style.display = 'flex';
+    }
+
+    // Show onboarding if not done
+    if (!localStorage.getItem('onboarding_done')) {
+      document.getElementById('onboarding-screen').style.display = 'flex';
+      onboardingStep = 0;
+      renderOnboarding();
+    }
+
     document.getElementById('main-app').style.display = 'block';
+    updateCompanionInUI();
 
     // Set user info
     const email = user.display_name || user.email || 'пользователь';
