@@ -1334,6 +1334,82 @@
   }
 </script>
   <script>
+    // PROFILE FUNCTIONS
+    let profileGoalOffset = 0;
+
+    function openProfile() {
+      document.getElementById('profile-popup').classList.add('show');
+      const p = JSON.parse(localStorage.getItem('user_profile') || '{}');
+      if (p.sex) {
+        document.getElementById('sex-f').classList.toggle('active', p.sex === 'female');
+        document.getElementById('sex-m').classList.toggle('active', p.sex === 'male');
+      }
+      if (p.age) document.getElementById('p-age').value = p.age;
+      if (p.weight) document.getElementById('p-weight').value = p.weight;
+      if (p.height) document.getElementById('p-height').value = p.height;
+      if (p.activity) document.getElementById('p-activity').value = p.activity;
+      profileGoalOffset = p.goalOffset || 0;
+    }
+
+    function selectSex(sex, btn) {
+      document.getElementById('sex-f').classList.toggle('active', sex === 'female');
+      document.getElementById('sex-m').classList.toggle('active', sex === 'male');
+    }
+
+    function selectGoal(offset, btn) {
+      profileGoalOffset = offset;
+      document.querySelectorAll('#profile-popup .goal-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function saveProfile() {
+      const sex = document.getElementById('sex-f').classList.contains('active') ? 'female' : 'male';
+      const age = parseInt(document.getElementById('p-age').value);
+      const weight = parseFloat(document.getElementById('p-weight').value);
+      const height = parseFloat(document.getElementById('p-height').value);
+      const activity = parseFloat(document.getElementById('p-activity').value);
+
+      if (!age || !weight || !height) {
+        alert('Пожалуйста заполни все поля');
+        return;
+      }
+
+      // Mifflin formula
+      let bmr = sex === 'female'
+        ? 10 * weight + 6.25 * height - 5 * age - 161
+        : 10 * weight + 6.25 * height - 5 * age + 5;
+      const norm = Math.round(bmr * activity + profileGoalOffset);
+
+      const profile = { sex, age, weight, height, activity, goalOffset: profileGoalOffset, norm };
+      localStorage.setItem('user_profile', JSON.stringify(profile));
+      document.getElementById('profile-popup').classList.remove('show');
+      renderNorm();
+    }
+
+    function renderNorm() {
+      const p = JSON.parse(localStorage.getItem('user_profile') || '{}');
+      const normEl = document.getElementById('norm-display');
+      if (!normEl) return;
+      if (p.norm) {
+        normEl.style.display = 'block';
+        document.getElementById('norm-value').textContent = p.norm;
+        updateProgressBar();
+      }
+    }
+
+    function updateProgressBar() {
+      const p = JSON.parse(localStorage.getItem('user_profile') || '{}');
+      if (!p.norm) return;
+      const diary = getDiary();
+      const todayKcal = diary.reduce((sum, item) => sum + (parseInt(item.kcal) || 0), 0);
+      const pct = Math.min(100, Math.round(todayKcal / p.norm * 100));
+      const el = document.getElementById('progress-bar-fill');
+      const label = document.getElementById('progress-label');
+      if (el) el.style.width = pct + '%';
+      if (label) label.textContent = todayKcal + ' из ' + p.norm + ' ккал (' + pct + '%)';
+      if (el) el.style.background = pct > 100 ? '#f09595' : pct > 80 ? '#EF9F27' : 'var(--yellow)';
+    }
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js');
