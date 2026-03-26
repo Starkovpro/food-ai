@@ -616,6 +616,23 @@
 
     .onboarding-skip:hover { color: var(--gray); }
 
+    /* RATE LIMIT */
+    .limit-banner {
+      background: #1a0a0a; border: 1px solid #501313;
+      border-radius: var(--radius); padding: 1rem 1.25rem;
+      margin-top: 1rem; text-align: center;
+    }
+    .limit-banner .limit-title { font-size: 15px; font-weight: 600; color: #f09595; margin-bottom: 6px; }
+    .limit-banner .limit-sub { font-size: 13px; color: #888880; line-height: 1.6; }
+    .limit-counter {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--black3); border: 1px solid var(--black4);
+      border-radius: 20px; padding: 4px 12px;
+      font-size: 12px; color: var(--gray); margin-bottom: 1rem;
+    }
+    .limit-counter.warning { border-color: #854f0b; color: #EF9F27; background: #1a0f00; }
+    .limit-counter.danger { border-color: #501313; color: #f09595; background: #1a0000; }
+
     /* PRIVACY CONSENT */
     .consent-bar {
       position: fixed; bottom: 0; left: 0; right: 0;
@@ -708,6 +725,7 @@
       <span class="user-email" id="user-email">загрузка...</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
+      <span class="limit-counter" id="limit-counter">⚡ Запросов: ...</span>
       <span class="user-trial" id="trial-badge">7 дней бесплатно</span>
       <button class="logout-btn" onclick="signOut()">Выйти</button>
     </div>
@@ -1004,6 +1022,33 @@
     updateCompanionInUI();
   }
 
+  async function checkSubscription() {
+    try {
+      const session = (await getSupabase().auth.getSession()).data.session;
+      if (!session) return;
+      const res = await fetch('/api/check-subscription', {
+        headers: { 'Authorization': 'Bearer ' + session.access_token }
+      });
+      const data = await res.json();
+      if (data.hasSubscription) {
+        localStorage.setItem('has_subscription', '1');
+        const badge = document.getElementById('trial-badge');
+        if (badge) {
+          const exp = new Date(data.expiresAt).toLocaleDateString('ru');
+          badge.textContent = '⭐ Подписка до ' + exp;
+          badge.style.background = '#0f2a0f';
+          badge.style.borderColor = '#3b6d11';
+          badge.style.color = '#97c459';
+        }
+      } else {
+        localStorage.removeItem('has_subscription');
+      }
+      updateLimitCounter();
+    } catch (e) {
+      console.log('Subscription check failed:', e.message);
+    }
+  }
+
   function updateCompanionInUI() {
     const saved = localStorage.getItem('companion');
     if (!saved) return;
@@ -1083,6 +1128,9 @@
 
     document.getElementById('main-app').style.display = 'block';
     updateCompanionInUI();
+    updateLimitCounter();
+    renderNorm();
+    checkSubscription();
 
     // Set user info
     const email = user.display_name || user.email || 'пользователь';
@@ -1256,6 +1304,11 @@
 
   async function analyzeCalories() {
     if (!imageBase64) return;
+    if (!canMakeRequest()) {
+      showLimitBanner('cal-error');
+      document.getElementById('cal-error').style.display = 'block';
+      return;
+    }
     document.getElementById('btn-cal').disabled = true;
     document.getElementById('cal-loader').style.display = 'flex';
     document.getElementById('cal-result').style.display = 'none';
@@ -1273,6 +1326,7 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
 
+      incrementRequests();
       const text = data.text || '';
       const kcalMatch = text.match(/ККАЛ:\s*(\d+)/i);
       const dishMatch = text.match(/БЛЮДО:\s*([^\n]+)/i);
@@ -1303,6 +1357,11 @@
   async function getRecipe() {
     const ingredients = document.getElementById('ingredients').value.trim();
     if (!ingredients) return;
+    if (!canMakeRequest()) {
+      showLimitBanner('rec-error');
+      document.getElementById('rec-error').style.display = 'block';
+      return;
+    }
     document.getElementById('btn-rec').disabled = true;
     document.getElementById('rec-loader').style.display = 'flex';
     document.getElementById('rec-result').style.display = 'none';
@@ -1317,6 +1376,7 @@
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
+      incrementRequests();
       document.getElementById('rec-text').textContent = data.text || '';
       document.getElementById('rec-result').style.display = 'block';
     } catch (e) {
@@ -1329,6 +1389,62 @@
   }
 </script>
   <script>
+    // RATE LIMITING
+    const FREE_LIMIT = 3;
+    const PAID_LIMIT = 50;
+
+    function getTodayKey() {
+      return 'requests_' + new Date().toISOString().split('T')[0];
+    }
+
+    function getRequestsToday() {
+      return parseInt(localStorage.getItem(getTodayKey()) || '0');
+    }
+
+    function incrementRequests() {
+      const key = getTodayKey();
+      const count = getRequestsToday() + 1;
+      localStorage.setItem(key, count);
+      // Clean old keys
+      Object.keys(localStorage).forEach(k => {
+        if (k.startsWith('requests_') && k !== key) localStorage.removeItem(k);
+      });
+      updateLimitCounter();
+      return count;
+    }
+
+    function getDailyLimit() {
+      return localStorage.getItem('has_subscription') === '1' ? PAID_LIMIT : FREE_LIMIT;
+    }
+
+    function canMakeRequest() {
+      return getRequestsToday() < getDailyLimit();
+    }
+
+    function updateLimitCounter() {
+      const used = getRequestsToday();
+      const limit = getDailyLimit();
+      const left = Math.max(0, limit - used);
+      const el = document.getElementById('limit-counter');
+      if (!el) return;
+      el.textContent = '⚡ Запросов сегодня: ' + left + ' из ' + limit;
+      el.className = 'limit-counter' + (left <= 1 ? ' danger' : left <= Math.ceil(limit * 0.3) ? ' warning' : '');
+    }
+
+    function showLimitBanner(containerId) {
+      const limit = getDailyLimit();
+      const isFree = limit === FREE_LIMIT;
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      el.innerHTML = `<div class="limit-banner">
+        <div class="limit-title">⚡ Лимит запросов на сегодня исчерпан</div>
+        <div class="limit-sub">${isFree
+          ? 'На бесплатном плане доступно ' + FREE_LIMIT + ' запроса в день.<br>Возвращайся завтра или оформи подписку для ' + PAID_LIMIT + ' запросов в день.'
+          : 'На твоём плане доступно ' + PAID_LIMIT + ' запросов в день.<br>Лимит обновится завтра в полночь.'
+        }</div>
+      </div>`;
+    }
+
     // PROFILE FUNCTIONS
     let profileGoalOffset = 0;
 
