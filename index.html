@@ -10,6 +10,54 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="НейроШеф">
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Нейро Шеф Повар — ИИ-помощник для подсчёта калорий по фото и создания рецептов из продуктов которые есть дома. 7 дней бесплатно.">
+  <meta name="keywords" content="подсчёт калорий, калории по фото, рецепты из продуктов, дневник питания, здоровое питание, ИИ диетолог">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://food-ai-omega.vercel.app/">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Нейро Шеф Повар — калории по фото и рецепты на ИИ">
+  <meta property="og:description" content="Сфотографируй еду — узнай калории. Перечисли продукты — получи рецепт. Работает на Claude, самой умной AI-модели в мире.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://food-ai-omega.vercel.app">
+  <meta property="og:image" content="https://food-ai-omega.vercel.app/icon-512.png">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:site_name" content="Нейро Шеф Повар">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Нейро Шеф Повар — калории по фото и рецепты на ИИ">
+  <meta name="twitter:description" content="Сфотографируй еду — узнай калории. Перечисли продукты — получи рецепт.">
+  <meta name="twitter:image" content="https://food-ai-omega.vercel.app/icon-512.png">
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Нейро Шеф Повар",
+    "description": "ИИ-помощник для подсчёта калорий по фото и создания рецептов из продуктов которые есть дома",
+    "url": "https://food-ai-omega.vercel.app",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "Web, iOS, Android",
+    "inLanguage": "ru",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "RUB",
+      "description": "7 дней бесплатно, затем 990 руб/мес"
+    },
+    "featureList": [
+      "Подсчёт калорий по фото еды",
+      "Рецепты из имеющихся продуктов",
+      "Совет тренера после каждого анализа",
+      "Дневник питания",
+      "Работает на Claude AI"
+    ]
+  }
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -126,31 +174,45 @@
 
     /* USER BAR */
     .user-bar {
-      display: flex; align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
       background: var(--black2);
-      border-bottom: 1px solid var(--black4);
-      margin-bottom: 1.5rem;
+      border: 1px solid var(--black4);
       border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+      padding: 10px 14px;
     }
 
-    .user-info { display: flex; align-items: center; gap: 10px; }
+    .user-bar-top {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 8px;
+    }
+
+    .user-info { display: flex; align-items: center; gap: 8px; min-width: 0; }
 
     .user-avatar {
-      width: 32px; height: 32px;
+      width: 32px; height: 32px; min-width: 32px;
       background: var(--yellow);
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       font-size: 14px; font-weight: 700; color: var(--black);
     }
 
-    .user-email { font-size: 13px; color: var(--gray); }
+    .user-email {
+      font-size: 12px; color: var(--gray);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      max-width: 160px;
+    }
+
+    .user-bar-bottom {
+      display: flex; align-items: center;
+      gap: 8px; margin-top: 8px;
+      flex-wrap: wrap;
+    }
 
     .user-trial {
       font-size: 11px; color: var(--yellow);
       background: #1a1a0a; border: 1px solid #3a3010;
       padding: 3px 8px; border-radius: 10px;
+      white-space: nowrap;
     }
 
     .logout-btn {
@@ -158,10 +220,14 @@
       background: none; border: none;
       cursor: pointer; padding: 4px 8px;
       border-radius: 6px; transition: color 0.2s;
-      font-family: inherit;
+      font-family: inherit; margin-left: auto;
     }
 
     .logout-btn:hover { color: #f09595; }
+
+    .limit-counter {
+      font-size: 11px; white-space: nowrap;
+    }
 
     /* TRIAL EXPIRED */
     .expired-screen {
@@ -195,6 +261,8 @@
       border-radius: 20px;
       margin-top: 10px;
       letter-spacing: 0.2px;
+      max-width: 100%;
+      text-align: center;
     }
 
     .powered-dot {
@@ -720,14 +788,16 @@
 <div class="app" id="main-app" style="display:none">
   <!-- USER BAR -->
   <div class="user-bar" id="user-bar">
-    <div class="user-info">
-      <div class="user-avatar" id="user-avatar">?</div>
-      <span class="user-email" id="user-email">загрузка...</span>
+    <div class="user-bar-top">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <span class="user-email" id="user-email">загрузка...</span>
+      </div>
+      <button class="logout-btn" onclick="signOut()">Выйти</button>
     </div>
-    <div style="display:flex;align-items:center;gap:8px">
+    <div class="user-bar-bottom">
       <span class="limit-counter" id="limit-counter">⚡ Запросов: ...</span>
       <span class="user-trial" id="trial-badge">7 дней бесплатно</span>
-      <button class="logout-btn" onclick="signOut()">Выйти</button>
     </div>
   </div>
 
@@ -769,13 +839,13 @@
   <div id="panel-calories" class="panel active">
 
     <div class="upload-buttons" id="upload-buttons">
-      <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+      <button class="upload-btn" aria-label="Загрузить фото из галереи" onclick="document.getElementById('fileInput').click()">
         <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(this.files[0])">
         <span class="btn-icon">🖼</span>
         <span class="btn-label">Загрузить фото</span>
         <span class="btn-hint">из галереи</span>
       </button>
-      <button class="upload-btn" onclick="document.getElementById('cameraInput').click()">
+      <button class="upload-btn" aria-label="Сфотографировать блюдо" onclick="document.getElementById('cameraInput').click()">
         <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleFile(this.files[0])">
         <span class="btn-icon">📷</span>
         <span class="btn-label">Сфотографировать</span>
@@ -784,7 +854,7 @@
     </div>
 
     <div id="preview-wrap" class="preview-wrap" style="display:none">
-      <img id="preview-img" src="" alt="Preview">
+      <img id="preview-img" src="" alt="Фото блюда для анализа калорий">
       <button class="remove-btn" onclick="removeImage()">✕ Удалить</button>
     </div>
 
@@ -1065,6 +1135,7 @@
   }
 
   const SUPABASE_URL = 'https://siwibqrykqlyxiwtukst.supabase.co';
+  // anon key — публичный ключ, безопасно хранить во фронтенде (только для чтения)
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpd2licXJ5a3FseXhpd3R1a3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNzMwODEsImV4cCI6MjA4OTY0OTA4MX0.hACYQJs1Il0IykGGvbJKisFxvSYukHB0a3Mtnh2I-T4';
   let _supabase = null;
   let currentUser = null;
@@ -1264,6 +1335,15 @@
     });
   }
 
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   function getDiary() {
     try { return JSON.parse(localStorage.getItem('nsp_diary') || '[]'); } catch { return []; }
   }
@@ -1293,7 +1373,7 @@
       <div class="diary-item">
         <div class="diary-num">${i + 1}</div>
         <div class="diary-info">
-          <div class="diary-dish">${item.dish}</div>
+          <div class="diary-dish">${escapeHtml(item.dish)}</div>
           <div class="diary-meta">${item.time}</div>
         </div>
         ${item.kcal ? `<div class="diary-kcal">🔥 ${item.kcal} ккал</div>` : ''}

@@ -1,16 +1,23 @@
 export default async function handler(req, res) {
-  // Check auth token
+  // 1. Method check first
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // 2. Auth check
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Необходима авторизация' });
   }
 
-  // Verify token with Supabase
   const token = authHeader.split(' ')[1];
-  const supabaseRes = await fetch('https://siwibqrykqlyxiwtukst.supabase.co/auth/v1/user', {
+  const SUPABASE_URL = 'https://siwibqrykqlyxiwtukst.supabase.co';
+  const ANON_KEY = process.env.SUPABASE_ANON_KEY;
+
+  const supabaseRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
     headers: {
       'Authorization': 'Bearer ' + token,
-      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpd2licXJ5a3FseXhpd3R1a3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNzMwODEsImV4cCI6MjA4OTY0OTA4MX0.hACYQJs1Il0IykGGvbJKisFxvSYukHB0a3Mtnh2I-T4'
+      'apikey': ANON_KEY
     }
   });
 
@@ -20,7 +27,7 @@ export default async function handler(req, res) {
 
   const userData = await supabaseRes.json();
 
-  // Check trial period (7 days)
+  // 3. Trial period check (7 days)
   const registeredAt = new Date(userData.created_at);
   const now = new Date();
   const daysPassed = Math.floor((now - registeredAt) / (1000 * 60 * 60 * 24));
@@ -28,14 +35,25 @@ export default async function handler(req, res) {
   if (daysPassed >= 7) {
     return res.status(403).json({ error: 'trial_expired' });
   }
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
 
+  // 4. API key check
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
   const { type, imageBase64, ingredients, weight, dishName, portions } = req.body;
+
+  // 5. Image size limit (max 2MB base64)
+  if (imageBase64 && imageBase64.length > 2 * 1024 * 1024) {
+    return res.status(400).json({ error: 'Изображение слишком большое, максимум 2MB' });
+  }
+
+  // 6. Input length limits
+  if (ingredients && ingredients.length > 1000) {
+    return res.status(400).json({ error: 'Слишком длинный список продуктов' });
+  }
+  if (dishName && dishName.length > 100) {
+    return res.status(400).json({ error: 'Слишком длинное название блюда' });
+  }
 
   const headers = {
     'Content-Type': 'application/json',
