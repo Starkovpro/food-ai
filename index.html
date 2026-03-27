@@ -1,1667 +1,1105 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Нейро Шеф Повар</title>
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#F5C800">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="НейроШеф">
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="Нейро Шеф Повар — ИИ-помощник для подсчёта калорий по фото и создания рецептов из продуктов которые есть дома. 7 дней бесплатно.">
-  <meta name="keywords" content="подсчёт калорий, калории по фото, рецепты из продуктов, дневник питания, здоровое питание, ИИ диетолог">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://food-ai-omega.vercel.app/">
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="Нейро Шеф Повар — калории по фото и рецепты на ИИ">
-  <meta property="og:description" content="Сфотографируй еду — узнай калории. Перечисли продукты — получи рецепт. Работает на Claude, самой умной AI-модели в мире.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://food-ai-omega.vercel.app">
-  <meta property="og:image" content="https://food-ai-omega.vercel.app/icon-512.png">
-  <meta property="og:locale" content="ru_RU">
-  <meta property="og:site_name" content="Нейро Шеф Повар">
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Нейро Шеф Повар — калории по фото и рецепты на ИИ">
-  <meta name="twitter:description" content="Сфотографируй еду — узнай калории. Перечисли продукты — получи рецепт.">
-  <meta name="twitter:image" content="https://food-ai-omega.vercel.app/icon-512.png">
-
-  <!-- Schema.org -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Нейро Шеф Повар",
-    "description": "ИИ-помощник для подсчёта калорий по фото и создания рецептов из продуктов которые есть дома",
-    "url": "https://food-ai-omega.vercel.app",
-    "applicationCategory": "HealthApplication",
-    "operatingSystem": "Web, iOS, Android",
-    "inLanguage": "ru",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "RUB",
-      "description": "7 дней бесплатно, затем 990 руб/мес"
-    },
-    "featureList": [
-      "Подсчёт калорий по фото еды",
-      "Рецепты из имеющихся продуктов",
-      "Совет тренера после каждого анализа",
-      "Дневник питания",
-      "Работает на Claude AI"
-    ]
-  }
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --yellow: #F5C800;
-      --yellow-dark: #D4A900;
-      --black: #0F0F0F;
-      --black2: #1A1A1A;
-      --black3: #242424;
-      --black4: #2E2E2E;
-      --gray: #888880;
-      --gray2: #555550;
-      --white: #FFFFFF;
-      --radius: 12px;
-      --radius-sm: 8px;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--black);
-      color: var(--white);
-      min-height: 100vh;
-      padding: 2rem 1rem 4rem;
-    }
-
-    .app { max-width: 680px; margin: 0 auto; }
-
-    .header {
-      text-align: center;
-      margin-bottom: 2rem;
-      padding-bottom: 2rem;
-      border-bottom: 1px solid var(--black4);
-    }
-
-    .logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-
-    .logo-icon {
-      width: 44px; height: 44px;
-      background: var(--yellow); border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
-    }
-
-    .header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
-    .header h1 span { color: var(--yellow); }
-    .header p { font-size: 14px; color: var(--gray); margin-top: 6px; }
-
-    /* AUTH SCREEN */
-    .auth-screen {
-      position: fixed; inset: 0;
-      background: var(--black);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 1000; padding: 2rem;
-    }
-
-    .auth-card {
-      background: var(--black2);
-      border: 1px solid var(--black4);
-      border-radius: 20px;
-      padding: 2.5rem 2rem;
-      max-width: 380px; width: 100%;
-      text-align: center;
-    }
-
-    .auth-logo {
-      width: 64px; height: 64px;
-      background: var(--yellow);
-      border-radius: 16px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 32px; margin: 0 auto 1.25rem;
-    }
-
-    .auth-title {
-      font-size: 22px; font-weight: 700;
-      color: var(--white); margin-bottom: 6px;
-    }
-
-    .auth-title span { color: var(--yellow); }
-
-    .auth-subtitle {
-      font-size: 14px; color: var(--gray);
-      line-height: 1.6; margin-bottom: 2rem;
-    }
-
-    .auth-btn {
-      width: 100%; padding: 13px 16px;
-      border-radius: var(--radius);
-      border: 1px solid var(--black4);
-      background: var(--black3);
-      color: var(--white);
-      font-size: 15px; font-weight: 500;
-      cursor: pointer; transition: all 0.2s;
-      display: flex; align-items: center;
-      justify-content: center; gap: 10px;
-      margin-bottom: 10px; font-family: inherit;
-    }
-
-    .auth-btn:hover { border-color: var(--yellow); background: var(--black4); }
-
-    .auth-btn-google { }
-
-    .auth-divider {
-      font-size: 12px; color: var(--gray2);
-      margin: 1rem 0; position: relative;
-    }
-
-    .auth-trial {
-      font-size: 12px; color: var(--gray);
-      margin-top: 1.5rem; line-height: 1.6;
-    }
-
-    .auth-trial strong { color: var(--yellow); }
-
-    /* USER BAR */
-    .user-bar {
-      background: var(--black2);
-      border: 1px solid var(--black4);
-      border-radius: var(--radius);
-      margin-bottom: 1.5rem;
-      padding: 10px 14px;
-    }
-
-    .user-bar-top {
-      display: flex; align-items: center;
-      justify-content: space-between; gap: 8px;
-    }
-
-    .user-info { display: flex; align-items: center; gap: 8px; min-width: 0; }
-
-    .user-avatar {
-      width: 32px; height: 32px; min-width: 32px;
-      background: var(--yellow);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 700; color: var(--black);
-    }
-
-    .user-email {
-      font-size: 12px; color: var(--gray);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      max-width: 160px;
-    }
-
-    .user-bar-bottom {
-      display: flex; align-items: center;
-      gap: 8px; margin-top: 8px;
-      flex-wrap: wrap;
-    }
-
-    .user-trial {
-      font-size: 11px; color: var(--yellow);
-      background: #1a1a0a; border: 1px solid #3a3010;
-      padding: 3px 8px; border-radius: 10px;
-      white-space: nowrap;
-    }
-
-    .logout-btn {
-      font-size: 12px; color: var(--gray2);
-      background: none; border: none;
-      cursor: pointer; padding: 4px 8px;
-      border-radius: 6px; transition: color 0.2s;
-      font-family: inherit; margin-left: auto;
-    }
-
-    .logout-btn:hover { color: #f09595; }
-
-    .limit-counter {
-      font-size: 11px; white-space: nowrap;
-    }
-
-    /* TRIAL EXPIRED */
-    .expired-screen {
-      text-align: center; padding: 3rem 1rem;
-    }
-
-    .expired-icon {
-      font-size: 48px; margin-bottom: 1rem; display: block;
-    }
-
-    .expired-title {
-      font-size: 20px; font-weight: 700;
-      color: var(--white); margin-bottom: 8px;
-    }
-
-    .expired-text {
-      font-size: 14px; color: var(--gray);
-      line-height: 1.7; margin-bottom: 2rem;
-    }
-
-    .powered-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: linear-gradient(135deg, #1a1a0a, #2a2a10);
-      border: 1px solid #4a4010;
-      color: #c8b840;
-      font-size: 12px;
-      font-weight: 500;
-      padding: 6px 14px;
-      border-radius: 20px;
-      margin-top: 10px;
-      letter-spacing: 0.2px;
-      max-width: 100%;
-      text-align: center;
-    }
-
-    .powered-dot {
-      width: 6px; height: 6px; min-width: 6px;
-      background: var(--yellow);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
-    }
-
-    .tabs {
-      display: flex; gap: 6px;
-      background: var(--black2); padding: 4px;
-      border-radius: var(--radius); margin-bottom: 1.5rem;
-      border: 1px solid var(--black4);
-    }
-
-    .tab {
-      flex: 1; padding: 10px; text-align: center;
-      font-size: 14px; font-weight: 500; cursor: pointer;
-      border-radius: 9px; border: none;
-      background: transparent; color: var(--gray); transition: all 0.2s;
-    }
-
-    .tab.active { background: var(--yellow); color: var(--black); font-weight: 600; }
-
-    .panel { display: none; }
-    .panel.active { display: block; }
-
-    .upload-buttons { display: flex; gap: 10px; }
-
-    .upload-btn {
-      flex: 1; padding: 1.5rem 1rem;
-      border: 1.5px dashed var(--black4);
-      border-radius: var(--radius);
-      background: var(--black2); color: var(--white);
-      cursor: pointer; text-align: center;
-      transition: all 0.2s; font-family: inherit; font-size: 14px;
-    }
-
-    .upload-btn:hover { border-color: var(--yellow); background: var(--black3); }
-    .upload-btn .btn-icon { font-size: 28px; display: block; margin-bottom: 8px; }
-    .upload-btn .btn-label { font-weight: 500; font-size: 14px; display: block; }
-    .upload-btn .btn-hint { font-size: 12px; color: var(--gray); margin-top: 3px; display: block; }
-
-    .preview-wrap {
-      position: relative; margin-top: 0;
-      border-radius: var(--radius); overflow: hidden;
-      border: 1px solid var(--black4);
-    }
-
-    .preview-wrap img { width: 100%; max-height: 300px; object-fit: cover; display: block; }
-
-    .remove-btn {
-      position: absolute; top: 10px; right: 10px;
-      background: rgba(15,15,15,0.85); border: 1px solid var(--black4);
-      color: var(--gray); border-radius: 6px;
-      padding: 5px 12px; font-size: 12px; cursor: pointer;
-    }
-
-    .weight-wrap { display: none; margin-top: 1rem; }
-    .field-label { font-size: 13px; color: var(--gray); margin-bottom: 8px; display: block; }
-    .weight-row { display: flex; align-items: center; gap: 10px; }
-
-    input[type=number] {
-      flex: 1; padding: 12px 14px; font-size: 15px;
-      border: 1.5px solid var(--black4); border-radius: var(--radius);
-      background: var(--black2); color: var(--white);
-      font-family: inherit; outline: none; transition: border-color 0.2s;
-    }
-
-    input[type=number]:focus { border-color: var(--yellow); }
-    .unit-label { font-size: 15px; color: var(--gray); white-space: nowrap; }
-
-    .btn {
-      width: 100%; margin-top: 1rem; padding: 13px;
-      background: var(--yellow); border: none; border-radius: var(--radius);
-      font-size: 15px; font-weight: 600; color: var(--black);
-      cursor: pointer; transition: all 0.2s;
-    }
-
-    .btn:hover { background: var(--yellow-dark); }
-    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
-
-    .result-card {
-      margin-top: 1rem; background: var(--black2);
-      border: 1px solid var(--black4); border-radius: var(--radius);
-      padding: 1.25rem;
-    }
-
-    .result-header {
-      display: flex; align-items: center;
-      justify-content: space-between; margin-bottom: 12px;
-    }
-
-    .result-card h3 {
-      font-size: 12px; font-weight: 600; color: var(--gray);
-      text-transform: uppercase; letter-spacing: 0.8px;
-    }
-
-    .copy-btn {
-      display: flex; align-items: center; gap: 6px;
-      background: var(--black3); border: 1px solid var(--black4);
-      color: var(--gray); border-radius: var(--radius-sm);
-      padding: 5px 12px; font-size: 12px; font-weight: 500;
-      cursor: pointer; transition: all 0.2s;
-    }
-
-    .copy-btn:hover { border-color: var(--yellow); color: var(--yellow); }
-    .copy-btn.copied { border-color: #3b6d11; color: #97c459; background: #1a2a0a; }
-
-    .kcal-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--yellow); color: var(--black);
-      padding: 7px 16px; border-radius: 20px;
-      font-size: 16px; font-weight: 700; margin-bottom: 14px;
-    }
-
-    .result-text {
-      font-size: 14px; color: #b0b0a8;
-      line-height: 1.75; white-space: pre-wrap;
-    }
-
-    .trainer-card {
-      margin-top: 1rem;
-      background: #1a1a0a; border: 1px solid #3a3010;
-      border-radius: var(--radius); padding: 1rem 1.25rem;
-      display: flex; gap: 12px; align-items: flex-start;
-    }
-
-    .trainer-avatar {
-      width: 36px; height: 36px; min-width: 36px;
-      background: var(--yellow); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-    }
-
-    .trainer-name { font-size: 11px; color: var(--yellow); font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px; }
-    .trainer-text { font-size: 14px; color: #d0cfa8; line-height: 1.6; }
-
-    .diary-section {
-      margin-top: 2.5rem; padding-top: 2rem;
-      border-top: 1px solid var(--black4);
-    }
-
-    .diary-header {
-      display: flex; align-items: center;
-      justify-content: space-between; margin-bottom: 1rem;
-    }
-
-    .diary-title { font-size: 14px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.8px; }
-
-    .diary-clear {
-      font-size: 12px; color: var(--gray2);
-      background: none; border: none; cursor: pointer;
-      padding: 4px 8px; border-radius: 6px; transition: color 0.2s;
-    }
-
-    .diary-clear:hover { color: #f09595; }
-
-    .diary-empty {
-      text-align: center; padding: 2rem;
-      color: var(--gray2); font-size: 14px;
-      background: var(--black2); border: 1px solid var(--black4);
-      border-radius: var(--radius);
-    }
-
-    .diary-list { display: flex; flex-direction: column; gap: 8px; }
-
-    .diary-item {
-      display: flex; align-items: center;
-      background: var(--black2); border: 1px solid var(--black4);
-      border-radius: var(--radius-sm); padding: 10px 14px; gap: 12px;
-    }
-
-    .diary-num {
-      width: 22px; height: 22px; min-width: 22px;
-      background: var(--black3); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; color: var(--gray);
-    }
-
-    .diary-info { flex: 1; min-width: 0; }
-    .diary-dish { font-size: 14px; color: var(--white); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .diary-meta { font-size: 12px; color: var(--gray); margin-top: 2px; }
-
-    .diary-kcal {
-      background: var(--yellow); color: var(--black);
-      font-size: 12px; font-weight: 700;
-      padding: 3px 10px; border-radius: 12px; white-space: nowrap;
-    }
-
-    .ingredients-label { font-size: 14px; color: var(--gray); margin-bottom: 8px; display: block; }
-
-    .portions-btn {
-      padding: 8px 16px;
-      border: 1.5px solid var(--black4);
-      border-radius: 20px;
-      background: var(--black2);
-      color: var(--gray);
-      font-size: 13px; font-weight: 500;
-      cursor: pointer; transition: all 0.2s;
-      font-family: inherit;
-    }
-
-    .portions-btn:hover { border-color: var(--yellow); color: var(--yellow); }
-    .portions-btn.active { background: var(--yellow); border-color: var(--yellow); color: var(--black); font-weight: 600; }
-
-    textarea {
-      width: 100%; min-height: 130px; padding: 14px; font-size: 14px;
-      border: 1.5px solid var(--black4); border-radius: var(--radius);
-      resize: vertical; background: var(--black2); color: var(--white);
-      font-family: inherit; line-height: 1.6; transition: border-color 0.2s;
-    }
-
-    textarea::placeholder { color: var(--gray2); }
-    textarea:focus { outline: none; border-color: var(--yellow); }
-
-    .loader {
-      display: flex; align-items: center; gap: 10px;
-      padding: 18px 0; color: var(--gray); font-size: 14px;
-    }
-
-    .dots span {
-      display: inline-block; width: 6px; height: 6px;
-      border-radius: 50%; background: var(--yellow);
-      animation: bounce 1.2s infinite;
-    }
-
-    .dots span:nth-child(2) { animation-delay: 0.2s; }
-    .dots span:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes bounce {
-      0%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-7px); }
-    }
-
-    .error-msg {
-      font-size: 13px; margin-top: 10px; padding: 10px 14px;
-      background: #2a0a0a; border: 1px solid #501313;
-      color: #f09595; border-radius: var(--radius-sm);
-    }
-
-
-    /* POPUP */
-    .popup-overlay {
-      display: none;
-      position: fixed; inset: 0; z-index: 100;
-      background: rgba(0,0,0,0.85);
-      align-items: center; justify-content: center;
-      padding: 1rem;
-    }
-    .popup-overlay.show { display: flex; }
-    .popup-box {
-      background: var(--black2); border: 1px solid var(--black4);
-      border-radius: 16px; padding: 1.75rem;
-      width: 100%; max-width: 420px;
-    }
-    .popup-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
-    .popup-sub { font-size: 13px; color: var(--gray); margin-bottom: 1.5rem; }
-    .popup-row { margin-bottom: 1rem; }
-    .popup-row label { font-size: 13px; color: var(--gray); display: block; margin-bottom: 6px; }
-    .popup-row input, .popup-row select {
-      width: 100%; padding: 10px 12px; font-size: 14px;
-      border: 1.5px solid var(--black4); border-radius: var(--radius-sm);
-      background: var(--black3); color: var(--white);
-      font-family: inherit; outline: none; transition: border-color 0.2s;
-    }
-    .popup-row input:focus, .popup-row select:focus { border-color: var(--yellow); }
-    .popup-row select option { background: var(--black3); }
-    .popup-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .goal-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-    .goal-btn {
-      flex: 1; padding: 8px 10px; font-size: 13px; font-weight: 500;
-      border: 1.5px solid var(--black4); border-radius: 20px;
-      background: var(--black3); color: var(--gray);
-      cursor: pointer; font-family: inherit; transition: all 0.2s; text-align: center;
-    }
-    .goal-btn.active { background: var(--yellow); border-color: var(--yellow); color: var(--black); font-weight: 600; }
-
-    /* NORM BAR */
-    .norm-card {
-      background: var(--black2); border: 1px solid var(--black4);
-      border-radius: var(--radius); padding: 1rem 1.25rem;
-      margin-bottom: 1.25rem;
-    }
-    .norm-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .norm-label { font-size: 13px; color: var(--gray); }
-    .norm-numbers { font-size: 13px; }
-    .norm-eaten { font-weight: 700; color: var(--white); }
-    .norm-total { color: var(--gray); }
-    .norm-track {
-      height: 8px; background: var(--black4); border-radius: 4px; overflow: hidden;
-    }
-    .norm-fill {
-      height: 100%; border-radius: 4px;
-      background: var(--yellow);
-      transition: width 0.6s ease, background 0.3s;
-    }
-    .norm-rest { font-size: 12px; color: var(--gray); margin-top: 8px; text-align: right; }
-    .norm-edit {
-      font-size: 11px; color: var(--gray2); background: none; border: none;
-      cursor: pointer; padding: 0; text-decoration: underline;
-    }
-    .norm-edit:hover { color: var(--yellow); }
-
-    @media (max-width: 480px) {
-      .header h1 { font-size: 20px; }
-      .tab { font-size: 12px; padding: 9px 4px; }
-    }
-
-    /* ONBOARDING */
-    .onboarding-screen {
-      position: fixed; inset: 0;
-      background: var(--black);
-      display: none; align-items: center; justify-content: center;
-      z-index: 999; padding: 2rem 1rem;
-    }
-
-    .onboarding-card {
-      background: var(--black2);
-      border: 1px solid var(--black4);
-      border-radius: 20px;
-      padding: 2rem 1.5rem;
-      max-width: 400px; width: 100%;
-      text-align: center;
-    }
-
-    .onboarding-steps {
-      display: flex; gap: 6px; justify-content: center;
-      margin-bottom: 2rem;
-    }
-
-    .onboarding-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--black4);
-      transition: all 0.3s;
-    }
-
-    .onboarding-dot.active { background: var(--yellow); width: 24px; border-radius: 4px; }
-    .onboarding-dot.done { background: var(--gray2); }
-
-    .onboarding-icon { font-size: 48px; margin-bottom: 1rem; display: block; }
-    .onboarding-title { font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
-    .onboarding-title span { color: var(--yellow); }
-    .onboarding-sub { font-size: 14px; color: var(--gray); line-height: 1.6; margin-bottom: 1.5rem; }
-
-    .onboarding-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.5rem; }
-
-    .onboarding-option {
-      padding: 12px 16px;
-      border: 1.5px solid var(--black4);
-      border-radius: var(--radius);
-      background: var(--black3);
-      color: var(--white);
-      font-size: 14px; font-weight: 500;
-      cursor: pointer; transition: all 0.2s;
-      text-align: left; font-family: inherit;
-      display: flex; align-items: center; gap: 12px;
-    }
-
-    .onboarding-option:hover { border-color: var(--yellow); }
-    .onboarding-option.selected { border-color: var(--yellow); background: #1a1a0a; color: var(--yellow); }
-    .onboarding-option .opt-icon { font-size: 20px; }
-    .onboarding-option .opt-text { flex: 1; }
-    .onboarding-option .opt-sub { font-size: 12px; color: var(--gray); font-weight: 400; display: block; margin-top: 2px; }
-
-    .onboarding-name-input {
-      width: 100%; padding: 14px;
-      font-size: 18px; text-align: center;
-      border: 1.5px solid var(--black4);
-      border-radius: var(--radius);
-      background: var(--black3); color: var(--white);
-      font-family: inherit; outline: none;
-      transition: border-color 0.2s;
-      margin-bottom: 1rem;
-    }
-
-    .onboarding-name-input:focus { border-color: var(--yellow); }
-    .onboarding-name-input::placeholder { color: var(--gray2); font-size: 15px; }
-
-    .onboarding-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 1.5rem; }
-
-    .onboarding-tag {
-      padding: 6px 14px;
-      border: 1px solid var(--black4);
-      border-radius: 20px;
-      background: var(--black3);
-      color: var(--gray);
-      font-size: 13px; cursor: pointer;
-      transition: all 0.2s; font-family: inherit;
-    }
-
-    .onboarding-tag:hover { border-color: var(--yellow); color: var(--yellow); }
-
-    .onboarding-btn {
-      width: 100%; padding: 13px;
-      background: var(--yellow); border: none;
-      border-radius: var(--radius);
-      font-size: 15px; font-weight: 600;
-      color: var(--black); cursor: pointer;
-      transition: all 0.2s; font-family: inherit;
-    }
-
-    .onboarding-btn:hover { background: var(--yellow-dark); }
-    .onboarding-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-
-    .onboarding-skip {
-      display: block; margin-top: 12px;
-      font-size: 12px; color: var(--gray2);
-      background: none; border: none;
-      cursor: pointer; font-family: inherit;
-    }
-
-    .onboarding-skip:hover { color: var(--gray); }
-
-    /* RATE LIMIT */
-    .limit-banner {
-      background: #1a0a0a; border: 1px solid #501313;
-      border-radius: var(--radius); padding: 1rem 1.25rem;
-      margin-top: 1rem; text-align: center;
-    }
-    .limit-banner .limit-title { font-size: 15px; font-weight: 600; color: #f09595; margin-bottom: 6px; }
-    .limit-banner .limit-sub { font-size: 13px; color: #888880; line-height: 1.6; }
-    .limit-counter {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--black3); border: 1px solid var(--black4);
-      border-radius: 20px; padding: 4px 12px;
-      font-size: 12px; color: var(--gray); margin-bottom: 1rem;
-    }
-    .limit-counter.warning { border-color: #854f0b; color: #EF9F27; background: #1a0f00; }
-    .limit-counter.danger { border-color: #501313; color: #f09595; background: #1a0000; }
-
-    /* PRIVACY CONSENT */
-    .consent-bar {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--black2);
-      border-top: 1px solid var(--black4);
-      padding: 1rem 1.5rem;
-      display: flex; align-items: center;
-      justify-content: space-between; gap: 1rem;
-      z-index: 998; flex-wrap: wrap;
-    }
-
-    .consent-text { font-size: 12px; color: var(--gray); flex: 1; min-width: 200px; }
-    .consent-text a { color: var(--yellow); }
-    .consent-btn {
-      padding: 8px 20px;
-      background: var(--yellow); border: none;
-      border-radius: var(--radius-sm);
-      font-size: 13px; font-weight: 600;
-      color: var(--black); cursor: pointer;
-      white-space: nowrap; font-family: inherit;
-    }
-
-    /* WELCOME SCREEN after onboarding */
-    .welcome-features {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 10px; margin-bottom: 1.5rem; text-align: left;
-    }
-
-    .welcome-feature {
-      background: var(--black3);
-      border: 1px solid var(--black4);
-      border-radius: var(--radius-sm);
-      padding: 12px;
-    }
-
-    .welcome-feature .feat-icon { font-size: 22px; display: block; margin-bottom: 6px; }
-    .welcome-feature .feat-title { font-size: 13px; font-weight: 600; color: var(--white); }
-    .welcome-feature .feat-sub { font-size: 11px; color: var(--gray); margin-top: 2px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0b0b14">
+<title>Твой Лучший Друг</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0b0b14;
+  --bg2:#12121f;
+  --bg3:#1a1a2e;
+  --surface:#1e1e32;
+  --border:#2a2a44;
+  --text:#e8e6e0;
+  --text2:#9896a3;
+  --accent:#e8a838;
+  --accent2:#f0c060;
+  --accent-glow:rgba(232,168,56,0.15);
+  --friend-bg:#1c1936;
+  --friend-border:#2d2960;
+  --user-bg:#2a2340;
+  --danger:#e84848;
+  --success:#48c878;
+  --radius:16px;
+  --radius-sm:10px;
+}
+html,body{
+  height:100%;width:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Outfit',sans-serif;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ===== ONBOARDING ===== */
+.onboarding{
+  position:fixed;inset:0;z-index:100;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  transition:opacity .5s ease;
+}
+.onboarding.hidden{opacity:0;pointer-events:none}
+.ob-screen{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:40px 28px;
+  opacity:0;transform:translateX(60px);
+  transition:all .45s cubic-bezier(.4,.0,.2,1);
+  pointer-events:none;
+}
+.ob-screen.active{opacity:1;transform:translateX(0);pointer-events:auto}
+.ob-screen.exit{opacity:0;transform:translateX(-60px)}
+
+/* Orb */
+.orb-wrap{position:relative;width:140px;height:140px;margin-bottom:36px}
+.orb{
+  width:140px;height:140px;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,#e8a838 0%,#c47820 40%,#8b4513 70%,#3a1a05 100%);
+  box-shadow:0 0 60px rgba(232,168,56,.35),0 0 120px rgba(232,168,56,.15);
+  animation:orbPulse 3s ease-in-out infinite;
+}
+.orb.small{width:90px;height:90px;margin:0 auto 24px}
+@keyframes orbPulse{
+  0%,100%{transform:scale(1);box-shadow:0 0 60px rgba(232,168,56,.35),0 0 120px rgba(232,168,56,.15)}
+  50%{transform:scale(1.06);box-shadow:0 0 80px rgba(232,168,56,.45),0 0 160px rgba(232,168,56,.2)}
+}
+
+/* Silhouette animation for screen 1 */
+.silhouette{
+  width:140px;height:140px;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,168,56,.08) 0%,transparent 70%);
+  animation:silhouetteAppear 2s ease-out forwards;
+  position:relative;
+}
+.silhouette::after{
+  content:'';position:absolute;inset:30%;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,#e8a838,#c47820 60%,transparent);
+  opacity:0;animation:silhouetteGlow 2s ease-out .5s forwards;
+}
+@keyframes silhouetteAppear{
+  0%{transform:scale(.3);opacity:0}
+  100%{transform:scale(1);opacity:1}
+}
+@keyframes silhouetteGlow{
+  0%{opacity:0;transform:scale(.5)}
+  100%{opacity:1;transform:scale(1)}
+}
+
+.ob-title{
+  font-size:26px;font-weight:600;
+  text-align:center;line-height:1.35;
+  margin-bottom:12px;
+  background:linear-gradient(135deg,var(--text),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.ob-subtitle{
+  font-size:15px;color:var(--text2);
+  text-align:center;line-height:1.5;
+  max-width:320px;margin-bottom:32px;
+}
+
+/* Progress dots */
+.ob-progress{
+  position:fixed;top:env(safe-area-inset-top, 16px);
+  left:50%;transform:translateX(-50%);
+  display:flex;gap:8px;z-index:110;
+  padding-top:16px;
+}
+.ob-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--border);transition:all .3s ease;
+}
+.ob-dot.active{background:var(--accent);width:24px;border-radius:4px}
+
+/* Name input */
+.name-input-wrap{width:100%;max-width:320px;margin-bottom:24px;position:relative}
+.name-input{
+  width:100%;padding:16px 20px;
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  color:var(--text);font-family:'Outfit',sans-serif;
+  font-size:20px;font-weight:500;text-align:center;
+  outline:none;transition:border-color .2s;
+}
+.name-input:focus{border-color:var(--accent)}
+.name-input::placeholder{color:var(--text2);font-weight:300}
+.name-preview{
+  font-size:18px;color:var(--text2);
+  text-align:center;margin-bottom:16px;
+  min-height:27px;
+}
+.name-preview b{color:var(--accent);font-weight:600}
+.name-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px}
+.name-tag{
+  padding:8px 16px;border-radius:20px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text2);font-size:14px;cursor:pointer;
+  transition:all .2s;
+}
+.name-tag:hover,.name-tag:active{
+  border-color:var(--accent);color:var(--accent);
+  background:var(--accent-glow);
+}
+
+/* Selection cards */
+.cards{display:flex;flex-direction:column;gap:12px;width:100%;max-width:340px}
+.card{
+  padding:18px 20px;
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:var(--radius);cursor:pointer;
+  display:flex;align-items:center;gap:14px;
+  transition:all .25s ease;
+}
+.card:hover{border-color:rgba(232,168,56,.4);background:rgba(232,168,56,.05)}
+.card.selected{
+  border-color:var(--accent);
+  background:var(--accent-glow);
+  box-shadow:0 0 20px rgba(232,168,56,.1);
+}
+.card-emoji{font-size:28px;width:36px;text-align:center;flex-shrink:0}
+.card-content{flex:1}
+.card-title{font-size:16px;font-weight:500;margin-bottom:2px}
+.card-desc{font-size:13px;color:var(--text2);line-height:1.4}
+
+/* Goals — multi-select */
+.goals-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:10px;width:100%;max-width:340px;
+}
+.goal-card{
+  padding:16px 14px;
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:var(--radius);cursor:pointer;
+  text-align:center;transition:all .25s ease;
+}
+.goal-card:last-child{grid-column:1 / -1;max-width:170px;justify-self:center}
+.goal-card:hover{border-color:rgba(232,168,56,.4)}
+.goal-card.selected{border-color:var(--accent);background:var(--accent-glow)}
+.goal-emoji{font-size:26px;margin-bottom:6px}
+.goal-label{font-size:14px;font-weight:400}
+
+/* Buttons */
+.btn{
+  padding:16px 40px;border:none;
+  border-radius:var(--radius);
+  font-family:'Outfit',sans-serif;
+  font-size:16px;font-weight:600;
+  cursor:pointer;transition:all .2s;
+  color:var(--bg);
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  box-shadow:0 4px 20px rgba(232,168,56,.3);
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(232,168,56,.4)}
+.btn-primary:active{transform:scale(.97)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-skip{
+  background:transparent;color:var(--text2);
+  font-size:14px;font-weight:400;
+  padding:10px 20px;margin-top:8px;
+}
+
+/* ===== FINAL SCREEN ===== */
+.final-orb{
+  width:120px;height:120px;border-radius:50%;margin-bottom:28px;
+  background:radial-gradient(circle at 40% 35%,#e8a838 0%,#c47820 40%,#8b4513 70%,#3a1a05 100%);
+  box-shadow:0 0 80px rgba(232,168,56,.4),0 0 160px rgba(232,168,56,.2);
+  animation:finalAppear 1.2s cubic-bezier(.4,.0,.2,1) forwards;
+}
+@keyframes finalAppear{
+  0%{transform:scale(.2);opacity:0}
+  60%{transform:scale(1.1)}
+  100%{transform:scale(1);opacity:1}
+}
+.final-message{
+  padding:18px 22px;
+  background:var(--friend-bg);
+  border:1px solid var(--friend-border);
+  border-radius:var(--radius) var(--radius) var(--radius) 4px;
+  font-size:15px;line-height:1.6;
+  max-width:300px;text-align:left;
+  color:var(--text);
+  animation:msgAppear .6s ease .8s both;
+}
+@keyframes msgAppear{
+  0%{opacity:0;transform:translateY(10px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+
+/* ===== MAIN CHAT SCREEN ===== */
+.app{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  background:var(--bg);
+  opacity:0;pointer-events:none;
+  transition:opacity .5s ease;
+}
+.app.visible{opacity:1;pointer-events:auto}
+
+/* Header */
+.header{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;
+  padding-top:calc(env(safe-area-inset-top, 8px) + 8px);
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.header-orb{
+  width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  background:radial-gradient(circle at 40% 35%,#e8a838,#c47820 60%,#6b3410);
+  box-shadow:0 0 16px rgba(232,168,56,.3);
+}
+.header-info{flex:1}
+.header-name{font-size:16px;font-weight:600}
+.header-status{font-size:12px;color:var(--success);display:flex;align-items:center;gap:4px}
+.header-status::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--success);display:inline-block;
+}
+.header-menu{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text2);font-size:18px;
+}
+
+/* Messages area */
+.messages{
+  flex:1;overflow-y:auto;
+  padding:16px;
+  display:flex;flex-direction:column;gap:12px;
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+}
+.msg{
+  max-width:82%;padding:14px 18px;
+  font-size:14.5px;line-height:1.55;
+  animation:msgSlide .3s ease both;
+  word-wrap:break-word;
+}
+@keyframes msgSlide{
+  0%{opacity:0;transform:translateY(8px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+.msg-friend{
+  align-self:flex-start;
+  background:var(--friend-bg);
+  border:1px solid var(--friend-border);
+  border-radius:var(--radius) var(--radius) var(--radius) 4px;
+}
+.msg-user{
+  align-self:flex-end;
+  background:var(--user-bg);
+  border:1px solid rgba(232,168,56,.15);
+  border-radius:var(--radius) var(--radius) 4px var(--radius);
+}
+
+/* Typing indicator */
+.typing{
+  align-self:flex-start;
+  padding:14px 18px;
+  background:var(--friend-bg);border:1px solid var(--friend-border);
+  border-radius:var(--radius) var(--radius) var(--radius) 4px;
+  display:none;
+}
+.typing.show{display:flex;gap:5px;align-items:center}
+.typing-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--text2);
+  animation:typingBounce .6s ease infinite;
+}
+.typing-dot:nth-child(2){animation-delay:.15s}
+.typing-dot:nth-child(3){animation-delay:.3s}
+@keyframes typingBounce{
+  0%,100%{opacity:.3;transform:translateY(0)}
+  50%{opacity:1;transform:translateY(-4px)}
+}
+
+/* Quick spheres */
+.spheres-bar{
+  display:flex;gap:8px;padding:10px 16px;
+  overflow-x:auto;flex-shrink:0;
+  background:var(--bg);
+  border-top:1px solid rgba(42,42,68,.5);
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.spheres-bar::-webkit-scrollbar{display:none}
+.sphere-btn{
+  flex-shrink:0;
+  padding:8px 14px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;
+  font-family:'Outfit',sans-serif;
+  font-size:13px;color:var(--text2);
+  cursor:pointer;transition:all .2s;
+  white-space:nowrap;
+  display:flex;align-items:center;gap:6px;
+}
+.sphere-btn:hover,.sphere-btn:active{
+  border-color:var(--accent);color:var(--accent);
+  background:var(--accent-glow);
+}
+.sphere-btn.emergency{
+  border-color:var(--danger);color:#ff8888;
+  background:rgba(232,72,72,.08);
+}
+
+/* Input area */
+.input-area{
+  display:flex;align-items:flex-end;gap:10px;
+  padding:12px 16px;
+  padding-bottom:calc(env(safe-area-inset-bottom, 8px) + 8px);
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  flex-shrink:0;
+}
+.input-wrap{
+  flex:1;position:relative;
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:24px;
+  display:flex;align-items:flex-end;
+  transition:border-color .2s;
+}
+.input-wrap:focus-within{border-color:var(--accent)}
+.chat-input{
+  flex:1;padding:12px 16px;
+  background:none;border:none;outline:none;
+  font-family:'Outfit',sans-serif;
+  font-size:15px;color:var(--text);
+  resize:none;max-height:120px;
+  line-height:1.4;
+}
+.chat-input::placeholder{color:var(--text2)}
+.attach-btn{
+  width:40px;height:40px;flex-shrink:0;
+  background:none;border:none;
+  color:var(--text2);font-size:20px;
+  cursor:pointer;display:flex;
+  align-items:center;justify-content:center;
+  transition:color .2s;
+}
+.attach-btn:hover{color:var(--accent)}
+.send-btn{
+  width:44px;height:44px;flex-shrink:0;
+  border-radius:50%;border:none;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:var(--bg);font-size:20px;
+  cursor:pointer;display:flex;
+  align-items:center;justify-content:center;
+  transition:all .2s;
+  box-shadow:0 2px 12px rgba(232,168,56,.25);
+}
+.send-btn:hover{transform:scale(1.05)}
+.send-btn:active{transform:scale(.93)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* Photo input hidden */
+#photoInput{display:none}
+
+/* Request counter */
+.req-counter{
+  position:fixed;top:env(safe-area-inset-top, 8px);right:12px;
+  padding:4px 10px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;font-size:11px;color:var(--text2);
+  z-index:50;display:none;
+}
+.app.visible .req-counter{display:block}
+
+/* Settings overlay */
+.settings-overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(8px);
+  opacity:0;pointer-events:none;
+  transition:opacity .3s;
+}
+.settings-overlay.show{opacity:1;pointer-events:auto}
+.settings-panel{
+  position:fixed;right:0;top:0;bottom:0;
+  width:min(320px,85vw);
+  background:var(--bg2);
+  border-left:1px solid var(--border);
+  padding:24px 20px;
+  transform:translateX(100%);
+  transition:transform .3s cubic-bezier(.4,.0,.2,1);
+  overflow-y:auto;
+  padding-top:calc(env(safe-area-inset-top, 16px) + 16px);
+}
+.settings-overlay.show .settings-panel{transform:translateX(0)}
+.settings-title{font-size:18px;font-weight:600;margin-bottom:20px}
+.settings-label{font-size:13px;color:var(--text2);margin-bottom:8px;margin-top:18px}
+.settings-value{
+  font-size:15px;padding:12px 14px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+}
+.settings-btn{
+  width:100%;padding:14px;margin-top:20px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  font-family:'Outfit',sans-serif;
+  font-size:14px;color:var(--danger);
+  cursor:pointer;text-align:center;
+}
+.settings-btn:active{opacity:.7}
+.settings-close{
+  position:absolute;top:16px;right:16px;
+  width:36px;height:36px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text2);font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  margin-top:env(safe-area-inset-top, 0px);
+}
+</style>
 </head>
 <body>
-<!-- CONSENT BAR -->
-<div class="consent-bar" id="consent-bar" style="display:none">
-  <span class="consent-text">
-    Используя сервис, вы соглашаетесь с нашей
-    <a href="/privacy.html" target="_blank">политикой конфиденциальности</a> и <a href="/faq.html" target="_blank">FAQ</a>.
-    Данные аккаунта хранятся на защищённых серверах.
-  </span>
-  <button class="consent-btn" onclick="acceptConsent()">Принять и продолжить</button>
-</div>
 
-<!-- ONBOARDING SCREEN -->
-<div class="onboarding-screen" id="onboarding-screen">
-  <div class="onboarding-card">
-    <div class="onboarding-steps" id="onboarding-steps">
-      <div class="onboarding-dot active" id="dot-0"></div>
-      <div class="onboarding-dot" id="dot-1"></div>
-      <div class="onboarding-dot" id="dot-2"></div>
-      <div class="onboarding-dot" id="dot-3"></div>
-    </div>
-    <div id="onboarding-content"></div>
+<!-- ONBOARDING -->
+<div class="onboarding" id="onboarding">
+  <div class="ob-progress" id="obProgress"></div>
+
+  <!-- Screen 1: Welcome -->
+  <div class="ob-screen active" data-step="0">
+    <div class="orb-wrap"><div class="silhouette"></div></div>
+    <div class="ob-title">Привет.</div>
+    <div class="ob-subtitle">Я буду твоим лучшим другом. Но сначала — позволь мне стать твоим. Создай меня.</div>
+    <button class="btn btn-primary" onclick="nextStep()">Начать</button>
   </div>
-</div>
 
-<!-- AUTH SCREEN -->
-<div class="auth-screen" id="auth-screen">
-  <div class="auth-card">
-    <div class="auth-logo">👨‍🍳</div>
-    <div class="auth-title"><span>Нейро</span> Шеф Повар</div>
-    <div class="auth-subtitle">Считает калории по фото и придумывает рецепты из того, что есть дома</div>
-
-    <button class="auth-btn auth-btn-google" onclick="signInGoogle()">
-      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2.04a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.5 10.48A4.8 4.8 0 0 1 4.5 7.5V5.43H1.83a8 8 0 0 0 0 7.12l2.67-2.07z"/><path fill="#EA4335" d="M8.98 3.58c1.32 0 2.5.45 3.44 1.35l2.54-2.54A8 8 0 0 0 1.83 5.43L4.5 7.5a4.77 4.77 0 0 1 4.48-3.92z"/></svg>
-      Войти через Google
-    </button>
-
-
-    <div class="auth-trial">
-      <strong>7 дней бесплатно</strong> — без карты и обязательств.<br>
-      После пробного периода — 1000 руб/мес.
+  <!-- Screen 2: Name -->
+  <div class="ob-screen" data-step="1">
+    <div class="orb-wrap"><div class="orb small"></div></div>
+    <div class="ob-title">Как меня зовут?</div>
+    <div class="name-preview" id="namePreview"></div>
+    <div class="name-tags">
+      <span class="name-tag" onclick="setName('Саша')">Саша</span>
+      <span class="name-tag" onclick="setName('Лея')">Лея</span>
+      <span class="name-tag" onclick="setName('Макс')">Макс</span>
+      <span class="name-tag" onclick="setName('Соня')">Соня</span>
+      <span class="name-tag" onclick="setName('Арт')">Арт</span>
+      <span class="name-tag" onclick="setName('Ника')">Ника</span>
     </div>
+    <div class="name-input-wrap">
+      <input class="name-input" id="nameInput" type="text" placeholder="Или введи своё имя" maxlength="20" autocomplete="off">
+    </div>
+    <button class="btn btn-primary" id="nameBtn" onclick="nextStep()" disabled>Это моё имя</button>
   </div>
-</div>
 
-<div class="app" id="main-app" style="display:none">
-  <!-- USER BAR -->
-  <div class="user-bar" id="user-bar">
-    <div class="user-bar-top">
-      <div class="user-info">
-        <div class="user-avatar" id="user-avatar">?</div>
-        <span class="user-email" id="user-email">загрузка...</span>
+  <!-- Screen 3: Gender -->
+  <div class="ob-screen" data-step="2">
+    <div class="ob-title">Кто я?</div>
+    <div class="ob-subtitle">Выбери мой образ</div>
+    <div class="cards" id="genderCards">
+      <div class="card" data-value="female" onclick="selectCard('gender',this)">
+        <div class="card-emoji">👩</div>
+        <div class="card-content">
+          <div class="card-title">Подруга</div>
+          <div class="card-desc">Тёплая и женственная</div>
+        </div>
       </div>
-      <button class="logout-btn" onclick="signOut()">Выйти</button>
+      <div class="card" data-value="male" onclick="selectCard('gender',this)">
+        <div class="card-emoji">👨</div>
+        <div class="card-content">
+          <div class="card-title">Друг</div>
+          <div class="card-desc">Надёжный и мужской</div>
+        </div>
+      </div>
+      <div class="card" data-value="neutral" onclick="selectCard('gender',this)">
+        <div class="card-emoji">🌟</div>
+        <div class="card-content">
+          <div class="card-title">Свой</div>
+          <div class="card-desc">Нейтральный и современный</div>
+        </div>
+      </div>
     </div>
-    <div class="user-bar-bottom">
-      <span class="limit-counter" id="limit-counter">⚡ Запросов: ...</span>
-      <span class="user-trial" id="trial-badge">7 дней бесплатно</span>
-    </div>
+    <button class="btn btn-primary" id="genderBtn" onclick="nextStep()" disabled style="margin-top:24px">Далее</button>
   </div>
+
+  <!-- Screen 4: Character -->
+  <div class="ob-screen" data-step="3">
+    <div class="ob-title">Мой характер</div>
+    <div class="ob-subtitle">Как я буду с тобой общаться?</div>
+    <div class="cards" id="charCards">
+      <div class="card" data-value="warm" onclick="selectCard('character',this)">
+        <div class="card-emoji">🤗</div>
+        <div class="card-content">
+          <div class="card-title">Тёплый и заботливый</div>
+          <div class="card-desc">Всегда поддержу и пойму</div>
+        </div>
+      </div>
+      <div class="card" data-value="direct" onclick="selectCard('character',this)">
+        <div class="card-emoji">⚡</div>
+        <div class="card-content">
+          <div class="card-title">Чёткий и мотивирующий</div>
+          <div class="card-desc">Скажу правду и помогу действовать</div>
+        </div>
+      </div>
+      <div class="card" data-value="funny" onclick="selectCard('character',this)">
+        <div class="card-emoji">😄</div>
+        <div class="card-content">
+          <div class="card-title">Весёлый и с юмором</div>
+          <div class="card-desc">Даже сложное сделаю лёгким</div>
+        </div>
+      </div>
+      <div class="card" data-value="wise" onclick="selectCard('character',this)">
+        <div class="card-emoji">🧘</div>
+        <div class="card-content">
+          <div class="card-title">Мудрый и спокойный</div>
+          <div class="card-desc">Помогу найти ответы внутри себя</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="charBtn" onclick="nextStep()" disabled style="margin-top:20px">Далее</button>
+  </div>
+
+  <!-- Screen 5: Goals -->
+  <div class="ob-screen" data-step="4">
+    <div class="ob-title">Что тебе важно?</div>
+    <div class="ob-subtitle">Выбери одно или несколько</div>
+    <div class="goals-grid" id="goalsGrid">
+      <div class="goal-card" data-value="food" onclick="toggleGoal(this)">
+        <div class="goal-emoji">🍽</div>
+        <div class="goal-label">Питание и здоровье</div>
+      </div>
+      <div class="goal-card" data-value="goals" onclick="toggleGoal(this)">
+        <div class="goal-emoji">🎯</div>
+        <div class="goal-label">Достижение целей</div>
+      </div>
+      <div class="goal-card" data-value="money" onclick="toggleGoal(this)">
+        <div class="goal-emoji">💰</div>
+        <div class="goal-label">Деньги и финансы</div>
+      </div>
+      <div class="goal-card" data-value="focus" onclick="toggleGoal(this)">
+        <div class="goal-emoji">🧠</div>
+        <div class="goal-label">Спокойствие и фокус</div>
+      </div>
+      <div class="goal-card" data-value="talk" onclick="toggleGoal(this)">
+        <div class="goal-emoji">💬</div>
+        <div class="goal-label">Просто поговорить</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="goalsBtn" onclick="nextStep()" disabled style="margin-top:24px">Далее</button>
+  </div>
+
+  <!-- Screen 6: Final -->
+  <div class="ob-screen" data-step="5">
+    <div class="final-orb"></div>
+    <div class="ob-title" id="finalTitle"></div>
+    <div class="final-message" id="finalMessage"></div>
+    <button class="btn btn-primary" onclick="startChat()" style="margin-top:32px">Начать общение</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app" id="app">
+  <div class="req-counter" id="reqCounter"></div>
 
   <div class="header">
-    <div class="logo">
-      <div class="logo-icon">👨‍🍳</div>
-      <h1><span>Нейро</span> Шеф Повар</h1>
+    <div class="header-orb"></div>
+    <div class="header-info">
+      <div class="header-name" id="headerName">Друг</div>
+      <div class="header-status">онлайн</div>
     </div>
-    <p>Считает калории по фото и придумывает рецепты из того, что есть дома</p>
-    <div class="powered-badge">
-      <span class="powered-dot"></span>
-      Работает на Claude — самой умной AI-модели в мире
-    </div>
-    <a href="/faq.html" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:12px;color:var(--gray);text-decoration:none;border:1px solid var(--black4);padding:4px 12px;border-radius:20px;background:var(--black3);" onmouseover="this.style.borderColor='var(--yellow)';this.style.color='var(--yellow)'" onmouseout="this.style.borderColor='var(--black4)';this.style.color='var(--gray)'">❓ Частые вопросы</a>
+    <div class="header-menu" onclick="toggleSettings()">☰</div>
   </div>
 
-
-  <!-- NORM BAR -->
-  <div class="norm-card" id="norm-card" style="display:none">
-    <div class="norm-top">
-      <span class="norm-label">Норма калорий сегодня</span>
-      <button class="norm-edit" onclick="openProfile()">изменить</button>
+  <div class="messages" id="messages">
+    <div class="typing" id="typing">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
     </div>
-    <div style="display:flex; align-items:baseline; gap:4px; margin-bottom:8px;">
-      <span class="norm-eaten" id="norm-eaten">0</span>
-      <span class="norm-total" id="norm-total">/ 1800 ккал</span>
-    </div>
-    <div class="norm-track">
-      <div class="norm-fill" id="norm-fill" style="width:0%"></div>
-    </div>
-    <div class="norm-rest" id="norm-rest">осталось 1800 ккал</div>
   </div>
 
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('calories')">📷 Калории по фото</button>
-    <button class="tab" onclick="switchTab('recipe')">🛒 Рецепт из продуктов</button>
+  <div class="spheres-bar">
+    <button class="sphere-btn" onclick="switchSphere('health')">🍽 Здоровье</button>
+    <button class="sphere-btn" onclick="switchSphere('self')">🧠 Фокус</button>
+    <button class="sphere-btn" onclick="switchSphere('growth')">🎯 Цели</button>
+    <button class="sphere-btn" onclick="switchSphere('finance')">💰 Деньги</button>
+    <button class="sphere-btn" onclick="switchSphere('family')">❤️ Отношения</button>
+    <button class="sphere-btn" onclick="switchSphere('general')">💬 Поговорить</button>
+    <button class="sphere-btn emergency" onclick="switchSphere('emergency')">🆘 Мне плохо</button>
   </div>
 
-  <!-- CALORIES TAB -->
-  <div id="panel-calories" class="panel active">
-
-    <div class="upload-buttons" id="upload-buttons">
-      <button class="upload-btn" aria-label="Загрузить фото из галереи" onclick="document.getElementById('fileInput').click()">
-        <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(this.files[0])">
-        <span class="btn-icon">🖼</span>
-        <span class="btn-label">Загрузить фото</span>
-        <span class="btn-hint">из галереи</span>
-      </button>
-      <button class="upload-btn" aria-label="Сфотографировать блюдо" onclick="document.getElementById('cameraInput').click()">
-        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleFile(this.files[0])">
-        <span class="btn-icon">📷</span>
-        <span class="btn-label">Сфотографировать</span>
-        <span class="btn-hint">открыть камеру</span>
-      </button>
+  <div class="input-area">
+    <div class="input-wrap">
+      <button class="attach-btn" onclick="document.getElementById('photoInput').click()">📷</button>
+      <textarea class="chat-input" id="chatInput" rows="1" placeholder="Напиши сообщение..." enterkeyhint="send"></textarea>
     </div>
-
-    <div id="preview-wrap" class="preview-wrap" style="display:none">
-      <img id="preview-img" src="" alt="Фото блюда для анализа калорий">
-      <button class="remove-btn" onclick="removeImage()">✕ Удалить</button>
-    </div>
-
-    <div class="weight-wrap" id="weight-wrap">
-      <div style="margin-bottom: 1rem;">
-        <label class="field-label" for="dish-name">Название блюда (необязательно, повысит точность):</label>
-        <input type="text" id="dish-name" placeholder="Например: борщ, греческий салат, куриная грудка..."
-          style="width:100%; padding: 12px 14px; font-size: 14px; border: 1.5px solid var(--black4); border-radius: var(--radius); background: var(--black2); color: var(--white); font-family: inherit; outline: none; transition: border-color 0.2s;"
-          onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='var(--black4)'">
-      </div>
-      <label class="field-label" for="weight">Вес блюда (необязательно, но повысит точность):</label>
-      <div class="weight-row">
-        <input type="number" id="weight" min="1" max="9999" placeholder="Например: 350">
-        <span class="unit-label">г (граммы)</span>
-      </div>
-    </div>
-
-    <button class="btn" id="btn-cal" onclick="analyzeCalories()" disabled>Подсчитать калории</button>
-
-    <div id="cal-loader" class="loader" style="display:none">
-      <div class="dots"><span></span><span></span><span></span></div>
-      Анализирую фото...
-    </div>
-
-    <div id="cal-result" style="display:none" class="result-card">
-      <div class="result-header">
-        <h3>Результат анализа</h3>
-        <button class="copy-btn" onclick="copyText('cal-text', this)">📋 Скопировать</button>
-      </div>
-      <div id="cal-badge"></div>
-      <div class="result-text" id="cal-text"></div>
-    </div>
-
-    <div id="trainer-card" class="trainer-card" style="display:none">
-      <div class="trainer-avatar">💪</div>
-      <div>
-        <div class="trainer-name" id="trainer-name">СОВЕТ ТРЕНЕРА</div>
-        <div class="trainer-text" id="trainer-text"></div>
-      </div>
-    </div>
-
-    <div id="cal-error" class="error-msg" style="display:none"></div>
-
-    <div class="diary-section">
-      <div class="diary-header">
-        <span class="diary-title">📋 Дневник питания сегодня</span>
-        <button class="diary-clear" onclick="clearDiary()">Очистить</button>
-      </div>
-      <div id="diary-content"></div>
-    </div>
-
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+    <input type="file" id="photoInput" accept="image/*" capture="environment" onchange="handlePhoto(event)">
   </div>
+</div>
 
-  <!-- RECIPE TAB -->
-  <div id="panel-recipe" class="panel">
-    <span class="ingredients-label">Перечислите продукты, которые есть у вас:</span>
-    <textarea id="ingredients" placeholder="Например: яйца, картошка, лук, морковь, сметана, укроп, сливочное масло..."></textarea>
-
-    <div style="margin-top: 1rem;">
-      <label class="field-label">Количество порций:</label>
-      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <button class="portions-btn active" onclick="selectPortions(this, 1)">1 порция</button>
-        <button class="portions-btn" onclick="selectPortions(this, 2)">2 порции</button>
-        <button class="portions-btn" onclick="selectPortions(this, 3)">3 порции</button>
-        <button class="portions-btn" onclick="selectPortions(this, 4)">4 порции</button>
-        
-      </div>
-    </div>
-
-    <button class="btn" id="btn-rec" onclick="getRecipe()">Найти рецепт</button>
-
-    <div id="rec-loader" class="loader" style="display:none">
-      <div class="dots"><span></span><span></span><span></span></div>
-      Подбираю рецепт...
-    </div>
-
-    <div id="rec-result" style="display:none" class="result-card">
-      <div class="result-header">
-        <h3>Рецепт</h3>
-        <button class="copy-btn" onclick="copyText('rec-text', this)">📋 Скопировать</button>
-      </div>
-      <div class="result-text" id="rec-text"></div>
-    </div>
-
-    <div id="rec-error" class="error-msg" style="display:none"></div>
+<!-- Settings overlay -->
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettings(event)">
+  <div class="settings-panel" onclick="event.stopPropagation()">
+    <div class="settings-close" onclick="toggleSettings()">✕</div>
+    <div class="settings-title">Настройки</div>
+    <div class="settings-label">Имя друга</div>
+    <div class="settings-value" id="setName">—</div>
+    <div class="settings-label">Образ</div>
+    <div class="settings-value" id="setGender">—</div>
+    <div class="settings-label">Характер</div>
+    <div class="settings-value" id="setChar">—</div>
+    <div class="settings-label">Сфера сейчас</div>
+    <div class="settings-value" id="setSphere">Общее</div>
+    <div class="settings-btn" onclick="resetAll()">Сбросить всё и начать заново</div>
   </div>
 </div>
 
 <script>
-  // ONBOARDING
-  let onboardingStep = 0;
-  let companion = { name: '', gender: '', character: '', goals: [] };
+// ===== STATE =====
+const STATE_KEY = 'bestfriend_profile';
+const HISTORY_KEY = 'bestfriend_history';
+const DAILY_KEY = 'bestfriend_daily';
+const MAX_FREE = 3;
 
-  const onboardingScreens = [
-    {
-      icon: '👋',
-      title: 'Привет! Я <span>Нейро Шеф Повар</span>',
-      sub: 'Прежде чем начать — позволь мне стать твоим. Создай своего ИИ-помощника за 1 минуту.',
-      render: () => `
-        <span class="onboarding-icon">👋</span>
-        <div class="onboarding-title">Привет! Я <span>Нейро Шеф Повар</span></div>
-        <div class="onboarding-sub">Прежде чем начать — создай своего персонального ИИ-помощника. Это займёт 1 минуту.</div>
-        <div class="welcome-features">
-          <div class="welcome-feature">
-            <span class="feat-icon">📷</span>
-            <div class="feat-title">Калории по фото</div>
-            <div class="feat-sub">Сфотографируй еду</div>
-          </div>
-          <div class="welcome-feature">
-            <span class="feat-icon">🍳</span>
-            <div class="feat-title">Рецепты</div>
-            <div class="feat-sub">Из того что есть дома</div>
-          </div>
-          <div class="welcome-feature">
-            <span class="feat-icon">💪</span>
-            <div class="feat-title">Совет тренера</div>
-            <div class="feat-sub">После каждого анализа</div>
-          </div>
-          <div class="welcome-feature">
-            <span class="feat-icon">📋</span>
-            <div class="feat-title">Дневник питания</div>
-            <div class="feat-sub">История и прогресс</div>
-          </div>
-        </div>
-        <button class="onboarding-btn" onclick="nextOnboarding()">Создать помощника →</button>
-      `
-    },
-    {
-      render: () => `
-        <span class="onboarding-icon">✨</span>
-        <div class="onboarding-title">Как меня назвать?</div>
-        <div class="onboarding-sub">Придумай имя для своего помощника</div>
-        <input class="onboarding-name-input" id="companion-name" placeholder="Например: Саша, Лея, Макс..." maxlength="20" oninput="companion.name = this.value">
-        <div class="onboarding-tags">
-          ${['Саша','Лея','Соня','Макс','Ника','Арт'].map(n => `<button class="onboarding-tag" onclick="setName('${n}')">${n}</button>`).join('')}
-        </div>
-        <button class="onboarding-btn" id="btn-name" onclick="nextOnboarding()" disabled>Это моё имя →</button>
-      `
-    },
-    {
-      render: () => `
-        <span class="onboarding-icon">🌟</span>
-        <div class="onboarding-title">Каким я буду?</div>
-        <div class="onboarding-sub">Выбери образ своего помощника</div>
-        <div class="onboarding-options">
-          <button class="onboarding-option" onclick="selectGender('female', this)">
-            <span class="opt-icon">👩</span>
-            <span class="opt-text">Подруга<span class="opt-sub">Тёплая и женственная</span></span>
-          </button>
-          <button class="onboarding-option" onclick="selectGender('male', this)">
-            <span class="opt-icon">👨</span>
-            <span class="opt-text">Друг<span class="opt-sub">Надёжный и мужской</span></span>
-          </button>
-          <button class="onboarding-option" onclick="selectGender('neutral', this)">
-            <span class="opt-icon">🌟</span>
-            <span class="opt-text">Свой<span class="opt-sub">Нейтральный и современный</span></span>
-          </button>
-        </div>
-        <button class="onboarding-btn" id="btn-gender" onclick="nextOnboarding()" disabled>Отлично →</button>
-      `
-    },
-    {
-      render: () => `
-        <span class="onboarding-icon">💫</span>
-        <div class="onboarding-title">Какой характер?</div>
-        <div class="onboarding-sub">Выбери как ${companion.name || 'помощник'} будет с тобой общаться</div>
-        <div class="onboarding-options">
-          <button class="onboarding-option" onclick="selectChar('warm', this)">
-            <span class="opt-icon">🤗</span>
-            <span class="opt-text">Тёплый и заботливый<span class="opt-sub">Всегда поддержу и пойму</span></span>
-          </button>
-          <button class="onboarding-option" onclick="selectChar('sharp', this)">
-            <span class="opt-icon">⚡</span>
-            <span class="opt-text">Чёткий и мотивирующий<span class="opt-sub">Скажу правду и помогу действовать</span></span>
-          </button>
-          <button class="onboarding-option" onclick="selectChar('fun', this)">
-            <span class="opt-icon">😄</span>
-            <span class="opt-text">Весёлый и с юмором<span class="opt-sub">Даже сложное сделаю лёгким</span></span>
-          </button>
-          <button class="onboarding-option" onclick="selectChar('wise', this)">
-            <span class="opt-icon">🧘</span>
-            <span class="opt-text">Мудрый и спокойный<span class="opt-sub">Помогу найти ответы внутри себя</span></span>
-          </button>
-        </div>
-        <button class="onboarding-btn" id="btn-char" onclick="finishOnboarding()" disabled>Готово! →</button>
-      `
+let state = loadState();
+let currentStep = 0;
+let selectedGoals = [];
+let currentSphere = 'general';
+let pendingImage = null;
+let isLoading = false;
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STATE_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveState() { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
+  catch { return []; }
+}
+function saveHistory(h) { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); }
+
+// Daily request counter
+function getDailyCount() {
+  try {
+    const d = JSON.parse(localStorage.getItem(DAILY_KEY)) || {};
+    const today = new Date().toISOString().slice(0, 10);
+    if (d.date !== today) return 0;
+    return d.count || 0;
+  } catch { return 0; }
+}
+function incDaily() {
+  const today = new Date().toISOString().slice(0, 10);
+  const d = { date: today, count: getDailyCount() + 1 };
+  localStorage.setItem(DAILY_KEY, JSON.stringify(d));
+  updateCounter();
+}
+function updateCounter() {
+  const el = document.getElementById('reqCounter');
+  const c = getDailyCount();
+  const max = state.maxRequests || MAX_FREE;
+  el.textContent = `${c} / ${max} запросов сегодня`;
+  if (c >= max) el.style.color = '#e84848';
+  else el.style.color = '';
+}
+
+// ===== ONBOARDING =====
+function initOnboarding() {
+  // If already completed, go to chat
+  if (state.onboardingDone) {
+    document.getElementById('onboarding').classList.add('hidden');
+    setTimeout(() => {
+      document.getElementById('onboarding').style.display = 'none';
+      showApp();
+    }, 500);
+    return;
+  }
+  renderDots();
+}
+
+function renderDots() {
+  const wrap = document.getElementById('obProgress');
+  wrap.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'ob-dot' + (i === currentStep ? ' active' : '');
+    wrap.appendChild(dot);
+  }
+}
+
+function nextStep() {
+  // Validate current step
+  if (currentStep === 1 && !state.friendName) return;
+  if (currentStep === 2 && !state.friendGender) return;
+  if (currentStep === 3 && !state.friendCharacter) return;
+  if (currentStep === 4 && selectedGoals.length === 0) return;
+
+  if (currentStep === 4) {
+    state.userGoals = selectedGoals;
+    saveState();
+    prepFinal();
+  }
+
+  const screens = document.querySelectorAll('.ob-screen');
+  screens[currentStep].classList.remove('active');
+  screens[currentStep].classList.add('exit');
+  currentStep++;
+  if (currentStep < screens.length) {
+    screens[currentStep].classList.add('active');
+  }
+  renderDots();
+}
+
+function setName(name) {
+  document.getElementById('nameInput').value = name;
+  state.friendName = name;
+  saveState();
+  updateNamePreview();
+  document.getElementById('nameBtn').disabled = false;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const ni = document.getElementById('nameInput');
+  ni.addEventListener('input', () => {
+    const v = ni.value.trim();
+    state.friendName = v;
+    saveState();
+    updateNamePreview();
+    document.getElementById('nameBtn').disabled = !v;
+  });
+
+  // Textarea auto-resize
+  const ci = document.getElementById('chatInput');
+  ci.addEventListener('input', () => {
+    ci.style.height = 'auto';
+    ci.style.height = Math.min(ci.scrollHeight, 120) + 'px';
+  });
+  ci.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
     }
-  ];
+  });
 
-  function renderOnboarding() {
-    document.getElementById('onboarding-content').innerHTML = onboardingScreens[onboardingStep].render();
-    for (let i = 0; i < 4; i++) {
-      const dot = document.getElementById('dot-' + i);
-      dot.className = 'onboarding-dot' + (i === onboardingStep ? ' active' : i < onboardingStep ? ' done' : '');
-    }
-    if (onboardingStep === 1) {
-      const input = document.getElementById('companion-name');
-      if (input) {
-        input.addEventListener('input', () => {
-          document.getElementById('btn-name').disabled = input.value.trim().length < 1;
-        });
-      }
-    }
+  initOnboarding();
+});
+
+function updateNamePreview() {
+  const el = document.getElementById('namePreview');
+  if (state.friendName) {
+    el.innerHTML = `Привет, я <b>${state.friendName}</b>`;
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+function selectCard(type, el) {
+  const parent = el.parentElement;
+  parent.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const val = el.dataset.value;
+  if (type === 'gender') {
+    state.friendGender = val;
+    document.getElementById('genderBtn').disabled = false;
+  } else if (type === 'character') {
+    state.friendCharacter = val;
+    document.getElementById('charBtn').disabled = false;
+  }
+  saveState();
+}
+
+function toggleGoal(el) {
+  el.classList.toggle('selected');
+  const val = el.dataset.value;
+  if (selectedGoals.includes(val)) {
+    selectedGoals = selectedGoals.filter(g => g !== val);
+  } else {
+    selectedGoals.push(val);
+  }
+  document.getElementById('goalsBtn').disabled = selectedGoals.length === 0;
+}
+
+function prepFinal() {
+  const name = state.friendName || 'Друг';
+  document.getElementById('finalTitle').textContent = name;
+
+  const greetings = {
+    warm: `Привет! Я ${name}, и я уже чувствую — мы подружимся 🤗 Я здесь чтобы поддержать тебя во всём. Расскажи о себе?`,
+    direct: `${name} на связи! Давай сразу к делу — расскажи что для тебя сейчас самое важное, и мы начнём ⚡`,
+    funny: `Та-дам! ${name} к вашим услугам 😄 Ну что, показывай свою жизнь — будем делать её ярче вместе!`,
+    wise: `Здравствуй. Я ${name}. Каждое знакомство — начало нового пути. Расскажи, что привело тебя сюда? 🧘`
+  };
+
+  document.getElementById('finalMessage').textContent =
+    greetings[state.friendCharacter] || greetings.warm;
+}
+
+function startChat() {
+  state.onboardingDone = true;
+  state.maxRequests = MAX_FREE;
+  saveState();
+
+  // Save first friend message to history
+  const greetings = {
+    warm: `Привет! Я ${state.friendName}, и я уже чувствую — мы подружимся 🤗 Я здесь чтобы поддержать тебя во всём. Расскажи о себе?`,
+    direct: `${state.friendName} на связи! Давай сразу к делу — расскажи что для тебя сейчас самое важное, и мы начнём ⚡`,
+    funny: `Та-дам! ${state.friendName} к вашим услугам 😄 Ну что, показывай свою жизнь — будем делать её ярче вместе!`,
+    wise: `Здравствуй. Я ${state.friendName}. Каждое знакомство — начало нового пути. Расскажи, что привело тебя сюда? 🧘`
+  };
+  const firstMsg = greetings[state.friendCharacter] || greetings.warm;
+  saveHistory([{ role: 'friend', text: firstMsg, time: Date.now() }]);
+
+  // Transition
+  document.getElementById('onboarding').classList.add('hidden');
+  setTimeout(() => {
+    document.getElementById('onboarding').style.display = 'none';
+    showApp();
+  }, 500);
+}
+
+// ===== MAIN APP =====
+function showApp() {
+  const app = document.getElementById('app');
+  app.classList.add('visible');
+  document.getElementById('headerName').textContent = state.friendName || 'Друг';
+  updateCounter();
+  renderHistory();
+  updateSettings();
+}
+
+function renderHistory() {
+  const container = document.getElementById('messages');
+  const typing = document.getElementById('typing');
+  // Clear all messages except typing
+  container.querySelectorAll('.msg').forEach(m => m.remove());
+
+  const history = loadHistory();
+  history.forEach(msg => {
+    const div = document.createElement('div');
+    div.className = 'msg ' + (msg.role === 'friend' ? 'msg-friend' : 'msg-user');
+    div.textContent = msg.text;
+    container.insertBefore(div, typing);
+  });
+  scrollToBottom();
+}
+
+function addMessage(role, text) {
+  const container = document.getElementById('messages');
+  const typing = document.getElementById('typing');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role === 'friend' ? 'msg-friend' : 'msg-user');
+  div.textContent = text;
+  container.insertBefore(div, typing);
+
+  // Save to history
+  const history = loadHistory();
+  history.push({ role, text, time: Date.now() });
+  // Keep last 100 messages
+  if (history.length > 100) history.splice(0, history.length - 100);
+  saveHistory(history);
+
+  scrollToBottom();
+}
+
+function scrollToBottom() {
+  const container = document.getElementById('messages');
+  requestAnimationFrame(() => {
+    container.scrollTop = container.scrollHeight;
+  });
+}
+
+function showTyping(show) {
+  document.getElementById('typing').classList.toggle('show', show);
+  if (show) scrollToBottom();
+}
+
+// ===== SEND MESSAGE =====
+async function sendMessage() {
+  if (isLoading) return;
+
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  const image = pendingImage;
+  pendingImage = null;
+
+  if (!text && !image) return;
+
+  // Check daily limit
+  const count = getDailyCount();
+  const max = state.maxRequests || MAX_FREE;
+  // Emergency is always free
+  if (currentSphere !== 'emergency' && count >= max) {
+    addMessage('friend', `У тебя закончились запросы на сегодня (${max}/${max}). Завтра будут новые! А пока — если тебе плохо, кнопка «🆘 Мне плохо» работает всегда.`);
+    return;
   }
 
-  function nextOnboarding() {
-    onboardingStep++;
-    renderOnboarding();
+  // Add user message
+  if (text) {
+    addMessage('user', text);
+    input.value = '';
+    input.style.height = 'auto';
+  } else if (image) {
+    addMessage('user', '📷 Фото');
   }
 
-  function setName(name) {
-    companion.name = name;
-    document.getElementById('companion-name').value = name;
-    document.getElementById('btn-name').disabled = false;
-  }
+  isLoading = true;
+  showTyping(true);
+  document.getElementById('sendBtn').disabled = true;
 
-  function selectGender(gender, btn) {
-    companion.gender = gender;
-    document.querySelectorAll('#onboarding-content .onboarding-option').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    document.getElementById('btn-gender').disabled = false;
-  }
-
-  function selectChar(char, btn) {
-    companion.character = char;
-    document.querySelectorAll('#onboarding-content .onboarding-option').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    document.getElementById('btn-char').disabled = false;
-  }
-
-  function finishOnboarding() {
-    localStorage.setItem('companion', JSON.stringify(companion));
-    localStorage.setItem('onboarding_done', '1');
-    document.getElementById('onboarding-screen').style.display = 'none';
-    updateCompanionInUI();
-  }
-
-  async function checkSubscription() {
-    try {
-      const session = (await getSupabase().auth.getSession()).data.session;
-      if (!session) return;
-      const res = await fetch('/api/check-subscription', {
-        headers: { 'Authorization': 'Bearer ' + session.access_token }
-      });
-      const data = await res.json();
-      if (data.hasSubscription) {
-        localStorage.setItem('has_subscription', '1');
-        const badge = document.getElementById('trial-badge');
-        if (badge) {
-          const exp = new Date(data.expiresAt).toLocaleDateString('ru');
-          badge.textContent = '⭐ Подписка до ' + exp;
-          badge.style.background = '#0f2a0f';
-          badge.style.borderColor = '#3b6d11';
-          badge.style.color = '#97c459';
-        }
-      } else {
-        localStorage.removeItem('has_subscription');
-      }
-      updateLimitCounter();
-    } catch (e) {
-      console.log('Subscription check failed:', e.message);
-    }
-  }
-
-  function updateCompanionInUI() {
-    const saved = localStorage.getItem('companion');
-    if (!saved) return;
-    const c = JSON.parse(saved);
-    if (c.name) {
-      const trainerName = document.getElementById('trainer-name');
-      if (trainerName) trainerName.textContent = c.name.toUpperCase();
-    }
-  }
-
-  function acceptConsent() {
-    localStorage.setItem('consent_accepted', '1');
-    document.getElementById('consent-bar').style.display = 'none';
-  }
-
-  const SUPABASE_URL = 'https://siwibqrykqlyxiwtukst.supabase.co';
-  // anon key — публичный ключ, безопасно хранить во фронтенде (только для чтения)
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpd2licXJ5a3FseXhpd3R1a3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNzMwODEsImV4cCI6MjA4OTY0OTA4MX0.hACYQJs1Il0IykGGvbJKisFxvSYukHB0a3Mtnh2I-T4';
-  let _supabase = null;
-  let currentUser = null;
-
-  function getSupabase() {
-    if (!_supabase) {
-      _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    }
-    return _supabase;
-  }
-
-  async function initAuth() {
-    const tgUser = localStorage.getItem('tg_user');
-    if (tgUser) {
-      try {
-        currentUser = JSON.parse(tgUser);
-        showApp(currentUser);
-        return;
-      } catch(e) {
-        localStorage.removeItem('tg_user');
-      }
-    }
-    const supabase = getSupabase();
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      showApp(session.user);
-    } else {
-      showAuthScreen();
-    }
-
-    getSupabase().auth.onAuthStateChange((event, session) => {
-      if (session) {
-        showApp(session.user);
-      } else {
-        showAuthScreen();
-      }
-    });
-  }
-
-  function showAuthScreen() {
-    document.getElementById('auth-screen').style.display = 'flex';
-    document.getElementById('main-app').style.display = 'none';
-    currentUser = null;
-  }
-
-  function showApp(user) {
-    currentUser = user;
-    document.getElementById('auth-screen').style.display = 'none';
-
-    // Show consent bar if not accepted
-    if (!localStorage.getItem('consent_accepted')) {
-      document.getElementById('consent-bar').style.display = 'flex';
-    }
-
-    // Show onboarding if not done
-    if (!localStorage.getItem('onboarding_done')) {
-      document.getElementById('onboarding-screen').style.display = 'flex';
-      onboardingStep = 0;
-      renderOnboarding();
-    }
-
-    document.getElementById('main-app').style.display = 'block';
-    updateCompanionInUI();
-    updateLimitCounter();
-    renderNorm();
-    checkSubscription();
-
-    // Set user info
-    const email = user.display_name || user.email || 'пользователь';
-    const avatar = email[0].toUpperCase();
-    document.getElementById('user-email').textContent = email;
-    document.getElementById('user-avatar').textContent = avatar;
-
-    // Check trial
-    const registeredAt = new Date(user.created_at);
-    const now = new Date();
-    const daysPassed = Math.floor((now - registeredAt) / (1000 * 60 * 60 * 24));
-    const daysLeft = 7 - daysPassed;
-    const badge = document.getElementById('trial-badge');
-
-    if (daysLeft > 0) {
-      badge.textContent = 'Пробный период: ' + daysLeft + ' дн.';
-      badge.style.display = 'inline-block';
-    } else {
-      badge.textContent = 'Подписка нужна';
-      badge.style.background = '#2a0a0a';
-      badge.style.borderColor = '#501313';
-      badge.style.color = '#f09595';
-    }
-  }
-
-  async function signInGoogle() {
-    const supabase = getSupabase();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin
-      }
-    });
-    if (error) alert('Ошибка входа: ' + error.message);
-  }
-
-  async function signOut() {
-    localStorage.removeItem('tg_user');
-    await getSupabase().auth.signOut();
-  }
-
-  function onTelegramAuth(user) {
-    const displayName = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-    const fakeEmail = 'tg_' + user.id + '@telegram.user';
-    currentUser = {
-      id: 'tg_' + user.id,
-      email: fakeEmail,
-      display_name: displayName,
-      photo: user.photo_url,
-      created_at: new Date().toISOString(),
-      provider: 'telegram'
+  try {
+    const history = loadHistory().slice(-10);
+    const body = {
+      message: text || '',
+      friendName: state.friendName,
+      friendGender: state.friendGender,
+      friendCharacter: state.friendCharacter,
+      userGoals: state.userGoals,
+      sphere: currentSphere,
+      history: history
     };
-    localStorage.setItem('tg_user', JSON.stringify(currentUser));
-    showApp(currentUser);
+    if (image) body.imageBase64 = image;
+
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    showTyping(false);
+
+    if (data.reply) {
+      addMessage('friend', data.reply);
+      if (currentSphere !== 'emergency') incDaily();
+    } else {
+      addMessage('friend', data.error || 'Прости, что-то пошло не так. Попробуй ещё раз.');
+    }
+  } catch (err) {
+    showTyping(false);
+    addMessage('friend', 'Не могу подключиться. Проверь интернет и попробуй ещё раз.');
+    console.error(err);
   }
 
-  function isTrialActive() {
-    if (!currentUser) return false;
-    const registeredAt = new Date(currentUser.created_at);
-    const now = new Date();
-    const daysPassed = Math.floor((now - registeredAt) / (1000 * 60 * 60 * 24));
-    return daysPassed < 7;
+  isLoading = false;
+  document.getElementById('sendBtn').disabled = false;
+}
+
+// ===== SPHERES =====
+function switchSphere(sphere) {
+  currentSphere = sphere;
+  updateSettings();
+
+  const sphereNames = {
+    health: 'Здоровье и еда',
+    self: 'Фокус и голова',
+    growth: 'Цели и развитие',
+    finance: 'Деньги',
+    family: 'Отношения',
+    career: 'Карьера',
+    social: 'Окружение',
+    leisure: 'Отдых',
+    general: 'Просто поговорить',
+    emergency: 'Поддержка'
+  };
+
+  const prompts = {
+    health: 'Привет! Давай поговорим о здоровье и питании. Можешь отправить фото еды для анализа калорий, спросить рецепт или задать вопрос.',
+    self: 'Чем помочь? Могу провести технику дыхания, помочь разгрузить голову, запустить фокус-сессию или поработать с тревогой.',
+    growth: 'Давай поработаем над целями! Расскажи какая у тебя цель — я помогу разбить её на шаги.',
+    finance: 'Поговорим о деньгах? Могу рассказать урок из «Самого богатого человека в Вавилоне», помочь с бюджетом или финансовой целью.',
+    family: 'Расскажи что происходит в отношениях — я постараюсь помочь разобраться.',
+    general: '',
+    emergency: ''
+  };
+
+  if (sphere === 'emergency') {
+    // Emergency — send immediately
+    const input = document.getElementById('chatInput');
+    input.value = 'Мне плохо';
+    sendMessage();
+    return;
   }
 
-  // Init on load
-  initAuth();
-
-  let imageBase64 = null;
-  let selectedPortions = 1;
-
-  function selectPortions(btn, count) {
-    selectedPortions = count;
-    document.querySelectorAll('.portions-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+  if (prompts[sphere]) {
+    addMessage('friend', prompts[sphere]);
   }
+}
 
-  function switchTab(tab) {
-    document.querySelectorAll('.tab').forEach((t, i) =>
-      t.classList.toggle('active', (i === 0 && tab === 'calories') || (i === 1 && tab === 'recipe'))
-    );
-    document.getElementById('panel-calories').classList.toggle('active', tab === 'calories');
-    document.getElementById('panel-recipe').classList.toggle('active', tab === 'recipe');
-  }
+// ===== PHOTO =====
+function handlePhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
 
-  function handleFile(file) {
-    if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    // Compress image
     const img = new Image();
-    const objectUrl = URL.createObjectURL(file);
     img.onload = () => {
-      const MAX = 800;
-      let w = img.width, h = img.height;
-      if (w > MAX || h > MAX) {
-        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-        else { w = Math.round(w * MAX / h); h = MAX; }
-      }
       const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
+      const maxW = 800;
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = (h * maxW) / w; w = maxW; }
+      canvas.width = w;
+      canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const compressed = canvas.toDataURL('image/jpeg', 0.82);
-      imageBase64 = compressed.split(',')[1];
-      document.getElementById('preview-img').src = compressed;
-      document.getElementById('preview-wrap').style.display = 'block';
-      document.getElementById('upload-buttons').style.display = 'none';
-      document.getElementById('btn-cal').disabled = false;
-      document.getElementById('weight-wrap').style.display = 'block';
-      document.getElementById('cal-result').style.display = 'none';
-      document.getElementById('trainer-card').style.display = 'none';
-      document.getElementById('cal-error').style.display = 'none';
-      URL.revokeObjectURL(objectUrl);
+      const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+      pendingImage = base64;
+      // Auto-send with sphere context
+      const input = document.getElementById('chatInput');
+      if (!input.value.trim()) {
+        if (currentSphere === 'health') {
+          input.value = 'Сколько тут калорий?';
+        } else {
+          input.value = 'Посмотри на это фото';
+        }
+      }
+      sendMessage();
     };
-    img.src = objectUrl;
-  }
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
 
-  function removeImage() {
-    imageBase64 = null;
-    document.getElementById('preview-wrap').style.display = 'none';
-    document.getElementById('upload-buttons').style.display = 'flex';
-    document.getElementById('btn-cal').disabled = true;
-    document.getElementById('weight-wrap').style.display = 'none';
-    document.getElementById('fileInput').value = '';
-    document.getElementById('cameraInput').value = '';
-    document.getElementById('cal-result').style.display = 'none';
-    document.getElementById('trainer-card').style.display = 'none';
-  }
+// ===== SETTINGS =====
+function toggleSettings() {
+  document.getElementById('settingsOverlay').classList.toggle('show');
+}
+function closeSettings(e) {
+  if (e.target === document.getElementById('settingsOverlay')) toggleSettings();
+}
+function updateSettings() {
+  const gMap = { female: '👩 Подруга', male: '👨 Друг', neutral: '🌟 Свой' };
+  const cMap = { warm: '🤗 Тёплый', direct: '⚡ Чёткий', funny: '😄 Весёлый', wise: '🧘 Мудрый' };
+  const sMap = {
+    health: '🍽 Здоровье', self: '🧠 Фокус', growth: '🎯 Цели',
+    finance: '💰 Деньги', family: '❤️ Отношения', career: '💼 Карьера',
+    general: '💬 Общее', emergency: '🆘 Поддержка'
+  };
+  document.getElementById('setName').textContent = state.friendName || '—';
+  document.getElementById('setGender').textContent = gMap[state.friendGender] || '—';
+  document.getElementById('setChar').textContent = cMap[state.friendCharacter] || '—';
+  document.getElementById('setSphere').textContent = sMap[currentSphere] || 'Общее';
+}
 
-  function copyText(id, btn) {
-    navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
-      btn.textContent = '✓ Скопировано!';
-      btn.classList.add('copied');
-      setTimeout(() => { btn.innerHTML = '📋 Скопировать'; btn.classList.remove('copied'); }, 2000);
-    });
-  }
-
-  function escapeHtml(str) {
-    return String(str || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
-
-  function getDiary() {
-    try { return JSON.parse(localStorage.getItem('nsp_diary') || '[]'); } catch { return []; }
-  }
-
-  function saveToDiary(dish, kcal) {
-    let diary = getDiary();
-    const time = new Date().toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
-    diary.unshift({ dish, kcal, time });
-    if (diary.length > 5) diary = diary.slice(0, 5);
-    localStorage.setItem('nsp_diary', JSON.stringify(diary));
-    renderDiary();
-  }
-
-  function clearDiary() {
-    localStorage.removeItem('nsp_diary');
-    renderDiary();
-  }
-
-  function renderDiary() {
-    const diary = getDiary();
-    const el = document.getElementById('diary-content');
-    if (!diary.length) {
-      el.innerHTML = '<div class="diary-empty">Пока пусто — отсканируй первое блюдо 🍽</div>';
-      return;
-    }
-    el.innerHTML = '<div class="diary-list">' + diary.map((item, i) => `
-      <div class="diary-item">
-        <div class="diary-num">${i + 1}</div>
-        <div class="diary-info">
-          <div class="diary-dish">${escapeHtml(item.dish)}</div>
-          <div class="diary-meta">${item.time}</div>
-        </div>
-        ${item.kcal ? `<div class="diary-kcal">🔥 ${item.kcal} ккал</div>` : ''}
-      </div>`).join('') + '</div>';
-  }
-
-  renderDiary();
-
-  async function analyzeCalories() {
-    if (!imageBase64) return;
-    if (!canMakeRequest()) {
-      showLimitBanner('cal-error');
-      document.getElementById('cal-error').style.display = 'block';
-      return;
-    }
-    document.getElementById('btn-cal').disabled = true;
-    document.getElementById('cal-loader').style.display = 'flex';
-    document.getElementById('cal-result').style.display = 'none';
-    document.getElementById('trainer-card').style.display = 'none';
-    document.getElementById('cal-error').style.display = 'none';
-
-    try {
-      const weight = document.getElementById('weight').value;
-      const session1 = (await getSupabase().auth.getSession()).data.session;
-      const res = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session1?.access_token },
-        body: JSON.stringify({ type: 'calories', imageBase64, weight, dishName: document.getElementById('dish-name').value })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
-
-      incrementRequests();
-      const text = data.text || '';
-      const kcalMatch = text.match(/ККАЛ:\s*(\d+)/i);
-      const dishMatch = text.match(/БЛЮДО:\s*([^\n]+)/i);
-      const kcal = kcalMatch ? kcalMatch[1] : null;
-      const dish = dishMatch ? dishMatch[1].trim() : 'Блюдо';
-      const body = text.replace(/ККАЛ:\s*\d+/i, '').replace(/БЛЮДО:[^\n]+/i, '').trim();
-
-      document.getElementById('cal-badge').innerHTML = kcal ? `<div class="kcal-badge">🔥 ~${kcal} ккал</div>` : '';
-      document.getElementById('cal-text').textContent = body;
-      document.getElementById('cal-result').style.display = 'block';
-
-      if (data.tip) {
-        document.getElementById('trainer-text').textContent = data.tip;
-        document.getElementById('trainer-card').style.display = 'flex';
-      }
-
-      if (kcal) saveToDiary(dish, kcal);
-
-    } catch (e) {
-      document.getElementById('cal-error').textContent = 'Ошибка: ' + e.message;
-      document.getElementById('cal-error').style.display = 'block';
-    } finally {
-      document.getElementById('cal-loader').style.display = 'none';
-      document.getElementById('btn-cal').disabled = false;
-    }
-  }
-
-  async function getRecipe() {
-    const ingredients = document.getElementById('ingredients').value.trim();
-    if (!ingredients) return;
-    if (!canMakeRequest()) {
-      showLimitBanner('rec-error');
-      document.getElementById('rec-error').style.display = 'block';
-      return;
-    }
-    document.getElementById('btn-rec').disabled = true;
-    document.getElementById('rec-loader').style.display = 'flex';
-    document.getElementById('rec-result').style.display = 'none';
-    document.getElementById('rec-error').style.display = 'none';
-
-    try {
-      const session2 = (await getSupabase().auth.getSession()).data.session;
-      const res = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session2?.access_token },
-        body: JSON.stringify({ type: 'recipe', ingredients, portions: selectedPortions })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
-      incrementRequests();
-      document.getElementById('rec-text').textContent = data.text || '';
-      document.getElementById('rec-result').style.display = 'block';
-    } catch (e) {
-      document.getElementById('rec-error').textContent = 'Ошибка: ' + e.message;
-      document.getElementById('rec-error').style.display = 'block';
-    } finally {
-      document.getElementById('rec-loader').style.display = 'none';
-      document.getElementById('btn-rec').disabled = false;
-    }
-  }
+function resetAll() {
+  if (!confirm('Удалить все данные и начать заново?')) return;
+  localStorage.removeItem(STATE_KEY);
+  localStorage.removeItem(HISTORY_KEY);
+  localStorage.removeItem(DAILY_KEY);
+  location.reload();
+}
 </script>
-  <script>
-    // RATE LIMITING
-    const FREE_LIMIT = 3;
-    const PAID_LIMIT = 50;
-
-    function getTodayKey() {
-      return 'requests_' + new Date().toISOString().split('T')[0];
-    }
-
-    function getRequestsToday() {
-      return parseInt(localStorage.getItem(getTodayKey()) || '0');
-    }
-
-    function incrementRequests() {
-      const key = getTodayKey();
-      const count = getRequestsToday() + 1;
-      localStorage.setItem(key, count);
-      // Clean old keys
-      Object.keys(localStorage).forEach(k => {
-        if (k.startsWith('requests_') && k !== key) localStorage.removeItem(k);
-      });
-      updateLimitCounter();
-      return count;
-    }
-
-    function getDailyLimit() {
-      return localStorage.getItem('has_subscription') === '1' ? PAID_LIMIT : FREE_LIMIT;
-    }
-
-    function canMakeRequest() {
-      return getRequestsToday() < getDailyLimit();
-    }
-
-    function updateLimitCounter() {
-      const used = getRequestsToday();
-      const limit = getDailyLimit();
-      const left = Math.max(0, limit - used);
-      const el = document.getElementById('limit-counter');
-      if (!el) return;
-      el.textContent = '⚡ Запросов сегодня: ' + left + ' из ' + limit;
-      el.className = 'limit-counter' + (left <= 1 ? ' danger' : left <= Math.ceil(limit * 0.3) ? ' warning' : '');
-    }
-
-    function showLimitBanner(containerId) {
-      const limit = getDailyLimit();
-      const isFree = limit === FREE_LIMIT;
-      const el = document.getElementById(containerId);
-      if (!el) return;
-      el.innerHTML = `<div class="limit-banner">
-        <div class="limit-title">⚡ Лимит запросов на сегодня исчерпан</div>
-        <div class="limit-sub">${isFree
-          ? 'На бесплатном плане доступно ' + FREE_LIMIT + ' запроса в день.<br>Возвращайся завтра или оформи подписку для ' + PAID_LIMIT + ' запросов в день.'
-          : 'На твоём плане доступно ' + PAID_LIMIT + ' запросов в день.<br>Лимит обновится завтра в полночь.'
-        }</div>
-      </div>`;
-    }
-
-    // PROFILE FUNCTIONS
-    let profileGoalOffset = 0;
-
-    function openProfile() {
-      document.getElementById('profile-popup').classList.add('show');
-      const p = JSON.parse(localStorage.getItem('user_profile') || '{}');
-      if (p.sex) {
-        document.getElementById('sex-f').classList.toggle('active', p.sex === 'female');
-        document.getElementById('sex-m').classList.toggle('active', p.sex === 'male');
-      }
-      if (p.age) document.getElementById('p-age').value = p.age;
-      if (p.weight) document.getElementById('p-weight').value = p.weight;
-      if (p.height) document.getElementById('p-height').value = p.height;
-      if (p.activity) document.getElementById('p-activity').value = p.activity;
-      profileGoalOffset = p.goalOffset || 0;
-    }
-
-    function selectSex(sex, btn) {
-      document.getElementById('sex-f').classList.toggle('active', sex === 'female');
-      document.getElementById('sex-m').classList.toggle('active', sex === 'male');
-    }
-
-    function selectGoal(offset, btn) {
-      profileGoalOffset = offset;
-      document.querySelectorAll('#profile-popup .goal-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    }
-
-    function saveProfile() {
-      const sex = document.getElementById('sex-f').classList.contains('active') ? 'female' : 'male';
-      const age = parseInt(document.getElementById('p-age').value);
-      const weight = parseFloat(document.getElementById('p-weight').value);
-      const height = parseFloat(document.getElementById('p-height').value);
-      const activity = parseFloat(document.getElementById('p-activity').value);
-
-      if (!age || !weight || !height) {
-        alert('Пожалуйста заполни все поля');
-        return;
-      }
-
-      // Mifflin formula
-      let bmr = sex === 'female'
-        ? 10 * weight + 6.25 * height - 5 * age - 161
-        : 10 * weight + 6.25 * height - 5 * age + 5;
-      const norm = Math.round(bmr * activity + profileGoalOffset);
-
-      const profile = { sex, age, weight, height, activity, goalOffset: profileGoalOffset, norm };
-      localStorage.setItem('user_profile', JSON.stringify(profile));
-      document.getElementById('profile-popup').classList.remove('show');
-      renderNorm();
-    }
-
-    function renderNorm() {
-      const p = JSON.parse(localStorage.getItem('user_profile') || '{}');
-      const normEl = document.getElementById('norm-display');
-      if (!normEl) return;
-      if (p.norm) {
-        normEl.style.display = 'block';
-        document.getElementById('norm-value').textContent = p.norm;
-        updateProgressBar();
-      }
-    }
-
-    function updateProgressBar() {
-      const p = JSON.parse(localStorage.getItem('user_profile') || '{}');
-      if (!p.norm) return;
-      const diary = getDiary();
-      const todayKcal = diary.reduce((sum, item) => sum + (parseInt(item.kcal) || 0), 0);
-      const pct = Math.min(100, Math.round(todayKcal / p.norm * 100));
-      const el = document.getElementById('progress-bar-fill');
-      const label = document.getElementById('progress-label');
-      if (el) el.style.width = pct + '%';
-      if (label) label.textContent = todayKcal + ' из ' + p.norm + ' ккал (' + pct + '%)';
-      if (el) el.style.background = pct > 100 ? '#f09595' : pct > 80 ? '#EF9F27' : 'var(--yellow)';
-    }
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js');
-      });
-    }
-  </script>
-
-<!-- PROFILE POPUP -->
-<div class="popup-overlay" id="profile-popup">
-  <div class="popup-box">
-    <div class="popup-title">👋 Привет!</div>
-    <div class="popup-sub">Введи данные один раз — и я буду считать твою личную норму калорий</div>
-
-    <div class="popup-row">
-      <label>Пол</label>
-      <div class="goal-btns">
-        <button class="goal-btn active" id="sex-f" onclick="selectSex('female', this)">Женский</button>
-        <button class="goal-btn" id="sex-m" onclick="selectSex('male', this)">Мужской</button>
-      </div>
-    </div>
-
-    <div class="popup-two">
-      <div class="popup-row">
-        <label>Возраст (лет)</label>
-        <input type="number" id="p-age" min="10" max="100" placeholder="30">
-      </div>
-      <div class="popup-row">
-        <label>Вес (кг)</label>
-        <input type="number" id="p-weight" min="30" max="300" placeholder="65">
-      </div>
-    </div>
-
-    <div class="popup-row">
-      <label>Рост (см)</label>
-      <input type="number" id="p-height" min="100" max="250" placeholder="168">
-    </div>
-
-    <div class="popup-row">
-      <label>Активность</label>
-      <select id="p-activity">
-        <option value="1.2">Минимальная (сидячий образ жизни)</option>
-        <option value="1.375" selected>Лёгкая (1-3 тренировки в неделю)</option>
-        <option value="1.55">Средняя (3-5 тренировок в неделю)</option>
-        <option value="1.725">Высокая (6-7 тренировок в неделю)</option>
-      </select>
-    </div>
-
-    <div class="popup-row">
-      <label>Цель</label>
-      <div class="goal-btns">
-        <button class="goal-btn" onclick="selectGoal(-300, this)">Похудеть</button>
-        <button class="goal-btn active" onclick="selectGoal(0, this)">Держать вес</button>
-        <button class="goal-btn" onclick="selectGoal(300, this)">Набрать</button>
-      </div>
-    </div>
-
-    <button class="btn" style="margin-top:0.5rem" onclick="saveProfile()">Сохранить и начать</button>
-  </div>
-</div>
-
-
 </body>
 </html>
