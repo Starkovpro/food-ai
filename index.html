@@ -630,11 +630,14 @@ html,body{
   </div>
 
   <div class="spheres-bar">
-    <button class="sphere-btn" onclick="switchSphere('health')">🍽 Здоровье</button>
-    <button class="sphere-btn" onclick="switchSphere('self')">🧠 Фокус</button>
-    <button class="sphere-btn" onclick="switchSphere('growth')">🎯 Цели</button>
-    <button class="sphere-btn" onclick="switchSphere('finance')">💰 Деньги</button>
-    <button class="sphere-btn" onclick="switchSphere('family')">❤️ Отношения</button>
+    <button class="sphere-btn" onclick="switchSphere('health')">🍽 Здоровье и спорт</button>
+    <button class="sphere-btn" onclick="switchSphere('career')">💼 Карьера</button>
+    <button class="sphere-btn" onclick="switchSphere('finance')">💰 Финансы</button>
+    <button class="sphere-btn" onclick="switchSphere('growth')">🌱 Саморазвитие</button>
+    <button class="sphere-btn" onclick="switchSphere('social')">👥 Окружение</button>
+    <button class="sphere-btn" onclick="switchSphere('family')">❤️ Семья</button>
+    <button class="sphere-btn" onclick="switchSphere('leisure')">🎨 Отдых</button>
+    <button class="sphere-btn" onclick="switchSphere('self')">🌟 Яркость жизни</button>
     <button class="sphere-btn" onclick="switchSphere('general')">💬 Поговорить</button>
     <button class="sphere-btn emergency" onclick="switchSphere('emergency')">🆘 Мне плохо</button>
   </div>
@@ -1002,24 +1005,27 @@ function switchSphere(sphere) {
   updateSettings();
 
   const sphereNames = {
-    health: 'Здоровье и еда',
-    self: 'Фокус и голова',
-    growth: 'Цели и развитие',
-    finance: 'Деньги',
-    family: 'Отношения',
-    career: 'Карьера',
+    health: 'Здоровье и спорт',
+    career: 'Карьера и бизнес',
+    finance: 'Финансы',
+    growth: 'Саморазвитие',
     social: 'Окружение',
-    leisure: 'Отдых',
+    family: 'Семья и отношения',
+    leisure: 'Отдых и развлечения',
+    self: 'Яркость жизни',
     general: 'Просто поговорить',
     emergency: 'Поддержка'
   };
 
   const prompts = {
-    health: 'Привет! Давай поговорим о здоровье и питании. Можешь отправить фото еды для анализа калорий, спросить рецепт или задать вопрос.',
-    self: 'Чем помочь? Могу провести технику дыхания, помочь разгрузить голову, запустить фокус-сессию или поработать с тревогой.',
-    growth: 'Давай поработаем над целями! Расскажи какая у тебя цель — я помогу разбить её на шаги.',
+    health: 'Давай поговорим о здоровье! Можешь отправить фото еды для анализа калорий, спросить рецепт, задать вопрос про тренировки или питание.',
+    career: 'Поговорим о карьере и бизнесе? Расскажи что сейчас происходит на работе — помогу найти точки роста.',
     finance: 'Поговорим о деньгах? Могу рассказать урок из «Самого богатого человека в Вавилоне», помочь с бюджетом или финансовой целью.',
-    family: 'Расскажи что происходит в отношениях — я постараюсь помочь разобраться.',
+    growth: 'Давай поработаем над развитием! Расскажи чему хочешь научиться или какая цель — помогу составить план.',
+    social: 'Расскажи что происходит в твоём окружении — помогу разобраться в отношениях с людьми.',
+    family: 'Расскажи что происходит в семье или отношениях — помогу разобраться и найти решение.',
+    leisure: 'Хочешь отдохнуть качественно? Расскажи что тебе нравится — подберём хобби, отдых или новые впечатления.',
+    self: 'Как ты себя чувствуешь? Могу провести технику дыхания, помочь разгрузить голову, поработать с тревогой или просто поддержать.',
     general: '',
     emergency: ''
   };
@@ -1084,8 +1090,9 @@ function updateSettings() {
   const gMap = { female: '👩 Подруга', male: '👨 Друг', neutral: '🌟 Свой' };
   const cMap = { warm: '🤗 Тёплый', direct: '⚡ Чёткий', funny: '😄 Весёлый', wise: '🧘 Мудрый' };
   const sMap = {
-    health: '🍽 Здоровье', self: '🧠 Фокус', growth: '🎯 Цели',
-    finance: '💰 Деньги', family: '❤️ Отношения', career: '💼 Карьера',
+    health: '🍽 Здоровье и спорт', career: '💼 Карьера', finance: '💰 Финансы',
+    growth: '🌱 Саморазвитие', social: '👥 Окружение', family: '❤️ Семья',
+    leisure: '🎨 Отдых', self: '🌟 Яркость жизни',
     general: '💬 Общее', emergency: '🆘 Поддержка'
   };
   document.getElementById('setName').textContent = state.friendName || '—';
