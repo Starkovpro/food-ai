@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://food-ai-omega.vercel.app/sitemap.xml
+Sitemap: https://neyrosheff.ru/sitemap.xml

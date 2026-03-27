@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://food-ai-omega.vercel.app/</loc>
+    <loc>https://neyrosheff.ru/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <lastmod>2026-03-26</lastmod>
+    <lastmod>2026-03-27</lastmod>
   </url>
   <url>
-    <loc>https://food-ai-omega.vercel.app/privacy.html</loc>
+    <loc>https://neyrosheff.ru/faq.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-03-27</lastmod>
+  </url>
+  <url>
+    <loc>https://neyrosheff.ru/privacy.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
-    <lastmod>2026-03-26</lastmod>
+    <lastmod>2026-03-27</lastmod>
   </url>
 </urlset>
