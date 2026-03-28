@@ -8,6 +8,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0b0b14">
 <title>Твой Лучший Друг</title>
+<meta name="description" content="Персональный ИИ-друг который считает калории по фото, помогает с тревогой и учит управлять деньгами. 3 дня бесплатно.">
+<meta property="og:title" content="Твой Лучший Друг">
+<meta property="og:description" content="Сфоткай еду — узнай калории за 3 секунды. ИИ-компаньон для здоровья, фокуса и финансов.">
+<meta property="og:image" content="https://neyrosheff.ru/icon-512.png">
+<meta property="og:url" content="https://neyrosheff.ru">
+<meta property="og:type" content="website">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/icon-192.png">
@@ -1054,7 +1060,7 @@ function renderAchievements() {
 // ===== TELEGRAM =====
 function openTelegram() {
   // TODO: replace with actual bot username when created
-  var botUrl = 'https://t.me/BestFriendAI_bot?start=' + (profile.referral_code || 'new');
+  var botUrl = 'https://t.me/My_best_friend_life_bot?start=' + (profile.referral_code || 'new');
   window.open(botUrl, '_blank');
   trackEvent('telegram_opened');
 }

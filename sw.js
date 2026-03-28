@@ -1,5 +1,5 @@
-const CACHE_NAME = 'bestfriend-v1';
-const URLS_TO_CACHE = ['/', '/index.html', '/manifest.json'];
+const CACHE_NAME = 'bestfriend-v2';
+const URLS_TO_CACHE = ['/', '/index.html', '/landing.html', '/privacy.html', '/manifest.json', '/icon-192.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
