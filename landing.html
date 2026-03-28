@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0b14">
+<title>Твой Лучший Друг — ИИ-помощник для клиенток Фрау Фитнес</title>
+<meta name="description" content="Сфоткай еду — узнай калории за 3 секунды. Персональный ИИ-компаньон для здоровья, фокуса и финансов. 3 дня бесплатно.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b0b14;color:#e8e6e0;font-family:'Outfit',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(232,168,56,.12) 0%,transparent 60%);pointer-events:none}
+
+.badge{display:inline-block;padding:6px 16px;background:rgba(232,168,56,.1);border:1px solid rgba(232,168,56,.25);border-radius:20px;font-size:12px;font-weight:500;color:#e8a838;margin-bottom:24px;letter-spacing:.5px}
+.hero-title{font-size:clamp(32px,7vw,52px);font-weight:800;line-height:1.15;margin-bottom:16px;max-width:600px}
+.hero-title span{background:linear-gradient(135deg,#e8a838,#f0c060);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:clamp(16px,3.5vw,20px);color:#a8a6b3;line-height:1.5;max-width:480px;margin-bottom:36px}
+
+.cta-btn{display:inline-flex;align-items:center;gap:10px;padding:18px 40px;background:linear-gradient(135deg,#e8a838,#f0c060);color:#0b0b14;font-family:'Outfit',sans-serif;font-size:18px;font-weight:700;border:none;border-radius:16px;cursor:pointer;text-decoration:none;box-shadow:0 4px 30px rgba(232,168,56,.35);transition:all .2s}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(232,168,56,.45)}
+.cta-btn:active{transform:scale(.97)}
+.cta-small{font-size:13px;color:#a8a6b3;margin-top:12px}
+
+.features{padding:60px 24px;max-width:500px;margin:0 auto}
+.feat{display:flex;gap:16px;margin-bottom:32px;align-items:flex-start}
+.feat-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.feat-icon.green{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2)}
+.feat-icon.blue{background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.2)}
+.feat-icon.gold{background:rgba(232,168,56,.1);border:1px solid rgba(232,168,56,.2)}
+.feat-icon.purple{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2)}
+.feat-title{font-size:16px;font-weight:600;margin-bottom:4px}
+.feat-desc{font-size:14px;color:#a8a6b3;line-height:1.5}
+
+.how{padding:40px 24px 60px;text-align:center}
+.how-title{font-size:22px;font-weight:700;margin-bottom:32px}
+.steps{display:flex;flex-direction:column;gap:20px;max-width:400px;margin:0 auto}
+.step{display:flex;align-items:center;gap:16px;text-align:left}
+.step-num{width:40px;height:40px;border-radius:50%;background:rgba(232,168,56,.1);border:1.5px solid rgba(232,168,56,.3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#e8a838;flex-shrink:0}
+.step-text{font-size:15px;line-height:1.5}
+
+.bottom-cta{padding:40px 24px 60px;text-align:center;position:relative}
+.bottom-cta::before{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:500px;height:300px;background:radial-gradient(circle,rgba(232,168,56,.06) 0%,transparent 70%)}
+
+.trust{padding:0 24px 40px;text-align:center}
+.trust-text{font-size:13px;color:#5a586a;line-height:1.6}
+.trust-text a{color:#e8a838;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">Для клиенток Фрау Фитнес</div>
+  <h1 class="hero-title">Сфоткай еду —<br>узнай <span>калории</span><br>за 3 секунды</h1>
+  <p class="hero-sub">Персональный ИИ-друг который считает калории, помогает с тревогой и учит управлять деньгами. Бесплатно 3 дня.</p>
+  <a href="/" class="cta-btn">Попробовать бесплатно →</a>
+  <div class="cta-small">Без карты · Вход через Google · 25 запросов в день</div>
+</div>
+
+<div class="features">
+  <div class="feat">
+    <div class="feat-icon green">🍽</div>
+    <div>
+      <div class="feat-title">Здоровье и питание</div>
+      <div class="feat-desc">Фото еды → калории, белки, жиры, углеводы. Рецепты из того что есть дома. Советы по тренировкам.</div>
+    </div>
+  </div>
+  <div class="feat">
+    <div class="feat-icon blue">🧠</div>
+    <div>
+      <div class="feat-title">Фокус и эмоции</div>
+      <div class="feat-desc">Техники дыхания, работа с тревогой, разгрузка головы перед сном. Помодоро-сессии с поддержкой.</div>
+    </div>
+  </div>
+  <div class="feat">
+    <div class="feat-icon gold">💰</div>
+    <div>
+      <div class="feat-title">Финансы</div>
+      <div class="feat-desc">Уроки из «Самого богатого человека в Вавилоне», помощь с бюджетом, финансовые цели.</div>
+    </div>
+  </div>
+  <div class="feat">
+    <div class="feat-icon purple">💬</div>
+    <div>
+      <div class="feat-title">Просто поговорить</div>
+      <div class="feat-desc">Обо всём на свете. Друг запоминает что ты рассказываешь и общается в твоём стиле.</div>
+    </div>
+  </div>
+</div>
+
+<div class="how">
+  <div class="how-title">Как это работает?</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-text">Войди через Google и создай своего друга — выбери имя и характер</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text">Сфоткай обед — друг посчитает калории и даст совет</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text">Переключайся между сферами — здоровье, фокус, финансы, общение</div></div>
+  </div>
+</div>
+
+<div class="bottom-cta">
+  <a href="/" class="cta-btn">Начать бесплатно →</a>
+  <div class="cta-small">3 дня бесплатно · потом 2000₽/мес</div>
+</div>
+
+<div class="trust">
+  <p class="trust-text">Работает на передовых ИИ-технологиях · Данные защищены · <a href="/privacy.html">Политика конфиденциальности</a></p>
+</div>
+
+<script>
+// Preserve referral code from QR
+var params = new URLSearchParams(window.location.search);
+var ref = params.get('ref');
+if (ref) {
+  // Add ref to all CTA links
+  document.querySelectorAll('.cta-btn').forEach(function(btn) {
+    btn.href = '/?ref=' + ref;
+  });
+}
+</script>
+</body>
+</html>

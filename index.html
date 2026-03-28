@@ -195,6 +195,43 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 
 /* TRIAL BADGE */
 .trial-badge{padding:3px 8px;background:rgba(232,168,56,.15);border:1px solid rgba(232,168,56,.3);border-radius:8px;font-size:10px;color:var(--accent);font-weight:500;margin-left:6px}
+
+/* SHARE BUTTON */
+.msg-actions{display:flex;gap:8px;margin-top:8px}
+.share-btn{padding:4px 12px;background:rgba(232,168,56,.1);border:1px solid rgba(232,168,56,.2);border-radius:12px;font-family:'Outfit',sans-serif;font-size:11px;color:var(--accent);cursor:pointer;transition:all .2s}
+.share-btn:active{transform:scale(.95)}
+
+/* REFERRAL in settings */
+.ref-code-wrap{display:flex;gap:8px;margin-top:8px}
+.ref-code{flex:1;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:monospace;font-size:14px;color:var(--accent);letter-spacing:2px;text-align:center}
+.ref-copy{padding:10px 16px;background:var(--accent);color:var(--bg);border:none;border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.ref-copy:active{transform:scale(.95)}
+.ref-bonus{font-size:12px;color:var(--success);margin-top:6px}
+
+/* BALANCE WHEEL */
+.wheel-overlay{position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);display:none;flex-direction:column;align-items:center;overflow-y:auto;padding:20px}
+.wheel-overlay.show{display:flex}
+.wheel-card{width:100%;max-width:400px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:24px;position:relative}
+.wheel-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text2);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.wheel-title{font-size:18px;font-weight:600;margin-bottom:4px;text-align:center}
+.wheel-sub{font-size:13px;color:var(--text2);text-align:center;margin-bottom:20px;line-height:1.5}
+.wheel-svg{display:block;margin:0 auto 20px;max-width:280px}
+.wheel-sliders{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wheel-slider{display:flex;flex-direction:column;gap:4px}
+.wheel-slider label{font-size:12px;color:var(--text2);display:flex;justify-content:space-between}
+.wheel-slider label span{color:var(--accent);font-weight:600}
+.wheel-slider input[type=range]{width:100%;accent-color:var(--accent);height:4px}
+.wheel-save{width:100%;padding:14px;margin-top:16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);border:none;border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer}
+.wheel-save:active{transform:scale(.97)}
+.wheel-history{margin-top:16px;font-size:12px;color:var(--text2);text-align:center}
+.wheel-btn{padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-family:'Outfit',sans-serif;font-size:12px;color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap}
+.wheel-btn:active{border-color:var(--accent);color:var(--accent)}
+
+/* PUSH opt-in */
+.push-banner{display:none;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);text-align:center;font-size:13px;color:var(--text2);flex-shrink:0}
+.push-banner.show{display:flex;align-items:center;gap:10px;justify-content:center}
+.push-yes{padding:6px 14px;background:var(--accent);color:var(--bg);border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+.push-no{background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif}
 </style>
 </head>
 <body>
@@ -277,9 +314,11 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
   <div class="header">
     <div class="header-orb"></div>
     <div class="header-info"><div class="header-name" id="headerName">Друг</div><div class="header-status">онлайн · <span class="header-sphere" id="headerSphere">💬 Общий чат</span></div></div>
-    <div class="req-counter" id="reqCounter">0 / 10</div>
+    <div class="req-counter" id="reqCounter">0 / 25</div>
+    <div class="wheel-btn" onclick="openWheel()">⚖️</div>
     <div class="header-menu" onclick="toggleSettings()">☰</div>
   </div>
+  <div class="push-banner" id="pushBanner">🔔 Утренние приветствия? <button class="push-yes" onclick="enablePush()">Включить</button><button class="push-no" onclick="dismissPush()">✕</button></div>
   <div class="messages" id="messages">
     <div class="empty-state" id="emptyState" style="display:none">
       <div class="empty-icon" id="emptyIcon">💬</div>
@@ -321,8 +360,27 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
     <div class="settings-label">Характер</div><div class="settings-value" id="setChar">—</div>
     <div class="settings-label">Сфера</div><div class="settings-value" id="setSphere">Общее</div>
     <div class="settings-label">Аккаунт</div><div class="settings-value" id="setEmail">—</div>
+    <div class="settings-label">Пригласи подругу — получите +5 запросов</div>
+    <div class="ref-code-wrap">
+      <div class="ref-code" id="refCode">------</div>
+      <button class="ref-copy" onclick="copyRefLink()">Копировать</button>
+    </div>
+    <div class="ref-bonus" id="refBonus"></div>
     <div class="settings-btn logout" onclick="signOut()">Выйти из аккаунта</div>
     <div class="settings-btn danger" onclick="resetAll()">Сбросить и начать заново</div>
+  </div>
+</div>
+
+<!-- BALANCE WHEEL -->
+<div class="wheel-overlay" id="wheelOverlay">
+  <div class="wheel-card">
+    <div class="wheel-close" onclick="closeWheel()">✕</div>
+    <div class="wheel-title">Колесо баланса</div>
+    <div class="wheel-sub" id="wheelSub">Оцени каждую сферу жизни от 1 до 10. Чем ровнее колесо — тем гармоничнее жизнь.</div>
+    <svg class="wheel-svg" id="wheelSvg" viewBox="0 0 300 300"></svg>
+    <div class="wheel-sliders" id="wheelSliders"></div>
+    <button class="wheel-save" onclick="saveWheel()">Сохранить оценку</button>
+    <div class="wheel-history" id="wheelHistory"></div>
   </div>
 </div>
 
@@ -469,6 +527,9 @@ function showApp() {
   document.querySelectorAll('.sphere-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.sphere === currentSphere); });
   renderHistory(); updateSettings(); fetchCount();
   trackEvent('session_start');
+  updateRefUI();
+  applyReferral();
+  if (localStorage.getItem('bf_push_enabled') === 'true') scheduleMorningCheck();
 
   // Check trial on load
   if (profile && profile.created_at) {
@@ -574,9 +635,16 @@ function addMessageToSphere(sphere, role, text) {
   // Only show in UI if we're still on that sphere
   if (sphere === currentSphere) {
     var c = document.getElementById('messages'); var es = document.getElementById('emptyState');
-    var d = document.createElement('div'); d.className = 'msg '+(role==='friend'?'msg-friend':'msg-user'); d.textContent = text;
+    var d = document.createElement('div'); d.className = 'msg '+(role==='friend'?'msg-friend':'msg-user');
+    d.textContent = text;
+    if (role === 'friend' && (sphere === 'health' || sphere === 'finance') && text.length > 50) {
+      var btn = document.createElement('button'); btn.className = 'share-btn'; btn.textContent = '📤 Поделиться';
+      btn.onclick = function() { shareResult(text); };
+      d.appendChild(btn);
+    }
     c.insertBefore(d, es); es.style.display = 'none'; scrollToBottom();
   }
+  showPushBanner();
 }
 
 // ===== SPHERES =====
@@ -669,6 +737,265 @@ function closePaywall() {
 function handleSubscribe() {
   // TODO: connect ЮKassa payment
   alert('Оплата будет доступна совсем скоро! Напиши нам: info@neyrosheff.ru');
+}
+
+// ===== SHARE RESULT =====
+function shareResult(text) {
+  // Generate share card as canvas
+  var canvas = document.createElement('canvas');
+  canvas.width = 1080; canvas.height = 1350;
+  var ctx = canvas.getContext('2d');
+  // Background
+  ctx.fillStyle = '#0b0b14'; ctx.fillRect(0, 0, 1080, 1350);
+  // Accent circle
+  ctx.beginPath(); ctx.arc(540, 200, 120, 0, Math.PI*2);
+  var grad = ctx.createRadialGradient(520, 180, 0, 540, 200, 120);
+  grad.addColorStop(0, '#e8a838'); grad.addColorStop(0.6, '#c47820'); grad.addColorStop(1, '#3a1a05');
+  ctx.fillStyle = grad; ctx.fill();
+  // Title
+  ctx.fillStyle = '#e8e6e0'; ctx.font = '600 48px Outfit, sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('Твой Лучший Друг', 540, 400);
+  // Result text - wrap lines
+  ctx.font = '400 32px Outfit, sans-serif'; ctx.fillStyle = '#a8a6b3';
+  var words = text.split(' '); var lines = []; var line = '';
+  for (var i = 0; i < words.length; i++) {
+    var test = line + words[i] + ' ';
+    if (ctx.measureText(test).width > 900 && line) { lines.push(line.trim()); line = words[i] + ' '; }
+    else line = test;
+  }
+  lines.push(line.trim());
+  var startY = 500;
+  for (var j = 0; j < Math.min(lines.length, 15); j++) {
+    ctx.fillText(lines[j], 540, startY + j * 44);
+  }
+  // Footer
+  ctx.fillStyle = '#e8a838'; ctx.font = '500 28px Outfit, sans-serif';
+  ctx.fillText('neyrosheff.ru', 540, 1250);
+  ctx.fillStyle = '#5a586a'; ctx.font = '400 22px Outfit, sans-serif';
+  ctx.fillText('3 дня бесплатно', 540, 1290);
+  // Download or share
+  canvas.toBlob(function(blob) {
+    if (navigator.share) {
+      var file = new File([blob], 'result.png', {type:'image/png'});
+      navigator.share({ files: [file], title: 'Мой результат' }).catch(function(){});
+    } else {
+      var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'result.png'; a.click();
+    }
+  });
+  trackEvent('share_result', { sphere: currentSphere });
+}
+
+// ===== REFERRAL =====
+function copyRefLink() {
+  var code = document.getElementById('refCode').textContent;
+  if (!code || code === '------') return;
+  var link = 'https://neyrosheff.ru/landing.html?ref=' + code;
+  navigator.clipboard.writeText(link).then(function() {
+    var btn = document.querySelector('.ref-copy');
+    btn.textContent = 'Скопировано!';
+    setTimeout(function() { btn.textContent = 'Копировать'; }, 2000);
+  }).catch(function() {
+    // Fallback
+    prompt('Скопируй ссылку:', link);
+  });
+  trackEvent('referral_copied');
+}
+
+async function applyReferral() {
+  var ref = localStorage.getItem('bf_ref');
+  if (!ref || !currentUser) return;
+  // Check if already applied
+  if (profile.referred_by) return;
+  try {
+    var result = await supabase.rpc('apply_referral', { p_new_user_id: currentUser.id, p_referral_code: ref });
+    if (result.data && result.data.success) {
+      trackEvent('referral_applied', { code: ref });
+    }
+  } catch(e) {}
+  localStorage.removeItem('bf_ref');
+}
+
+function updateRefUI() {
+  if (profile.referral_code) {
+    document.getElementById('refCode').textContent = profile.referral_code;
+  }
+  if (profile.bonus_requests > 0) {
+    document.getElementById('refBonus').textContent = '🎁 Бонусных запросов: ' + profile.bonus_requests;
+  }
+}
+
+// ===== BALANCE WHEEL =====
+var wheelAreas = [
+  { key: 'health', name: 'Здоровье', color: '#48c878' },
+  { key: 'focus', name: 'Фокус', color: '#48a0c8' },
+  { key: 'finance', name: 'Финансы', color: '#e8a838' },
+  { key: 'relationships', name: 'Отношения', color: '#fb7185' },
+  { key: 'career', name: 'Карьера', color: '#60a5fa' },
+  { key: 'fun', name: 'Отдых', color: '#a78bfa' },
+  { key: 'growth', name: 'Развитие', color: '#34d399' },
+  { key: 'energy', name: 'Энергия', color: '#f59e0b' }
+];
+var wheelValues = {};
+
+function openWheel() {
+  document.getElementById('wheelOverlay').classList.add('show');
+  // Init sliders
+  var sl = document.getElementById('wheelSliders');
+  sl.innerHTML = '';
+  wheelAreas.forEach(function(a) {
+    wheelValues[a.key] = wheelValues[a.key] || 5;
+    var div = document.createElement('div');
+    div.className = 'wheel-slider';
+    div.innerHTML = '<label>' + a.name + ' <span id="wv_'+a.key+'">' + wheelValues[a.key] + '</span></label>' +
+      '<input type="range" min="1" max="10" value="'+wheelValues[a.key]+'" oninput="updateWheelVal(\''+a.key+'\',this.value)">';
+    sl.appendChild(div);
+  });
+  drawWheel();
+  loadWheelHistory();
+}
+
+function closeWheel() { document.getElementById('wheelOverlay').classList.remove('show'); }
+
+function updateWheelVal(key, val) {
+  wheelValues[key] = parseInt(val);
+  document.getElementById('wv_' + key).textContent = val;
+  drawWheel();
+}
+
+function drawWheel() {
+  var svg = document.getElementById('wheelSvg');
+  var cx = 150, cy = 150, maxR = 130;
+  var n = wheelAreas.length;
+  var html = '';
+  // Grid circles
+  for (var r = 1; r <= 5; r++) {
+    var radius = (r / 5) * maxR;
+    html += '<circle cx="'+cx+'" cy="'+cy+'" r="'+radius+'" fill="none" stroke="#252540" stroke-width="0.5"/>';
+  }
+  // Grid lines
+  for (var i = 0; i < n; i++) {
+    var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+    var x2 = cx + maxR * Math.cos(angle);
+    var y2 = cy + maxR * Math.sin(angle);
+    html += '<line x1="'+cx+'" y1="'+cy+'" x2="'+x2+'" y2="'+y2+'" stroke="#252540" stroke-width="0.5"/>';
+    // Labels
+    var lx = cx + (maxR + 18) * Math.cos(angle);
+    var ly = cy + (maxR + 18) * Math.sin(angle);
+    html += '<text x="'+lx+'" y="'+ly+'" fill="'+wheelAreas[i].color+'" font-size="10" font-family="Outfit" font-weight="500" text-anchor="middle" dominant-baseline="central">'+wheelAreas[i].name+'</text>';
+  }
+  // Data polygon
+  var points = [];
+  for (var j = 0; j < n; j++) {
+    var a = (Math.PI * 2 * j / n) - Math.PI / 2;
+    var v = (wheelValues[wheelAreas[j].key] || 5) / 10;
+    points.push((cx + maxR * v * Math.cos(a)).toFixed(1) + ',' + (cy + maxR * v * Math.sin(a)).toFixed(1));
+  }
+  html += '<polygon points="'+points.join(' ')+'" fill="rgba(232,168,56,0.15)" stroke="#e8a838" stroke-width="2"/>';
+  // Dots
+  for (var k = 0; k < n; k++) {
+    var a2 = (Math.PI * 2 * k / n) - Math.PI / 2;
+    var v2 = (wheelValues[wheelAreas[k].key] || 5) / 10;
+    var dx = cx + maxR * v2 * Math.cos(a2);
+    var dy = cy + maxR * v2 * Math.sin(a2);
+    html += '<circle cx="'+dx.toFixed(1)+'" cy="'+dy.toFixed(1)+'" r="4" fill="'+wheelAreas[k].color+'"/>';
+  }
+  svg.innerHTML = html;
+}
+
+async function saveWheel() {
+  if (!currentUser) return;
+  var data = { user_id: currentUser.id };
+  wheelAreas.forEach(function(a) { data[a.key] = wheelValues[a.key] || 5; });
+  try {
+    await supabase.from('balance_wheel').insert(data);
+    document.getElementById('wheelSub').textContent = '✅ Сохранено! Заполняй каждую неделю чтобы видеть рост.';
+    setTimeout(function() { document.getElementById('wheelSub').textContent = 'Оцени каждую сферу жизни от 1 до 10.'; }, 3000);
+    loadWheelHistory();
+    trackEvent('wheel_saved', wheelValues);
+  } catch(e) { console.error('Wheel save error:', e); }
+}
+
+async function loadWheelHistory() {
+  if (!currentUser) return;
+  try {
+    var { data } = await supabase.from('balance_wheel').select('*').eq('user_id', currentUser.id).order('recorded_at', { ascending: false }).limit(5);
+    if (data && data.length > 0) {
+      // Load latest values into sliders
+      var latest = data[0];
+      wheelAreas.forEach(function(a) {
+        if (latest[a.key]) {
+          wheelValues[a.key] = latest[a.key];
+          var slider = document.querySelector('input[oninput*="'+a.key+'"]');
+          if (slider) slider.value = latest[a.key];
+          var span = document.getElementById('wv_' + a.key);
+          if (span) span.textContent = latest[a.key];
+        }
+      });
+      drawWheel();
+      // Show history count
+      var el = document.getElementById('wheelHistory');
+      el.textContent = 'Записей: ' + data.length + ' · последняя: ' + new Date(latest.recorded_at).toLocaleDateString('ru');
+    }
+  } catch(e) {}
+}
+
+// ===== PUSH NOTIFICATIONS =====
+function showPushBanner() {
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+  if (Notification.permission === 'granted' || localStorage.getItem('bf_push_dismissed')) return;
+  // Show after 3rd message
+  var hist = loadHistory();
+  if (hist.filter(function(m){return m.role==='user'}).length >= 3) {
+    document.getElementById('pushBanner').classList.add('show');
+  }
+}
+
+async function enablePush() {
+  document.getElementById('pushBanner').classList.remove('show');
+  try {
+    var permission = await Notification.requestPermission();
+    if (permission !== 'granted') return;
+    var reg = await navigator.serviceWorker.ready;
+    // For real push you need VAPID keys — for now use simple notification scheduling
+    localStorage.setItem('bf_push_enabled', 'true');
+    // Save to profile
+    if (currentUser) {
+      await supabase.from('user_profiles').update({ push_enabled: true }).eq('user_id', currentUser.id);
+    }
+    trackEvent('push_enabled');
+    // Schedule first morning notification check
+    scheduleMorningCheck();
+  } catch(e) { console.error('Push error:', e); }
+}
+
+function dismissPush() {
+  document.getElementById('pushBanner').classList.remove('show');
+  localStorage.setItem('bf_push_dismissed', 'true');
+}
+
+function scheduleMorningCheck() {
+  // Check every hour if it's morning (8-9 AM) and send notification
+  setInterval(function() {
+    var h = new Date().getHours();
+    if (h === 8 && localStorage.getItem('bf_push_enabled') === 'true') {
+      var lastPush = localStorage.getItem('bf_last_push');
+      var today = new Date().toISOString().slice(0,10);
+      if (lastPush === today) return;
+      localStorage.setItem('bf_last_push', today);
+      var name = (profile && profile.friend_name) || 'Друг';
+      var greetings = [
+        name + ' ждёт тебя! Как спала? ☀️',
+        'Доброе утро! ' + name + ' хочет узнать как дела 🌅',
+        name + ' уже онлайн и готов помочь! 💛',
+        'Новый день — новые возможности! ' + name + ' рядом ✨',
+        'Утро! ' + name + ' приготовил кое-что интересное 😊'
+      ];
+      var msg = greetings[Math.floor(Math.random() * greetings.length)];
+      if (Notification.permission === 'granted') {
+        new Notification('Твой Лучший Друг', { body: msg, icon: '/icon-192.png' });
+      }
+    }
+  }, 1000 * 60 * 30); // Check every 30 minutes
 }
 
 // ===== ANALYTICS =====
