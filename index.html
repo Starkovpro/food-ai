@@ -170,8 +170,70 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .settings-title{font-size:18px;font-weight:600;margin-bottom:20px}
 .settings-label{font-size:13px;color:var(--text2);margin-bottom:8px;margin-top:18px}
 .settings-value{font-size:15px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)}
-.settings-btn{width:100%;padding:14px;margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:14px;cursor:pointer;text-align:center}
+.settings-btn{width:100%;padding:14px;margin-top:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:14px;cursor:pointer;text-align:center;display:flex;align-items:center;gap:10px;justify-content:center}
 .settings-btn.danger{color:var(--danger)}.settings-btn.logout{color:var(--text2)}
+.settings-btn .btn-icon{font-size:18px}
+.settings-btn .btn-arrow{margin-left:auto;color:var(--text3);font-size:12px}
+
+/* Page overlays (goals, subscription, edit friend, achievements, telegram) */
+.page-overlay{position:fixed;inset:0;z-index:250;background:var(--bg);display:none;flex-direction:column;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,20px)}
+.page-overlay.show{display:flex}
+.page-header{display:flex;align-items:center;gap:12px;padding:14px 16px;padding-top:calc(env(safe-area-inset-top,8px)+8px);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.page-back{width:36px;height:36px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:16px}
+.page-title{font-size:17px;font-weight:600;flex:1}
+.page-body{flex:1;padding:20px 16px}
+
+/* Goals page */
+.goal-input-wrap{display:flex;gap:8px;margin-bottom:16px}
+.goal-input{flex:1;padding:12px 16px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none}
+.goal-input:focus{border-color:var(--accent)}
+.goal-add-btn{padding:12px 20px;background:var(--accent);color:var(--bg);border:none;border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer}
+.goal-list{display:flex;flex-direction:column;gap:8px}
+.goal-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);transition:all .2s}
+.goal-item.done{opacity:.5}
+.goal-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;transition:all .2s}
+.goal-check.checked{background:var(--success);border-color:var(--success);color:#fff}
+.goal-text{flex:1;font-size:14px;line-height:1.4}
+.goal-text.checked{text-decoration:line-through;color:var(--text2)}
+.goal-del{width:28px;height:28px;border-radius:50%;background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer}
+.goal-empty{text-align:center;padding:40px 20px;color:var(--text2);font-size:14px;line-height:1.6}
+
+/* Subscription page */
+.sub-card{padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:20px;text-align:center;margin-bottom:16px}
+.sub-status-big{font-size:14px;font-weight:600;padding:6px 16px;border-radius:20px;display:inline-block;margin-bottom:12px}
+.sub-status-big.trial{color:var(--accent);background:rgba(232,168,56,.1);border:1px solid rgba(232,168,56,.25)}
+.sub-status-big.paid{color:var(--success);background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25)}
+.sub-status-big.expired{color:var(--danger);background:rgba(232,72,72,.1);border:1px solid rgba(232,72,72,.25)}
+.sub-days{font-size:36px;font-weight:700;color:var(--text);margin:8px 0}
+.sub-days-label{font-size:13px;color:var(--text2)}
+.sub-price{margin-top:20px;font-size:28px;font-weight:700;color:var(--accent)}
+.sub-period{font-size:14px;color:var(--text2);margin-bottom:20px}
+.sub-features{text-align:left;margin:16px 0}
+.sub-feat{padding:8px 0;font-size:14px;color:var(--text);display:flex;align-items:center;gap:8px}
+.sub-feat::before{content:'✓';color:var(--success);font-weight:700}
+.sub-buy-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);border:none;border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;cursor:pointer}
+.sub-buy-btn:active{transform:scale(.97)}
+.sub-info{font-size:12px;color:var(--text3);text-align:center;margin-top:12px;line-height:1.5}
+
+/* Edit friend page */
+.edit-section{margin-bottom:24px}
+.edit-label{font-size:13px;color:var(--text2);margin-bottom:10px}
+.edit-input{width:100%;padding:14px 18px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Outfit',sans-serif;font-size:18px;font-weight:500;text-align:center;outline:none}
+.edit-input:focus{border-color:var(--accent)}
+.edit-cards{display:flex;flex-direction:column;gap:10px}
+.edit-card{padding:14px 16px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .2s}
+.edit-card.selected{border-color:var(--accent);background:var(--accent-glow)}
+.edit-save{width:100%;padding:16px;margin-top:24px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);border:none;border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;cursor:pointer}
+
+/* Achievements page */
+.ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ach-card{padding:20px 16px;background:var(--surface);border:1px solid var(--border);border-radius:16px;text-align:center;transition:all .2s;position:relative;overflow:hidden}
+.ach-card.unlocked{border-color:var(--accent);background:var(--accent-glow)}
+.ach-card.locked{opacity:.4}
+.ach-icon{font-size:36px;margin-bottom:8px}
+.ach-name{font-size:13px;font-weight:600;margin-bottom:4px}
+.ach-desc{font-size:11px;color:var(--text2);line-height:1.4}
+.ach-badge{position:absolute;top:8px;right:8px;font-size:10px;padding:2px 8px;border-radius:10px;background:var(--accent);color:var(--bg);font-weight:700}
 .settings-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text2);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:env(safe-area-inset-top,0)}
 
 /* OFFLINE */
@@ -355,19 +417,115 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
   <div class="settings-panel" onclick="event.stopPropagation()">
     <div class="settings-close" onclick="toggleSettings()">✕</div>
     <div class="settings-title">Настройки</div>
-    <div class="settings-label">Имя друга</div><div class="settings-value" id="setName">—</div>
-    <div class="settings-label">Образ</div><div class="settings-value" id="setGender">—</div>
-    <div class="settings-label">Характер</div><div class="settings-value" id="setChar">—</div>
-    <div class="settings-label">Сфера</div><div class="settings-value" id="setSphere">Общее</div>
-    <div class="settings-label">Аккаунт</div><div class="settings-value" id="setEmail">—</div>
-    <div class="settings-label">Пригласи подругу — получите +5 запросов</div>
+    <div class="settings-label">Друг</div>
+    <div class="settings-value" id="setFriendInfo">—</div>
+    <div class="settings-label">Аккаунт</div>
+    <div class="settings-value" id="setEmail">—</div>
+
+    <div class="settings-btn" onclick="openPage('goals')"><span class="btn-icon">🎯</span> Мои цели <span class="btn-arrow">›</span></div>
+    <div class="settings-btn" onclick="openPage('subscription')"><span class="btn-icon">💳</span> Подписка <span class="btn-arrow">›</span></div>
+    <div class="settings-btn" onclick="openPage('editFriend')"><span class="btn-icon">✏️</span> Изменить друга <span class="btn-arrow">›</span></div>
+    <div class="settings-btn" onclick="openPage('achievements')"><span class="btn-icon">🏆</span> Мои достижения <span class="btn-arrow">›</span></div>
+    <div class="settings-btn" onclick="openTelegram()"><span class="btn-icon">🔔</span> Напоминания в Telegram <span class="btn-arrow">›</span></div>
+
+    <div class="settings-label" style="margin-top:20px">Пригласи подругу — +5 запросов</div>
     <div class="ref-code-wrap">
       <div class="ref-code" id="refCode">------</div>
       <button class="ref-copy" onclick="copyRefLink()">Копировать</button>
     </div>
     <div class="ref-bonus" id="refBonus"></div>
-    <div class="settings-btn logout" onclick="signOut()">Выйти из аккаунта</div>
-    <div class="settings-btn danger" onclick="resetAll()">Сбросить и начать заново</div>
+
+    <div class="settings-btn logout" onclick="signOut()">Выйти</div>
+    <div class="settings-btn danger" onclick="resetAll()">Сбросить всё</div>
+  </div>
+</div>
+
+<!-- PAGE: GOALS -->
+<div class="page-overlay" id="pageGoals">
+  <div class="page-header">
+    <div class="page-back" onclick="closePage('goals')">←</div>
+    <div class="page-title">🎯 Мои цели</div>
+  </div>
+  <div class="page-body">
+    <div class="goal-input-wrap">
+      <input class="goal-input" id="goalInput" type="text" placeholder="Добавить цель..." maxlength="100">
+      <button class="goal-add-btn" onclick="addGoal()">+</button>
+    </div>
+    <div class="goal-list" id="goalList"></div>
+    <div class="goal-empty" id="goalEmpty">Пока нет целей. Добавь свою первую цель — друг поможет её достичь!</div>
+  </div>
+</div>
+
+<!-- PAGE: SUBSCRIPTION -->
+<div class="page-overlay" id="pageSubscription">
+  <div class="page-header">
+    <div class="page-back" onclick="closePage('subscription')">←</div>
+    <div class="page-title">💳 Подписка</div>
+  </div>
+  <div class="page-body">
+    <div class="sub-card">
+      <div class="sub-status-big trial" id="subStatusBig">Пробный период</div>
+      <div class="sub-days" id="subDays">3</div>
+      <div class="sub-days-label" id="subDaysLabel">дня осталось</div>
+    </div>
+    <div class="sub-card">
+      <div class="sub-price">2 000 ₽</div>
+      <div class="sub-period">в месяц</div>
+      <div class="sub-features">
+        <div class="sub-feat">25 запросов в день</div>
+        <div class="sub-feat">4 экспертных направления</div>
+        <div class="sub-feat">Друг помнит всё о тебе</div>
+        <div class="sub-feat">Анализ еды по фото</div>
+        <div class="sub-feat">Техники дыхания и фокуса</div>
+        <div class="sub-feat">Финансовый коучинг</div>
+        <div class="sub-feat">Колесо баланса</div>
+      </div>
+      <button class="sub-buy-btn" onclick="handleSubscribe()">Оформить подписку</button>
+      <div class="sub-info">Оплата будет доступна совсем скоро.<br>Пока пишите: info@neyrosheff.ru</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: EDIT FRIEND -->
+<div class="page-overlay" id="pageEditFriend">
+  <div class="page-header">
+    <div class="page-back" onclick="closePage('editFriend')">←</div>
+    <div class="page-title">✏️ Изменить друга</div>
+  </div>
+  <div class="page-body">
+    <div class="edit-section">
+      <div class="edit-label">Имя друга</div>
+      <input class="edit-input" id="editName" type="text" maxlength="20">
+    </div>
+    <div class="edit-section">
+      <div class="edit-label">Образ</div>
+      <div class="edit-cards" id="editGenderCards">
+        <div class="edit-card" data-val="female" onclick="selectEdit('gender',this)"><span style="font-size:22px">👩</span><span>Подруга</span></div>
+        <div class="edit-card" data-val="male" onclick="selectEdit('gender',this)"><span style="font-size:22px">👨</span><span>Друг</span></div>
+        <div class="edit-card" data-val="neutral" onclick="selectEdit('gender',this)"><span style="font-size:22px">🌟</span><span>Свой</span></div>
+      </div>
+    </div>
+    <div class="edit-section">
+      <div class="edit-label">Характер</div>
+      <div class="edit-cards" id="editCharCards">
+        <div class="edit-card" data-val="warm" onclick="selectEdit('character',this)"><span style="font-size:22px">🤗</span><span>Тёплый и заботливый</span></div>
+        <div class="edit-card" data-val="direct" onclick="selectEdit('character',this)"><span style="font-size:22px">⚡</span><span>Чёткий и мотивирующий</span></div>
+        <div class="edit-card" data-val="funny" onclick="selectEdit('character',this)"><span style="font-size:22px">😄</span><span>Весёлый и с юмором</span></div>
+        <div class="edit-card" data-val="wise" onclick="selectEdit('character',this)"><span style="font-size:22px">🧘</span><span>Мудрый и спокойный</span></div>
+      </div>
+    </div>
+    <button class="edit-save" onclick="saveFriendEdit()">Сохранить изменения</button>
+  </div>
+</div>
+
+<!-- PAGE: ACHIEVEMENTS -->
+<div class="page-overlay" id="pageAchievements">
+  <div class="page-header">
+    <div class="page-back" onclick="closePage('achievements')">←</div>
+    <div class="page-title">🏆 Мои достижения</div>
+  </div>
+  <div class="page-body">
+    <div class="ach-grid" id="achGrid"></div>
   </div>
 </div>
 
@@ -436,6 +594,7 @@ async function signInGoogle() {
 async function signOut() {
   await supabase.auth.signOut();
   ['general','health','focus','finance'].forEach(function(s) { localStorage.removeItem('bf_h_' + s); });
+  ['bf_goals','bf_visits','bf_ach_photo','bf_ach_wheel','bf_push_enabled','bf_push_dismissed','bf_ref','bf_last_push'].forEach(function(k) { localStorage.removeItem(k); });
   location.reload();
 }
 function showAuth() { document.getElementById('authScreen').classList.remove('hidden'); document.getElementById('onboarding').classList.add('hidden'); document.getElementById('app').classList.remove('visible'); }
@@ -529,6 +688,7 @@ function showApp() {
   trackEvent('session_start');
   updateRefUI();
   applyReferral();
+  getStreak(); // Track daily visit
   if (localStorage.getItem('bf_push_enabled') === 'true') scheduleMorningCheck();
 
   // Check trial on load
@@ -698,6 +858,7 @@ function handlePhoto(event) {
       if (w > maxW) { h = (h*maxW)/w; w = maxW; } canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
       pendingImage = canvas.toDataURL('image/jpeg',0.8).split(',')[1];
+      localStorage.setItem('bf_ach_photo', 'true');
       var input = document.getElementById('chatInput');
       if (!input.value.trim()) input.value = (currentSphere==='health') ? 'Сколько тут калорий?' : 'Посмотри фото';
       sendMessage();
@@ -712,18 +873,202 @@ function updateSettings() {
   var gMap={female:'👩 Подруга',male:'👨 Друг',neutral:'🌟 Свой'};
   var cMap={warm:'🤗 Тёплый',direct:'⚡ Чёткий',funny:'😄 Весёлый',wise:'🧘 Мудрый'};
   var sMap={health:'🍽 Здоровье',focus:'🧠 Фокус',finance:'💰 Финансы',general:'💬 Общий чат'};
-  document.getElementById('setName').textContent = profile.friend_name || '—';
-  document.getElementById('setGender').textContent = gMap[profile.friend_gender] || '—';
-  document.getElementById('setChar').textContent = cMap[profile.friend_character] || '—';
-  document.getElementById('setSphere').textContent = sMap[currentSphere] || 'Общее';
+  document.getElementById('setFriendInfo').textContent = (profile.friend_name || '—') + ' · ' + (gMap[profile.friend_gender] || '') + ' · ' + (cMap[profile.friend_character] || '');
   document.getElementById('headerSphere').textContent = sMap[currentSphere] || '💬 Общий чат';
+}
+
+// ===== PAGE NAVIGATION =====
+function openPage(page) {
+  toggleSettings();
+  var map = {goals:'pageGoals',subscription:'pageSubscription',editFriend:'pageEditFriend',achievements:'pageAchievements'};
+  var el = document.getElementById(map[page]);
+  if (el) { el.classList.add('show'); initPage(page); }
+}
+function closePage(page) {
+  var map = {goals:'pageGoals',subscription:'pageSubscription',editFriend:'pageEditFriend',achievements:'pageAchievements'};
+  var el = document.getElementById(map[page]);
+  if (el) el.classList.remove('show');
+}
+function initPage(page) {
+  if (page === 'goals') renderGoals();
+  if (page === 'subscription') renderSubscription();
+  if (page === 'editFriend') initEditFriend();
+  if (page === 'achievements') renderAchievements();
+}
+
+// ===== GOALS PAGE =====
+function loadGoals() { try { return JSON.parse(localStorage.getItem('bf_goals')) || []; } catch(e) { return []; } }
+function saveGoals(g) { localStorage.setItem('bf_goals', JSON.stringify(g)); }
+function addGoal() {
+  var input = document.getElementById('goalInput');
+  var text = input.value.trim();
+  if (!text) return;
+  var goals = loadGoals();
+  goals.push({ id: Date.now(), text: text, done: false, created: new Date().toISOString() });
+  saveGoals(goals);
+  input.value = '';
+  renderGoals();
+  trackEvent('goal_added');
+}
+function toggleGoalDone(id) {
+  var goals = loadGoals();
+  goals.forEach(function(g) { if (g.id === id) g.done = !g.done; });
+  saveGoals(goals);
+  renderGoals();
+}
+function deleteGoal(id) {
+  var goals = loadGoals().filter(function(g) { return g.id !== id; });
+  saveGoals(goals);
+  renderGoals();
+}
+function renderGoals() {
+  var goals = loadGoals();
+  var list = document.getElementById('goalList');
+  var empty = document.getElementById('goalEmpty');
+  list.innerHTML = '';
+  empty.style.display = goals.length === 0 ? 'block' : 'none';
+  goals.forEach(function(g) {
+    var div = document.createElement('div');
+    div.className = 'goal-item' + (g.done ? ' done' : '');
+    div.innerHTML = '<div class="goal-check'+(g.done?' checked':'')+'" onclick="toggleGoalDone('+g.id+')">'+(g.done?'✓':'')+'</div>' +
+      '<div class="goal-text'+(g.done?' checked':'')+'">'+g.text+'</div>' +
+      '<button class="goal-del" onclick="deleteGoal('+g.id+')">×</button>';
+    list.appendChild(div);
+  });
+  // Enter key to add
+  document.getElementById('goalInput').onkeydown = function(e) { if (e.key === 'Enter') addGoal(); };
+}
+
+// ===== SUBSCRIPTION PAGE =====
+function renderSubscription() {
+  var statusEl = document.getElementById('subStatusBig');
+  var daysEl = document.getElementById('subDays');
+  var labelEl = document.getElementById('subDaysLabel');
+  var subStatus = (profile && profile.subscription_status) || 'free';
+  var createdAt = (profile && profile.created_at) ? new Date(profile.created_at) : new Date();
+  var days = (new Date() - createdAt) / (1000*60*60*24);
+  var subEnd = (profile && profile.subscription_end) ? new Date(profile.subscription_end) : null;
+
+  if (subStatus === 'paid' && subEnd && subEnd > new Date()) {
+    var daysLeft = Math.ceil((subEnd - new Date()) / (1000*60*60*24));
+    statusEl.className = 'sub-status-big paid'; statusEl.textContent = 'Активная подписка';
+    daysEl.textContent = daysLeft; labelEl.textContent = 'дней осталось';
+  } else if (days <= 3) {
+    var trialLeft = Math.ceil(3 - days);
+    statusEl.className = 'sub-status-big trial'; statusEl.textContent = 'Пробный период';
+    daysEl.textContent = trialLeft; labelEl.textContent = trialLeft === 1 ? 'день остался' : 'дня осталось';
+  } else {
+    statusEl.className = 'sub-status-big expired'; statusEl.textContent = 'Период закончился';
+    daysEl.textContent = '0'; labelEl.textContent = 'дней осталось';
+  }
+}
+
+// ===== EDIT FRIEND PAGE =====
+var editData = {};
+function initEditFriend() {
+  editData = { name: profile.friend_name, gender: profile.friend_gender, character: profile.friend_character };
+  document.getElementById('editName').value = editData.name || '';
+  // Highlight current selections
+  document.querySelectorAll('#editGenderCards .edit-card').forEach(function(c) { c.classList.toggle('selected', c.dataset.val === editData.gender); });
+  document.querySelectorAll('#editCharCards .edit-card').forEach(function(c) { c.classList.toggle('selected', c.dataset.val === editData.character); });
+}
+function selectEdit(type, el) {
+  el.parentElement.querySelectorAll('.edit-card').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+  if (type === 'gender') editData.gender = el.dataset.val;
+  if (type === 'character') editData.character = el.dataset.val;
+}
+async function saveFriendEdit() {
+  var newName = document.getElementById('editName').value.trim();
+  if (!newName) return;
+  editData.name = newName;
+  try {
+    await supabase.from('user_profiles').update({
+      friend_name: editData.name,
+      friend_gender: editData.gender,
+      friend_character: editData.character,
+      updated_at: new Date().toISOString()
+    }).eq('user_id', currentUser.id);
+    profile.friend_name = editData.name;
+    profile.friend_gender = editData.gender;
+    profile.friend_character = editData.character;
+    document.getElementById('headerName').textContent = editData.name;
+    updateSettings();
+    closePage('editFriend');
+    trackEvent('friend_edited');
+  } catch(e) { console.error('Edit save:', e); }
+}
+
+// ===== ACHIEVEMENTS PAGE =====
+var achievements = [
+  { id: 'first_msg', icon: '💬', name: 'Первый разговор', desc: 'Отправь первое сообщение', check: function() { return getAllMsgCount() >= 1; } },
+  { id: 'photo', icon: '📸', name: 'Фотограф', desc: 'Отправь фото еды на анализ', check: function() { return localStorage.getItem('bf_ach_photo') === 'true'; } },
+  { id: 'all_spheres', icon: '🌈', name: 'Исследователь', desc: 'Попробуй все 4 сферы', check: function() { return ['health','focus','finance','general'].every(function(s) { return loadHistory(s).length > 0; }); } },
+  { id: 'streak3', icon: '🔥', name: '3 дня подряд', desc: 'Заходи 3 дня подряд', check: function() { return getStreak() >= 3; } },
+  { id: 'streak7', icon: '⚡', name: '7 дней подряд', desc: 'Заходи 7 дней подряд', check: function() { return getStreak() >= 7; } },
+  { id: 'msgs50', icon: '💪', name: 'Активист', desc: 'Отправь 50 сообщений', check: function() { return getAllMsgCount() >= 50; } },
+  { id: 'msgs200', icon: '🌟', name: 'Суперпользователь', desc: 'Отправь 200 сообщений', check: function() { return getAllMsgCount() >= 200; } },
+  { id: 'referral', icon: '👯', name: 'Друг друзей', desc: 'Пригласи подругу', check: function() { return (profile.bonus_requests || 0) > 0; } },
+  { id: 'wheel', icon: '⚖️', name: 'Баланс', desc: 'Заполни колесо баланса', check: function() { return localStorage.getItem('bf_ach_wheel') === 'true'; } },
+  { id: 'goals3', icon: '🎯', name: 'Целеустремлённый', desc: 'Поставь 3 цели', check: function() { return loadGoals().length >= 3; } }
+];
+
+function getAllMsgCount() {
+  var count = 0;
+  ['health','focus','finance','general'].forEach(function(s) {
+    count += loadHistory(s).filter(function(m) { return m.role === 'user'; }).length;
+  });
+  return count;
+}
+
+function getStreak() {
+  var visits = JSON.parse(localStorage.getItem('bf_visits') || '[]');
+  var today = new Date().toISOString().slice(0,10);
+  if (visits[visits.length-1] !== today) { visits.push(today); localStorage.setItem('bf_visits', JSON.stringify(visits.slice(-30))); }
+  var streak = 1;
+  for (var i = visits.length - 1; i > 0; i--) {
+    var d1 = new Date(visits[i]); var d2 = new Date(visits[i-1]);
+    if ((d1 - d2) / (1000*60*60*24) <= 1.5) streak++; else break;
+  }
+  return streak;
+}
+
+function renderAchievements() {
+  var grid = document.getElementById('achGrid');
+  grid.innerHTML = '';
+  var unlocked = 0;
+  achievements.forEach(function(a) {
+    var done = false;
+    try { done = a.check(); } catch(e) {}
+    if (done) unlocked++;
+    var div = document.createElement('div');
+    div.className = 'ach-card ' + (done ? 'unlocked' : 'locked');
+    div.innerHTML = '<div class="ach-icon">' + a.icon + '</div>' +
+      '<div class="ach-name">' + a.name + '</div>' +
+      '<div class="ach-desc">' + a.desc + '</div>' +
+      (done ? '<div class="ach-badge">✓</div>' : '');
+    grid.appendChild(div);
+  });
+}
+
+// ===== TELEGRAM =====
+function openTelegram() {
+  // TODO: replace with actual bot username when created
+  var botUrl = 'https://t.me/BestFriendAI_bot?start=' + (profile.referral_code || 'new');
+  window.open(botUrl, '_blank');
+  trackEvent('telegram_opened');
 }
 async function resetAll() {
   if (!confirm('Удалить все данные и начать заново?')) return;
   try { await supabase.from('user_profiles').delete().eq('user_id',currentUser.id); await supabase.from('friend_memory').delete().eq('user_id',currentUser.id); } catch(e){}
-  // Clear all sphere histories
-  var spheres = ['general','health','focus','finance'];
-  spheres.forEach(function(s) { localStorage.removeItem('bf_h_' + s); });
+  ['general','health','focus','finance'].forEach(function(s) { localStorage.removeItem('bf_h_' + s); });
+  localStorage.removeItem('bf_goals');
+  localStorage.removeItem('bf_visits');
+  localStorage.removeItem('bf_ach_photo');
+  localStorage.removeItem('bf_ach_wheel');
+  localStorage.removeItem('bf_push_enabled');
+  localStorage.removeItem('bf_push_dismissed');
+  localStorage.removeItem('bf_ref');
   location.reload();
 }
 
@@ -908,6 +1253,7 @@ async function saveWheel() {
   wheelAreas.forEach(function(a) { data[a.key] = wheelValues[a.key] || 5; });
   try {
     await supabase.from('balance_wheel').insert(data);
+    localStorage.setItem('bf_ach_wheel', 'true');
     document.getElementById('wheelSub').textContent = '✅ Сохранено! Заполняй каждую неделю чтобы видеть рост.';
     setTimeout(function() { document.getElementById('wheelSub').textContent = 'Оцени каждую сферу жизни от 1 до 10.'; }, 3000);
     loadWheelHistory();
