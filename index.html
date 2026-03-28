@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -11,15 +11,16 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
-
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#0b0b14;--bg2:#12121f;--bg3:#1a1a2e;
   --surface:#1e1e32;--border:#2a2a44;
-  --text:#e8e6e0;--text2:#9896a3;
+  --text:#e8e6e0;--text2:#a8a6b3;
   --accent:#e8a838;--accent2:#f0c060;
   --accent-glow:rgba(232,168,56,0.15);
   --friend-bg:#1c1936;--friend-border:#2d2960;
@@ -29,7 +30,7 @@
 }
 html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
 
-/* ===== AUTH SCREEN ===== */
+/* AUTH */
 .auth-screen{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;transition:opacity .5s}
 .auth-screen.hidden{opacity:0;pointer-events:none}
 .auth-orb{width:100px;height:100px;border-radius:50%;margin-bottom:32px;background:radial-gradient(circle at 40% 35%,#e8a838 0%,#c47820 40%,#8b4513 70%,#3a1a05 100%);box-shadow:0 0 60px rgba(232,168,56,.35);animation:orbPulse 3s ease-in-out infinite}
@@ -43,7 +44,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .auth-disclaimer{position:fixed;bottom:24px;left:0;right:0;text-align:center;font-size:11px;color:var(--text2);padding:0 20px;line-height:1.5}
 .auth-disclaimer a{color:var(--accent);text-decoration:none}
 
-/* ===== ONBOARDING ===== */
+/* ONBOARDING */
 .onboarding{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;transition:opacity .5s}
 .onboarding.hidden{opacity:0;pointer-events:none}
 .ob-screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;opacity:0;transform:translateX(60px);transition:all .45s cubic-bezier(.4,0,.2,1);pointer-events:none}
@@ -52,6 +53,8 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .ob-progress{position:fixed;top:env(safe-area-inset-top,16px);left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:110;padding-top:16px}
 .ob-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s}
 .ob-dot.active{background:var(--accent);width:24px;border-radius:4px}
+.ob-back{position:fixed;top:env(safe-area-inset-top,16px);left:16px;z-index:111;padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:20px;color:var(--text2);font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;display:none;margin-top:12px}
+.ob-back.show{display:block}
 
 @keyframes orbPulse{0%,100%{transform:scale(1);box-shadow:0 0 60px rgba(232,168,56,.35)}50%{transform:scale(1.06);box-shadow:0 0 80px rgba(232,168,56,.45)}}
 .orb-wrap{position:relative;width:140px;height:140px;margin-bottom:36px}
@@ -75,7 +78,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .name-tag:hover,.name-tag:active{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
 .cards{display:flex;flex-direction:column;gap:12px;width:100%;max-width:340px}
 .card{padding:18px 20px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;gap:14px;transition:all .25s}
-.card:hover{border-color:rgba(232,168,56,.4);background:rgba(232,168,56,.05)}
+.card:hover{border-color:rgba(232,168,56,.4)}
 .card.selected{border-color:var(--accent);background:var(--accent-glow);box-shadow:0 0 20px rgba(232,168,56,.1)}
 .card-emoji{font-size:28px;width:36px;text-align:center;flex-shrink:0}
 .card-content{flex:1}
@@ -98,15 +101,14 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .final-message{padding:18px 22px;background:var(--friend-bg);border:1px solid var(--friend-border);border-radius:var(--radius) var(--radius) var(--radius) 4px;font-size:15px;line-height:1.6;max-width:300px;text-align:left;animation:msgAppear .6s ease .8s both}
 @keyframes msgAppear{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
 
-/* ===== CHAT ===== */
+/* CHAT */
 .app{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg);opacity:0;pointer-events:none;transition:opacity .5s}
 .app.visible{opacity:1;pointer-events:auto}
 .header{display:flex;align-items:center;gap:12px;padding:12px 16px;padding-top:calc(env(safe-area-inset-top,8px)+8px);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
 .header-orb{width:40px;height:40px;border-radius:50%;flex-shrink:0;background:radial-gradient(circle at 40% 35%,#e8a838,#c47820 60%,#6b3410);box-shadow:0 0 16px rgba(232,168,56,.3)}
-.header-info{flex:1}
-.header-name{font-size:16px;font-weight:600}
+.header-info{flex:1}.header-name{font-size:16px;font-weight:600}
 .header-status{font-size:12px;color:var(--success);display:flex;align-items:center;gap:4px}
-.header-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--success);display:inline-block}
+.header-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--success)}
 .header-menu{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:18px}
 .messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
 .msg{max-width:82%;padding:14px 18px;font-size:14.5px;line-height:1.55;animation:msgSlide .3s ease both;word-wrap:break-word}
@@ -119,11 +121,23 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .typing-dot:nth-child(2){animation-delay:.15s}
 .typing-dot:nth-child(3){animation-delay:.3s}
 @keyframes bounce{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
-.spheres-bar{display:flex;gap:8px;padding:10px 16px;overflow-x:auto;flex-shrink:0;background:var(--bg);border-top:1px solid rgba(42,42,68,.5);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+
+/* HINTS */
+.hints{align-self:center;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.hint-chip{padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:13px;color:var(--text2);cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
+.hint-chip:hover{border-color:var(--accent);color:var(--accent)}
+
+/* SPHERES + EMERGENCY always visible */
+.bottom-bar{flex-shrink:0;background:var(--bg);border-top:1px solid rgba(42,42,68,.5)}
+.emergency-row{display:flex;padding:8px 16px 0}
+.emergency-btn{flex:1;padding:10px;background:rgba(232,72,72,.08);border:1px solid rgba(232,72,72,.3);border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:13px;color:#ff8888;cursor:pointer;text-align:center;transition:all .2s}
+.emergency-btn:active{background:rgba(232,72,72,.15)}
+.spheres-bar{display:flex;gap:8px;padding:8px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .spheres-bar::-webkit-scrollbar{display:none}
 .sphere-btn{flex-shrink:0;padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap}
 .sphere-btn:hover,.sphere-btn:active{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
-.sphere-btn.emergency{border-color:var(--danger);color:#ff8888;background:rgba(232,72,72,.08)}
+.sphere-btn.active{border-color:var(--accent);color:var(--accent)}
+
 .input-area{display:flex;align-items:flex-end;gap:10px;padding:12px 16px;padding-bottom:calc(env(safe-area-inset-bottom,8px)+8px);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
 .input-wrap{flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:24px;display:flex;align-items:flex-end;transition:border-color .2s}
 .input-wrap:focus-within{border-color:var(--accent)}
@@ -137,7 +151,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .req-counter{position:fixed;top:env(safe-area-inset-top,8px);right:12px;padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;font-size:11px;color:var(--text2);z-index:50;display:none}
 .app.visible .req-counter{display:block}
 
-/* Settings */
+/* SETTINGS */
 .settings-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s}
 .settings-overlay.show{opacity:1;pointer-events:auto}
 .settings-panel{position:fixed;right:0;top:0;bottom:0;width:min(320px,85vw);background:var(--bg2);border-left:1px solid var(--border);padding:24px 20px;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);overflow-y:auto;padding-top:calc(env(safe-area-inset-top,16px)+16px)}
@@ -146,14 +160,19 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .settings-label{font-size:13px;color:var(--text2);margin-bottom:8px;margin-top:18px}
 .settings-value{font-size:15px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)}
 .settings-btn{width:100%;padding:14px;margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:14px;cursor:pointer;text-align:center}
-.settings-btn.danger{color:var(--danger)}
-.settings-btn.logout{color:var(--text2)}
+.settings-btn.danger{color:var(--danger)}.settings-btn.logout{color:var(--text2)}
 .settings-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text2);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:env(safe-area-inset-top,0)}
+
+/* OFFLINE */
+.offline-banner{display:none;padding:8px;background:var(--danger);color:#fff;text-align:center;font-size:12px;font-weight:500}
+.offline-banner.show{display:block}
 </style>
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
+<div class="offline-banner" id="offlineBanner">Нет интернета. Сообщения не отправляются.</div>
+
+<!-- AUTH -->
 <div class="auth-screen" id="authScreen">
   <div class="auth-orb"></div>
   <div class="auth-title">Твой Лучший Друг</div>
@@ -169,6 +188,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 <!-- ONBOARDING -->
 <div class="onboarding hidden" id="onboarding">
   <div class="ob-progress" id="obProgress"></div>
+  <button class="ob-back" id="obBack" onclick="prevStep()">← Назад</button>
   <div class="ob-screen active" data-step="0">
     <div class="orb-wrap"><div class="silhouette"></div></div>
     <div class="ob-title">Привет.</div>
@@ -180,21 +200,13 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
     <div class="ob-title">Как меня зовут?</div>
     <div class="name-preview" id="namePreview"></div>
     <div class="name-tags">
-      <span class="name-tag" onclick="setName('Саша')">Саша</span>
-      <span class="name-tag" onclick="setName('Лея')">Лея</span>
-      <span class="name-tag" onclick="setName('Макс')">Макс</span>
-      <span class="name-tag" onclick="setName('Соня')">Соня</span>
-      <span class="name-tag" onclick="setName('Арт')">Арт</span>
-      <span class="name-tag" onclick="setName('Ника')">Ника</span>
+      <span class="name-tag" onclick="setName('Саша')">Саша</span><span class="name-tag" onclick="setName('Лея')">Лея</span><span class="name-tag" onclick="setName('Макс')">Макс</span><span class="name-tag" onclick="setName('Соня')">Соня</span><span class="name-tag" onclick="setName('Арт')">Арт</span><span class="name-tag" onclick="setName('Ника')">Ника</span>
     </div>
-    <div class="name-input-wrap">
-      <input class="name-input" id="nameInput" type="text" placeholder="Или введи своё имя" maxlength="20" autocomplete="off">
-    </div>
+    <div class="name-input-wrap"><input class="name-input" id="nameInput" type="text" placeholder="Или введи своё имя" maxlength="20" autocomplete="off"></div>
     <button class="btn btn-primary" id="nameBtn" onclick="nextStep()" disabled>Это моё имя</button>
   </div>
   <div class="ob-screen" data-step="2">
-    <div class="ob-title">Кто я?</div>
-    <div class="ob-subtitle">Выбери мой образ</div>
+    <div class="ob-title">Кто я?</div><div class="ob-subtitle">Выбери мой образ</div>
     <div class="cards" id="genderCards">
       <div class="card" data-value="female" onclick="selectCard('gender',this)"><div class="card-emoji">👩</div><div class="card-content"><div class="card-title">Подруга</div><div class="card-desc">Тёплая и женственная</div></div></div>
       <div class="card" data-value="male" onclick="selectCard('gender',this)"><div class="card-emoji">👨</div><div class="card-content"><div class="card-title">Друг</div><div class="card-desc">Надёжный и мужской</div></div></div>
@@ -203,8 +215,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
     <button class="btn btn-primary" id="genderBtn" onclick="nextStep()" disabled style="margin-top:24px">Далее</button>
   </div>
   <div class="ob-screen" data-step="3">
-    <div class="ob-title">Мой характер</div>
-    <div class="ob-subtitle">Как я буду с тобой общаться?</div>
+    <div class="ob-title">Мой характер</div><div class="ob-subtitle">Как я буду с тобой общаться?</div>
     <div class="cards" id="charCards">
       <div class="card" data-value="warm" onclick="selectCard('character',this)"><div class="card-emoji">🤗</div><div class="card-content"><div class="card-title">Тёплый и заботливый</div><div class="card-desc">Всегда поддержу и пойму</div></div></div>
       <div class="card" data-value="direct" onclick="selectCard('character',this)"><div class="card-emoji">⚡</div><div class="card-content"><div class="card-title">Чёткий и мотивирующий</div><div class="card-desc">Скажу правду и помогу действовать</div></div></div>
@@ -214,9 +225,8 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
     <button class="btn btn-primary" id="charBtn" onclick="nextStep()" disabled style="margin-top:20px">Далее</button>
   </div>
   <div class="ob-screen" data-step="4">
-    <div class="ob-title">Что тебе важно?</div>
-    <div class="ob-subtitle">Выбери одно или несколько</div>
-    <div class="goals-grid" id="goalsGrid">
+    <div class="ob-title">Что тебе важно?</div><div class="ob-subtitle">Выбери одно или несколько</div>
+    <div class="goals-grid">
       <div class="goal-card" data-value="food" onclick="toggleGoal(this)"><div class="goal-emoji">🍽</div><div class="goal-label">Питание и здоровье</div></div>
       <div class="goal-card" data-value="goals" onclick="toggleGoal(this)"><div class="goal-emoji">🎯</div><div class="goal-label">Достижение целей</div></div>
       <div class="goal-card" data-value="money" onclick="toggleGoal(this)"><div class="goal-emoji">💰</div><div class="goal-label">Деньги и финансы</div></div>
@@ -242,19 +252,27 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
     <div class="header-menu" onclick="toggleSettings()">☰</div>
   </div>
   <div class="messages" id="messages">
+    <div class="hints" id="hints">
+      <div class="hint-chip" onclick="quickSend('Что ты умеешь?')">Что ты умеешь?</div>
+      <div class="hint-chip" onclick="document.getElementById('photoInput').click()">📷 Фото еды</div>
+      <div class="hint-chip" onclick="quickSend('Мне тревожно')">Мне тревожно</div>
+      <div class="hint-chip" onclick="quickSend('Что приготовить на ужин?')">Что на ужин?</div>
+    </div>
     <div class="typing" id="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
   </div>
-  <div class="spheres-bar">
-    <button class="sphere-btn" onclick="switchSphere('health')">🍽 Здоровье и спорт</button>
-    <button class="sphere-btn" onclick="switchSphere('career')">💼 Карьера</button>
-    <button class="sphere-btn" onclick="switchSphere('finance')">💰 Финансы</button>
-    <button class="sphere-btn" onclick="switchSphere('growth')">🌱 Саморазвитие</button>
-    <button class="sphere-btn" onclick="switchSphere('social')">👥 Окружение</button>
-    <button class="sphere-btn" onclick="switchSphere('family')">❤️ Семья</button>
-    <button class="sphere-btn" onclick="switchSphere('leisure')">🎨 Отдых</button>
-    <button class="sphere-btn" onclick="switchSphere('self')">🌟 Яркость жизни</button>
-    <button class="sphere-btn" onclick="switchSphere('general')">💬 Поговорить</button>
-    <button class="sphere-btn emergency" onclick="switchSphere('emergency')">🆘 Мне плохо</button>
+  <div class="bottom-bar">
+    <div class="emergency-row"><button class="emergency-btn" onclick="switchSphere('emergency')">🆘 Мне плохо — экстренная поддержка</button></div>
+    <div class="spheres-bar">
+      <button class="sphere-btn" data-sphere="health" onclick="switchSphere('health')">🍽 Здоровье</button>
+      <button class="sphere-btn" data-sphere="career" onclick="switchSphere('career')">💼 Карьера</button>
+      <button class="sphere-btn" data-sphere="finance" onclick="switchSphere('finance')">💰 Финансы</button>
+      <button class="sphere-btn" data-sphere="growth" onclick="switchSphere('growth')">🌱 Развитие</button>
+      <button class="sphere-btn" data-sphere="social" onclick="switchSphere('social')">👥 Окружение</button>
+      <button class="sphere-btn" data-sphere="family" onclick="switchSphere('family')">❤️ Семья</button>
+      <button class="sphere-btn" data-sphere="leisure" onclick="switchSphere('leisure')">🎨 Отдых</button>
+      <button class="sphere-btn" data-sphere="self" onclick="switchSphere('self')">🌟 Яркость</button>
+      <button class="sphere-btn" data-sphere="general" onclick="switchSphere('general')">💬 Поговорить</button>
+    </div>
   </div>
   <div class="input-area">
     <div class="input-wrap">
@@ -274,200 +292,118 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
     <div class="settings-label">Имя друга</div><div class="settings-value" id="setName">—</div>
     <div class="settings-label">Образ</div><div class="settings-value" id="setGender">—</div>
     <div class="settings-label">Характер</div><div class="settings-value" id="setChar">—</div>
-    <div class="settings-label">Сфера сейчас</div><div class="settings-value" id="setSphere">Общее</div>
+    <div class="settings-label">Сфера</div><div class="settings-value" id="setSphere">Общее</div>
     <div class="settings-label">Аккаунт</div><div class="settings-value" id="setEmail">—</div>
     <div class="settings-btn logout" onclick="signOut()">Выйти из аккаунта</div>
-    <div class="settings-btn danger" onclick="resetAll()">Сбросить всё и начать заново</div>
+    <div class="settings-btn danger" onclick="resetAll()">Сбросить и начать заново</div>
   </div>
 </div>
 
 <script>
-// ===== CONFIG =====
-// ВАЖНО: замени SUPABASE_ANON_KEY на свой ключ из Supabase → Settings → API → anon/public
 var SUPABASE_URL = 'https://siwibqrykqlyxiwtukst.supabase.co';
-var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpd2licXJ5a3FseXhpd3R1a3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNzMwODEsImV4cCI6MjA4OTY0OTA4MX0.hACYQJs1Il0IykGGvbJKisFxvSYukHB0a3Mtnh2I-T4'; // из Supabase Dashboard → Settings → API
-
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpd2licXJ5a3FseXhpd3R1a3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNzMwODEsImV4cCI6MjA4OTY0OTA4MX0.hACYQJs1Il0IykGGvbJKisFxvSYukHB0a3Mtnh2I-T4';
 var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ===== STATE =====
 var HISTORY_KEY = 'bf_history';
-var currentStep = 0;
-var selectedGoals = [];
-var currentSphere = 'general';
-var pendingImage = null;
-var isLoading = false;
-var currentUser = null;
-var authToken = null;
-var profile = {};
+var currentStep = 0, selectedGoals = [], currentSphere = 'general', pendingImage = null, isLoading = false;
+var currentUser = null, authToken = null, profile = {};
+var lastSphereMsg = ''; // prevent sphere spam
+
+// ===== OFFLINE =====
+window.addEventListener('online', function() { document.getElementById('offlineBanner').classList.remove('show'); });
+window.addEventListener('offline', function() { document.getElementById('offlineBanner').classList.add('show'); });
 
 // ===== AUTH =====
 async function initAuth() {
-  // Check existing session
-  var { data } = await supabase.auth.getSession();
-  if (data.session) {
-    currentUser = data.session.user;
-    authToken = data.session.access_token;
-    onAuthSuccess();
-  }
+  // Check referral
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('ref')) localStorage.setItem('bf_ref', params.get('ref'));
 
-  // Listen for auth changes
-  supabase.auth.onAuthStateChange(function(event, session) {
-    if (session) {
-      currentUser = session.user;
-      authToken = session.access_token;
-      if (event === 'SIGNED_IN') onAuthSuccess();
-    } else {
-      currentUser = null;
-      authToken = null;
-      showAuth();
-    }
+  var { data } = await supabase.auth.getSession();
+  if (data.session) { currentUser = data.session.user; authToken = data.session.access_token; onAuthSuccess(); }
+  supabase.auth.onAuthStateChange(function(ev, session) {
+    if (session) { currentUser = session.user; authToken = session.access_token; if (ev === 'SIGNED_IN') onAuthSuccess(); }
+    else { currentUser = null; authToken = null; showAuth(); }
   });
 }
-
 async function signInGoogle() {
   document.getElementById('authError').textContent = '';
   document.getElementById('googleBtn').disabled = true;
-  var { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.origin }
-  });
-  if (error) {
-    document.getElementById('authError').textContent = error.message;
-    document.getElementById('googleBtn').disabled = false;
-  }
+  var { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
+  if (error) { document.getElementById('authError').textContent = error.message; document.getElementById('googleBtn').disabled = false; }
 }
-
-async function signOut() {
-  await supabase.auth.signOut();
-  localStorage.removeItem(HISTORY_KEY);
-  location.reload();
-}
-
-function showAuth() {
-  document.getElementById('authScreen').classList.remove('hidden');
-  document.getElementById('onboarding').classList.add('hidden');
-  document.getElementById('app').classList.remove('visible');
-}
+async function signOut() { await supabase.auth.signOut(); localStorage.removeItem(HISTORY_KEY); location.reload(); }
+function showAuth() { document.getElementById('authScreen').classList.remove('hidden'); document.getElementById('onboarding').classList.add('hidden'); document.getElementById('app').classList.remove('visible'); }
 
 async function onAuthSuccess() {
   document.getElementById('authScreen').classList.add('hidden');
   setTimeout(function() { document.getElementById('authScreen').style.display = 'none'; }, 500);
-
-  // Load profile from Supabase
   try {
-    var { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', currentUser.id).single();
-    if (data) {
-      profile = data;
-    }
+    var { data } = await supabase.from('user_profiles').select('*').eq('user_id', currentUser.id).single();
+    if (data) profile = data;
   } catch (e) {}
-
-  if (profile.friend_name) {
-    // Onboarding done — go to chat
-    document.getElementById('onboarding').style.display = 'none';
-    showApp();
-  } else {
-    // Show onboarding
-    document.getElementById('onboarding').classList.remove('hidden');
-    renderDots();
-  }
+  if (profile.friend_name) { document.getElementById('onboarding').style.display = 'none'; showApp(); }
+  else { document.getElementById('onboarding').classList.remove('hidden'); renderDots(); }
 }
 
 // ===== ONBOARDING =====
 function renderDots() {
-  var wrap = document.getElementById('obProgress');
-  wrap.innerHTML = '';
-  for (var i = 0; i < 6; i++) {
-    var dot = document.createElement('div');
-    dot.className = 'ob-dot' + (i === currentStep ? ' active' : '');
-    wrap.appendChild(dot);
-  }
+  var w = document.getElementById('obProgress'); w.innerHTML = '';
+  for (var i = 0; i < 6; i++) { var d = document.createElement('div'); d.className = 'ob-dot' + (i === currentStep ? ' active' : ''); w.appendChild(d); }
+  document.getElementById('obBack').className = 'ob-back' + (currentStep > 0 && currentStep < 5 ? ' show' : '');
 }
-
 function nextStep() {
   if (currentStep === 1 && !profile.friend_name) return;
   if (currentStep === 2 && !profile.friend_gender) return;
   if (currentStep === 3 && !profile.friend_character) return;
   if (currentStep === 4 && selectedGoals.length === 0) return;
   if (currentStep === 4) { profile.user_goals = selectedGoals; prepFinal(); }
-
   var screens = document.querySelectorAll('.ob-screen');
-  screens[currentStep].classList.remove('active');
-  screens[currentStep].classList.add('exit');
+  screens[currentStep].classList.remove('active'); screens[currentStep].classList.add('exit');
   currentStep++;
   if (currentStep < screens.length) screens[currentStep].classList.add('active');
   renderDots();
 }
-
-function setName(name) {
-  document.getElementById('nameInput').value = name;
-  profile.friend_name = name;
-  updateNamePreview();
-  document.getElementById('nameBtn').disabled = false;
+function prevStep() {
+  if (currentStep <= 0) return;
+  var screens = document.querySelectorAll('.ob-screen');
+  screens[currentStep].classList.remove('active');
+  currentStep--;
+  screens[currentStep].classList.remove('exit'); screens[currentStep].classList.add('active');
+  renderDots();
 }
-
-function updateNamePreview() {
-  var el = document.getElementById('namePreview');
-  el.innerHTML = profile.friend_name ? 'Привет, я <b>' + profile.friend_name + '</b>' : '';
-}
-
+function setName(n) { document.getElementById('nameInput').value = n; profile.friend_name = n; updateNamePreview(); document.getElementById('nameBtn').disabled = false; }
+function updateNamePreview() { var el = document.getElementById('namePreview'); el.innerHTML = profile.friend_name ? 'Привет, я <b>' + profile.friend_name + '</b>' : ''; }
 function selectCard(type, el) {
-  el.parentElement.querySelectorAll('.card').forEach(function(c) { c.classList.remove('selected'); });
-  el.classList.add('selected');
-  var val = el.dataset.value;
-  if (type === 'gender') { profile.friend_gender = val; document.getElementById('genderBtn').disabled = false; }
-  if (type === 'character') { profile.friend_character = val; document.getElementById('charBtn').disabled = false; }
+  el.parentElement.querySelectorAll('.card').forEach(function(c) { c.classList.remove('selected'); }); el.classList.add('selected');
+  if (type === 'gender') { profile.friend_gender = el.dataset.value; document.getElementById('genderBtn').disabled = false; }
+  if (type === 'character') { profile.friend_character = el.dataset.value; document.getElementById('charBtn').disabled = false; }
 }
-
-function toggleGoal(el) {
-  el.classList.toggle('selected');
-  var val = el.dataset.value;
-  var idx = selectedGoals.indexOf(val);
-  if (idx > -1) selectedGoals.splice(idx, 1); else selectedGoals.push(val);
-  document.getElementById('goalsBtn').disabled = selectedGoals.length === 0;
-}
-
+function toggleGoal(el) { el.classList.toggle('selected'); var v = el.dataset.value; var i = selectedGoals.indexOf(v); if (i > -1) selectedGoals.splice(i, 1); else selectedGoals.push(v); document.getElementById('goalsBtn').disabled = selectedGoals.length === 0; }
 function prepFinal() {
-  var name = profile.friend_name || 'Друг';
-  document.getElementById('finalTitle').textContent = name;
-  var greetings = {
-    warm: 'Привет! Я ' + name + ', и я уже чувствую — мы подружимся 🤗 Я здесь чтобы поддержать тебя. Расскажи о себе?',
-    direct: name + ' на связи! Давай сразу к делу — что сейчас самое важное? ⚡',
-    funny: 'Та-дам! ' + name + ' к вашим услугам 😄 Ну что, показывай жизнь — будем делать её ярче!',
-    wise: 'Здравствуй. Я ' + name + '. Каждое знакомство — начало нового пути. Что привело тебя сюда? 🧘'
-  };
-  document.getElementById('finalMessage').textContent = greetings[profile.friend_character] || greetings.warm;
+  var n = profile.friend_name || 'Друг';
+  document.getElementById('finalTitle').textContent = n;
+  var g = { warm:'Привет! Я '+n+' 🤗 Расскажи о себе — я хочу узнать тебя получше!', direct:n+' на связи! Что сейчас самое важное? ⚡', funny:'Та-дам! '+n+' здесь 😄 Ну что, показывай жизнь!', wise:'Здравствуй. Я '+n+'. Что привело тебя сюда? 🧘' };
+  document.getElementById('finalMessage').textContent = g[profile.friend_character] || g.warm;
 }
-
 async function startChat() {
-  // Save profile to Supabase
+  // First 3 days bonus: 30 requests
+  var maxReq = 30;
   try {
     await supabase.from('user_profiles').upsert({
-      user_id: currentUser.id,
-      friend_name: profile.friend_name,
-      friend_gender: profile.friend_gender,
-      friend_character: profile.friend_character,
-      user_goals: profile.user_goals,
-      max_requests: 15,
-      subscription_status: 'free',
-      updated_at: new Date().toISOString()
+      user_id: currentUser.id, friend_name: profile.friend_name, friend_gender: profile.friend_gender,
+      friend_character: profile.friend_character, user_goals: profile.user_goals,
+      max_requests: maxReq, subscription_status: 'free', message_count: 0, updated_at: new Date().toISOString()
     });
-  } catch (e) { console.error('Save profile:', e); }
-
-  // Save first message
-  var greetings = {
-    warm: 'Привет! Я ' + profile.friend_name + ', и я здесь чтобы поддержать тебя 🤗 Расскажи о себе?',
-    direct: profile.friend_name + ' на связи! Что сейчас самое важное? ⚡',
-    funny: 'Та-дам! ' + profile.friend_name + ' здесь 😄 Показывай жизнь — сделаем ярче!',
-    wise: 'Здравствуй. Я ' + profile.friend_name + '. Что привело тебя сюда? 🧘'
-  };
-  var firstMsg = greetings[profile.friend_character] || greetings.warm;
-  saveHistory([{ role: 'friend', text: firstMsg, time: Date.now() }]);
-
-  // Init memory
-  try {
-    await supabase.from('friend_memory').upsert({ user_id: currentUser.id, facts: '', updated_at: new Date().toISOString() });
-  } catch (e) {}
-
+  } catch (e) { console.error('Save:', e); }
+  // First message + CTA hint
+  var greet = { warm:'Привет! Я '+profile.friend_name+' 🤗 Хочешь покажу что я умею? Отправь мне фото своей еды — я посчитаю калории! Или просто расскажи как дела.',
+    direct:profile.friend_name+' на связи! Давай сразу — кинь фото еды и я посчитаю калории. Или расскажи что сейчас важнее всего ⚡',
+    funny:profile.friend_name+' появился! 😄 Хочешь фокус? Сфоткай свой обед — скажу сколько там калорий. Или просто болтаем!',
+    wise:'Здравствуй. Я '+profile.friend_name+'. Если хочешь — покажи фото еды, я разберу состав. Или расскажи что на душе 🧘' };
+  var first = greet[profile.friend_character] || greet.warm;
+  saveHistory([{ role: 'friend', text: first, time: Date.now() }]);
+  try { await supabase.from('friend_memory').upsert({ user_id: currentUser.id, facts: '', updated_at: new Date().toISOString() }); } catch (e) {}
   document.getElementById('onboarding').classList.add('hidden');
   setTimeout(function() { document.getElementById('onboarding').style.display = 'none'; showApp(); }, 500);
 }
@@ -475,203 +411,129 @@ async function startChat() {
 // ===== CHAT =====
 function loadHistory() { try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch(e) { return []; } }
 function saveHistory(h) { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); }
-
 function showApp() {
   document.getElementById('app').classList.add('visible');
   document.getElementById('headerName').textContent = profile.friend_name || 'Друг';
   if (currentUser) document.getElementById('setEmail').textContent = currentUser.email || '—';
-  renderHistory();
-  updateSettings();
-  fetchCount();
+  renderHistory(); updateSettings(); fetchCount();
 }
-
 function renderHistory() {
-  var container = document.getElementById('messages');
-  var typing = document.getElementById('typing');
-  container.querySelectorAll('.msg').forEach(function(m) { m.remove(); });
-  loadHistory().forEach(function(msg) {
-    var div = document.createElement('div');
-    div.className = 'msg ' + (msg.role === 'friend' ? 'msg-friend' : 'msg-user');
-    div.textContent = msg.text;
-    container.insertBefore(div, typing);
-  });
+  var c = document.getElementById('messages'); var t = document.getElementById('typing'); var h = document.getElementById('hints');
+  c.querySelectorAll('.msg').forEach(function(m) { m.remove(); });
+  var hist = loadHistory();
+  hist.forEach(function(m) { var d = document.createElement('div'); d.className = 'msg '+(m.role==='friend'?'msg-friend':'msg-user'); d.textContent = m.text; c.insertBefore(d, h); });
+  // Hide hints if there are user messages
+  if (hist.some(function(m) { return m.role === 'user'; })) h.style.display = 'none';
   scrollToBottom();
 }
-
 function addMessage(role, text) {
-  var container = document.getElementById('messages');
-  var typing = document.getElementById('typing');
-  var div = document.createElement('div');
-  div.className = 'msg ' + (role === 'friend' ? 'msg-friend' : 'msg-user');
-  div.textContent = text;
-  container.insertBefore(div, typing);
-  var history = loadHistory();
-  history.push({ role: role, text: text, time: Date.now() });
-  if (history.length > 100) history.splice(0, history.length - 100);
-  saveHistory(history);
-  scrollToBottom();
+  var c = document.getElementById('messages'); var t = document.getElementById('typing'); var h = document.getElementById('hints');
+  var d = document.createElement('div'); d.className = 'msg '+(role==='friend'?'msg-friend':'msg-user'); d.textContent = text;
+  c.insertBefore(d, h);
+  if (role === 'user') h.style.display = 'none';
+  var hist = loadHistory(); hist.push({ role: role, text: text, time: Date.now() });
+  if (hist.length > 100) hist.splice(0, hist.length - 100);
+  saveHistory(hist); scrollToBottom();
 }
-
-function scrollToBottom() {
-  var c = document.getElementById('messages');
-  requestAnimationFrame(function() { c.scrollTop = c.scrollHeight; });
-}
-
-function showTyping(show) {
-  document.getElementById('typing').classList.toggle('show', show);
-  if (show) scrollToBottom();
-}
+function scrollToBottom() { var c = document.getElementById('messages'); requestAnimationFrame(function() { c.scrollTop = c.scrollHeight; }); }
+function showTyping(s) { document.getElementById('typing').classList.toggle('show', s); if (s) scrollToBottom(); }
+function quickSend(text) { document.getElementById('chatInput').value = text; sendMessage(); }
 
 async function fetchCount() {
   if (!authToken) return;
-  try {
-    var { data } = await supabase.rpc('get_daily_count', { p_user_id: currentUser.id });
-    if (data) updateCounter(data.count || 0, data.max || 15);
-  } catch(e) { updateCounter(0, 15); }
+  try { var { data } = await supabase.rpc('get_daily_count', { p_user_id: currentUser.id }); if (data) updateCounter(data.count||0, data.max||10); } catch(e) { updateCounter(0, 10); }
 }
+function updateCounter(count, max) { var el = document.getElementById('reqCounter'); el.textContent = count+' / '+max+' запросов'; el.style.color = count >= max ? '#e84848' : ''; }
 
-function updateCounter(count, max) {
-  var el = document.getElementById('reqCounter');
-  el.textContent = count + ' / ' + max + ' запросов';
-  el.style.color = count >= max ? '#e84848' : '';
-}
-
-// ===== SEND =====
 async function sendMessage() {
   if (isLoading || !authToken) return;
-  var input = document.getElementById('chatInput');
-  var text = input.value.trim();
-  var image = pendingImage;
-  pendingImage = null;
+  var input = document.getElementById('chatInput'); var text = input.value.trim(); var image = pendingImage; pendingImage = null;
   if (!text && !image) return;
-
   if (text) { addMessage('user', text); input.value = ''; input.style.height = 'auto'; }
-  else if (image) { addMessage('user', '📷 Фото'); }
-
-  isLoading = true;
-  showTyping(true);
-  document.getElementById('sendBtn').disabled = true;
-
+  else if (image) addMessage('user', '📷 Фото');
+  isLoading = true; showTyping(true); document.getElementById('sendBtn').disabled = true;
   try {
-    // Refresh token
     var { data: sess } = await supabase.auth.getSession();
     if (sess.session) authToken = sess.session.access_token;
-
-    var history = loadHistory().slice(-10);
-    var body = { message: text || '', sphere: currentSphere, history: history };
+    var hist = loadHistory().slice(-10);
+    var body = { message: text || '', sphere: currentSphere, history: hist };
     if (image) body.imageBase64 = image;
-
-    var res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
-      body: JSON.stringify(body)
-    });
-
-    var data = await res.json();
-    showTyping(false);
-
-    if (res.status === 401) {
-      addMessage('friend', 'Сессия истекла. Обнови страницу.');
-    } else if (res.status === 429) {
-      addMessage('friend', data.error || 'Запросы на сегодня закончились. Кнопка «🆘 Мне плохо» работает всегда.');
-      if (data.count != null) updateCounter(data.count, data.max);
-    } else if (data.reply) {
-      addMessage('friend', data.reply);
-      if (data.count != null) updateCounter(data.count, data.max);
-    } else {
-      addMessage('friend', data.error || 'Что-то пошло не так. Попробуй ещё раз.');
-    }
-  } catch (err) {
-    showTyping(false);
-    addMessage('friend', 'Не могу подключиться. Проверь интернет.');
-    console.error(err);
-  }
-
-  isLoading = false;
-  document.getElementById('sendBtn').disabled = false;
+    var res = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+authToken}, body:JSON.stringify(body) });
+    var data = await res.json(); showTyping(false);
+    if (res.status === 401) addMessage('friend', 'Сессия истекла. Обнови страницу.');
+    else if (res.status === 429) { addMessage('friend', data.error || 'Запросы закончились. 🆘 работает всегда.'); if (data.count != null) updateCounter(data.count, data.max); }
+    else if (data.reply) { addMessage('friend', data.reply); if (data.count != null) updateCounter(data.count, data.max); }
+    else addMessage('friend', data.error || 'Что-то пошло не так.');
+  } catch (err) { showTyping(false); addMessage('friend', 'Не могу подключиться. Проверь интернет.'); console.error(err); }
+  isLoading = false; document.getElementById('sendBtn').disabled = false;
 }
 
 // ===== SPHERES =====
 function switchSphere(sphere) {
   currentSphere = sphere;
   updateSettings();
+  // Highlight active sphere
+  document.querySelectorAll('.sphere-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.sphere === sphere); });
   var prompts = {
-    health: 'Давай поговорим о здоровье! Можешь отправить фото еды, спросить рецепт или задать вопрос про тренировки.',
-    career: 'Поговорим о карьере? Расскажи что сейчас на работе — помогу найти точки роста.',
-    finance: 'Поговорим о деньгах? Могу рассказать урок из «Вавилона», помочь с бюджетом или целью.',
-    growth: 'Давай поработаем над развитием! Какая цель или чему хочешь научиться?',
-    social: 'Расскажи что происходит в окружении — помогу разобраться.',
-    family: 'Расскажи что в семье или отношениях — помогу найти решение.',
-    leisure: 'Хочешь качественно отдохнуть? Расскажи что нравится — подберём.',
-    self: 'Как себя чувствуешь? Могу провести дыхание, разгрузить голову или поработать с тревогой.',
+    health: 'Ой, здоровье? Отлично! Кинь фото еды — посчитаю калории 📸 Или спроси что приготовить, расскажи про тренировки — помогу!',
+    career: 'Карьера, да? Расскажи что сейчас на работе — вместе найдём точки роста.',
+    finance: 'Деньги! Могу рассказать крутой урок из «Вавилона», помочь с бюджетом или поставить финансовую цель.',
+    growth: 'Саморазвитие — люблю это! Какая цель? Или чему хочешь научиться?',
+    social: 'Расскажи что с людьми вокруг — разберёмся вместе.',
+    family: 'Семья — важно. Расскажи что происходит, помогу найти решение.',
+    leisure: 'Хочешь классно отдохнуть? Расскажи что нравится — подберём!',
+    self: 'Как ты? Могу провести дыхание, разгрузить голову или поработать с тревогой.',
     general: '', emergency: ''
   };
-  if (sphere === 'emergency') {
-    document.getElementById('chatInput').value = 'Мне плохо';
-    sendMessage();
-    return;
-  }
-  if (prompts[sphere]) addMessage('friend', prompts[sphere]);
+  if (sphere === 'emergency') { document.getElementById('chatInput').value = 'Мне плохо'; sendMessage(); return; }
+  // Prevent sphere spam
+  var prompt = prompts[sphere];
+  if (prompt && prompt !== lastSphereMsg) { addMessage('friend', prompt); lastSphereMsg = prompt; }
 }
 
 // ===== PHOTO =====
 function handlePhoto(event) {
-  var file = event.target.files[0];
-  if (!file) return;
+  var file = event.target.files[0]; if (!file) return;
   var reader = new FileReader();
   reader.onload = function(e) {
     var img = new Image();
     img.onload = function() {
-      var canvas = document.createElement('canvas');
-      var maxW = 800; var w = img.width; var h = img.height;
-      if (w > maxW) { h = (h * maxW) / w; w = maxW; }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      pendingImage = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+      var canvas = document.createElement('canvas'); var maxW = 800; var w = img.width; var h = img.height;
+      if (w > maxW) { h = (h*maxW)/w; w = maxW; } canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      pendingImage = canvas.toDataURL('image/jpeg',0.8).split(',')[1];
       var input = document.getElementById('chatInput');
-      if (!input.value.trim()) input.value = (currentSphere === 'health') ? 'Сколько тут калорий?' : 'Посмотри фото';
+      if (!input.value.trim()) input.value = (currentSphere==='health') ? 'Сколько тут калорий?' : 'Посмотри фото';
       sendMessage();
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-  event.target.value = '';
+    }; img.src = e.target.result;
+  }; reader.readAsDataURL(file); event.target.value = '';
 }
 
 // ===== SETTINGS =====
 function toggleSettings() { document.getElementById('settingsOverlay').classList.toggle('show'); }
 function closeSettings(e) { if (e.target === document.getElementById('settingsOverlay')) toggleSettings(); }
 function updateSettings() {
-  var gMap = { female: '👩 Подруга', male: '👨 Друг', neutral: '🌟 Свой' };
-  var cMap = { warm: '🤗 Тёплый', direct: '⚡ Чёткий', funny: '😄 Весёлый', wise: '🧘 Мудрый' };
-  var sMap = { health:'🍽 Здоровье',career:'💼 Карьера',finance:'💰 Финансы',growth:'🌱 Саморазвитие',social:'👥 Окружение',family:'❤️ Семья',leisure:'🎨 Отдых',self:'🌟 Яркость',general:'💬 Общее',emergency:'🆘 Поддержка' };
+  var gMap={female:'👩 Подруга',male:'👨 Друг',neutral:'🌟 Свой'};
+  var cMap={warm:'🤗 Тёплый',direct:'⚡ Чёткий',funny:'😄 Весёлый',wise:'🧘 Мудрый'};
+  var sMap={health:'🍽 Здоровье',career:'💼 Карьера',finance:'💰 Финансы',growth:'🌱 Развитие',social:'👥 Окружение',family:'❤️ Семья',leisure:'🎨 Отдых',self:'🌟 Яркость',general:'💬 Общее',emergency:'🆘 Поддержка'};
   document.getElementById('setName').textContent = profile.friend_name || '—';
   document.getElementById('setGender').textContent = gMap[profile.friend_gender] || '—';
   document.getElementById('setChar').textContent = cMap[profile.friend_character] || '—';
   document.getElementById('setSphere').textContent = sMap[currentSphere] || 'Общее';
 }
-
 async function resetAll() {
   if (!confirm('Удалить все данные и начать заново?')) return;
-  try {
-    await supabase.from('user_profiles').delete().eq('user_id', currentUser.id);
-    await supabase.from('friend_memory').delete().eq('user_id', currentUser.id);
-  } catch(e) {}
-  localStorage.removeItem(HISTORY_KEY);
-  location.reload();
+  try { await supabase.from('user_profiles').delete().eq('user_id',currentUser.id); await supabase.from('friend_memory').delete().eq('user_id',currentUser.id); } catch(e){}
+  localStorage.removeItem(HISTORY_KEY); location.reload();
 }
 
-// ===== TEXTAREA RESIZE =====
+// ===== INIT =====
 document.addEventListener('DOMContentLoaded', function() {
   var ci = document.getElementById('chatInput');
-  ci.addEventListener('input', function() { ci.style.height = 'auto'; ci.style.height = Math.min(ci.scrollHeight, 120) + 'px'; });
-  ci.addEventListener('keydown', function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+  ci.addEventListener('input', function() { ci.style.height='auto'; ci.style.height=Math.min(ci.scrollHeight,120)+'px'; });
+  ci.addEventListener('keydown', function(e) { if (e.key==='Enter'&&!e.shiftKey) { e.preventDefault(); sendMessage(); } });
   var ni = document.getElementById('nameInput');
-  ni.addEventListener('input', function() {
-    profile.friend_name = ni.value.trim();
-    updateNamePreview();
-    document.getElementById('nameBtn').disabled = !profile.friend_name;
-  });
+  ni.addEventListener('input', function() { profile.friend_name=ni.value.trim(); updateNamePreview(); document.getElementById('nameBtn').disabled=!profile.friend_name; });
   initAuth();
 });
 </script>
