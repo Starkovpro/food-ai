@@ -300,6 +300,50 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .push-banner.show{display:flex;align-items:center;gap:10px;justify-content:center}
 .push-yes{padding:6px 14px;background:var(--accent);color:var(--bg);border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
 .push-no{background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif}
+
+/* BREATHING TIMER */
+.breath-overlay{position:fixed;inset:0;z-index:260;background:rgba(0,0,0,.92);backdrop-filter:blur(16px);display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
+.breath-overlay.show{display:flex}
+.breath-close{position:absolute;top:calc(env(safe-area-inset-top,16px)+16px);right:16px;width:36px;height:36px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text2);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.breath-ring{position:relative;width:220px;height:220px;margin-bottom:32px}
+.breath-circle{width:220px;height:220px;border-radius:50%;border:3px solid rgba(72,160,200,.2);display:flex;align-items:center;justify-content:center;transition:transform 4s ease-in-out, border-color .5s, box-shadow 4s ease-in-out}
+.breath-circle.inhale{transform:scale(1.3);border-color:#48a0c8;box-shadow:0 0 60px rgba(72,160,200,.2)}
+.breath-circle.hold{transform:scale(1.3);border-color:#a78bfa;box-shadow:0 0 60px rgba(167,139,250,.2)}
+.breath-circle.exhale{transform:scale(1);border-color:#48c878;box-shadow:0 0 40px rgba(72,200,120,.15)}
+.breath-phase{font-size:22px;font-weight:600;color:var(--text);transition:color .5s}
+.breath-circle.inhale .breath-phase{color:#48a0c8}
+.breath-circle.hold .breath-phase{color:#a78bfa}
+.breath-circle.exhale .breath-phase{color:#48c878}
+.breath-counter{font-size:48px;font-weight:300;color:var(--text2);position:absolute;bottom:0;left:50%;transform:translateX(-50%)}
+.breath-timer{font-size:14px;color:var(--text2);margin-bottom:8px}
+.breath-sub{font-size:13px;color:var(--text2);opacity:.6;margin-top:16px}
+.breath-start-btn{margin-top:20px;padding:14px 40px;background:linear-gradient(135deg,#48a0c8,#60b8e0);color:var(--bg);border:none;border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(72,160,200,.25)}
+.breath-start-btn:active{transform:scale(.97)}
+.breath-start-btn.stop{background:linear-gradient(135deg,var(--danger),#f06060)}
+
+/* POMODORO TIMER */
+.pomo-overlay{position:fixed;inset:0;z-index:260;background:rgba(0,0,0,.92);backdrop-filter:blur(16px);display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
+.pomo-overlay.show{display:flex}
+.pomo-close{position:absolute;top:calc(env(safe-area-inset-top,16px)+16px);right:16px;width:36px;height:36px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text2);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.pomo-ring{position:relative;width:200px;height:200px;margin-bottom:28px}
+.pomo-ring svg{width:200px;height:200px;transform:rotate(-90deg)}
+.pomo-ring .bg{fill:none;stroke:#252540;stroke-width:6}
+.pomo-ring .progress{fill:none;stroke:var(--accent);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+.pomo-time{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pomo-digits{font-size:44px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.pomo-label{font-size:13px;color:var(--text2);margin-top:2px}
+.pomo-title{font-size:18px;font-weight:600;margin-bottom:4px;color:var(--text)}
+.pomo-desc{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.5;max-width:280px}
+.pomo-btns{display:flex;gap:10px}
+.pomo-btn{padding:14px 32px;border:none;border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s}
+.pomo-btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);box-shadow:0 4px 20px rgba(232,168,56,.25)}
+.pomo-btn.secondary{background:var(--surface);border:1px solid var(--border);color:var(--text2)}
+.pomo-btn:active{transform:scale(.97)}
+
+/* SPHERE-SPECIFIC HINTS */
+.focus-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:4px 0}
+.focus-action{padding:8px 14px;background:rgba(72,160,200,.08);border:1px solid rgba(72,160,200,.2);border-radius:20px;font-family:'Outfit',sans-serif;font-size:12px;color:#48a0c8;cursor:pointer;transition:all .2s;white-space:nowrap}
+.focus-action:hover,.focus-action:active{background:rgba(72,160,200,.15);border-color:#48a0c8}
 </style>
 </head>
 <body>
@@ -567,6 +611,42 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
   <button class="paywall-close" onclick="closePaywall()">Позже</button>
 </div>
 
+<!-- BREATHING TIMER -->
+<div class="breath-overlay" id="breathOverlay">
+  <div class="breath-close" onclick="stopBreathing()">✕</div>
+  <div class="breath-ring">
+    <div class="breath-circle" id="breathCircle">
+      <div class="breath-phase" id="breathPhase">Приготовься</div>
+    </div>
+  </div>
+  <div class="breath-timer" id="breathTimer">1:00</div>
+  <div id="breathUI">
+    <div class="breath-sub">Бокс-дыхание 4-4-4 · 1 минута</div>
+    <button class="breath-start-btn" id="breathStartBtn" onclick="startBreathing()">Начать дыхание</button>
+  </div>
+</div>
+
+<!-- POMODORO TIMER -->
+<div class="pomo-overlay" id="pomoOverlay">
+  <div class="pomo-close" onclick="stopPomodoro()">✕</div>
+  <div class="pomo-title" id="pomoTitle">Фокус-сессия</div>
+  <div class="pomo-desc" id="pomoDesc">25 минут полного фокуса. Друг провожает и встречает.</div>
+  <div class="pomo-ring">
+    <svg viewBox="0 0 200 200">
+      <circle class="bg" cx="100" cy="100" r="90"/>
+      <circle class="progress" id="pomoProgress" cx="100" cy="100" r="90" stroke-dasharray="565.5" stroke-dashoffset="0"/>
+    </svg>
+    <div class="pomo-time">
+      <div class="pomo-digits" id="pomoDigits">25:00</div>
+      <div class="pomo-label" id="pomoLabel">нажми старт</div>
+    </div>
+  </div>
+  <div class="pomo-btns" id="pomoBtns">
+    <button class="pomo-btn primary" id="pomoStartBtn" onclick="startPomodoro()">Старт</button>
+    <button class="pomo-btn secondary" onclick="stopPomodoro()">Отмена</button>
+  </div>
+</div>
+
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 var SUPABASE_URL = 'https://siwibqrykqlyxiwtukst.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpd2licXJ5a3FseXhpd3R1a3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNzMwODEsImV4cCI6MjA4OTY0OTA4MX0.hACYQJs1Il0IykGGvbJKisFxvSYukHB0a3Mtnh2I-T4';
@@ -691,7 +771,7 @@ function showApp() {
   document.getElementById('headerName').textContent = profile.friend_name || 'Друг';
   if (currentUser) document.getElementById('setEmail').textContent = currentUser.email || '—';
   document.querySelectorAll('.sphere-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.sphere === currentSphere); });
-  renderHistory(); updateSettings(); fetchCount();
+  renderHistory(); updateSettings(); fetchCount(); updateHints();
   trackEvent('session_start');
   updateRefUI();
   applyReferral();
@@ -832,6 +912,7 @@ function switchSphere(sphere) {
   updateSettings();
   document.querySelectorAll('.sphere-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.sphere === sphere); });
   renderHistory();
+  updateHints();
 
   var hist = loadHistory();
   if (hist.length === 0) {
@@ -1349,6 +1430,147 @@ function scheduleMorningCheck() {
       }
     }
   }, 1000 * 60 * 30); // Check every 30 minutes
+}
+
+// ===== BREATHING TIMER =====
+var breathInterval = null, breathTimeout = null, breathSeconds = 60;
+function openBreathing() {
+  document.getElementById('breathOverlay').classList.add('show');
+  document.getElementById('breathPhase').textContent = 'Приготовься';
+  document.getElementById('breathTimer').textContent = '1:00';
+  document.getElementById('breathCircle').className = 'breath-circle';
+  document.getElementById('breathStartBtn').textContent = 'Начать дыхание';
+  document.getElementById('breathStartBtn').className = 'breath-start-btn';
+  document.getElementById('breathStartBtn').onclick = startBreathing;
+  breathSeconds = 60;
+  trackEvent('breathing_opened');
+}
+function startBreathing() {
+  document.getElementById('breathStartBtn').textContent = 'Остановить';
+  document.getElementById('breathStartBtn').className = 'breath-start-btn stop';
+  document.getElementById('breathStartBtn').onclick = stopBreathing;
+  breathSeconds = 60;
+  var phases = ['inhale','hold','exhale'];
+  var labels = ['Вдох...','Пауза...','Выдох...'];
+  var idx = 0;
+  function nextPhase() {
+    if (breathSeconds <= 0) { finishBreathing(); return; }
+    var circle = document.getElementById('breathCircle');
+    circle.className = 'breath-circle ' + phases[idx];
+    document.getElementById('breathPhase').textContent = labels[idx];
+    idx = (idx + 1) % 3;
+    breathTimeout = setTimeout(nextPhase, 4000);
+  }
+  nextPhase();
+  breathInterval = setInterval(function() {
+    breathSeconds--;
+    if (breathSeconds <= 0) { clearInterval(breathInterval); return; }
+    var m = Math.floor(breathSeconds / 60);
+    var s = breathSeconds % 60;
+    document.getElementById('breathTimer').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  }, 1000);
+  trackEvent('breathing_started');
+}
+function finishBreathing() {
+  clearInterval(breathInterval); clearTimeout(breathTimeout);
+  breathInterval = null; breathTimeout = null;
+  document.getElementById('breathCircle').className = 'breath-circle';
+  document.getElementById('breathPhase').textContent = 'Отлично! 🧘';
+  document.getElementById('breathTimer').textContent = '0:00';
+  document.getElementById('breathStartBtn').textContent = 'Ещё раз';
+  document.getElementById('breathStartBtn').className = 'breath-start-btn';
+  document.getElementById('breathStartBtn').onclick = startBreathing;
+  // Add message to focus chat
+  addMessageToSphere('focus', 'friend', 'Молодец! Минута дыхания — это уже маленькая победа 🧘 Как себя чувствуешь?');
+  if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+  trackEvent('breathing_completed');
+}
+function stopBreathing() {
+  clearInterval(breathInterval); clearTimeout(breathTimeout);
+  breathInterval = null; breathTimeout = null;
+  document.getElementById('breathOverlay').classList.remove('show');
+}
+
+// ===== POMODORO TIMER =====
+var pomoInterval = null, pomoTotal = 25 * 60, pomoLeft = 0, pomoRunning = false;
+function openPomodoro() {
+  document.getElementById('pomoOverlay').classList.add('show');
+  pomoLeft = pomoTotal;
+  pomoRunning = false;
+  updatePomoDisplay();
+  document.getElementById('pomoLabel').textContent = 'нажми старт';
+  document.getElementById('pomoTitle').textContent = 'Фокус-сессия';
+  document.getElementById('pomoDesc').textContent = '25 минут полного фокуса. Убери отвлечения и сосредоточься на одной задаче.';
+  document.getElementById('pomoStartBtn').textContent = 'Старт';
+  document.getElementById('pomoStartBtn').onclick = startPomodoro;
+  document.getElementById('pomoProgress').style.strokeDashoffset = '0';
+  trackEvent('pomodoro_opened');
+}
+function startPomodoro() {
+  pomoRunning = true;
+  document.getElementById('pomoLabel').textContent = 'осталось';
+  document.getElementById('pomoStartBtn').textContent = 'Пауза';
+  document.getElementById('pomoStartBtn').onclick = pausePomodoro;
+  addMessageToSphere('focus', 'friend', 'Фокус-сессия началась! 🎯 25 минут — ты справишься. Убери телефон и начинай. Я буду ждать тебя здесь.');
+  pomoInterval = setInterval(function() {
+    pomoLeft--;
+    updatePomoDisplay();
+    var pct = 1 - (pomoLeft / pomoTotal);
+    document.getElementById('pomoProgress').style.strokeDashoffset = (565.5 * pct).toFixed(1);
+    if (pomoLeft <= 0) { finishPomodoro(); }
+  }, 1000);
+  trackEvent('pomodoro_started');
+}
+function pausePomodoro() {
+  clearInterval(pomoInterval); pomoInterval = null;
+  document.getElementById('pomoLabel').textContent = 'пауза';
+  document.getElementById('pomoStartBtn').textContent = 'Продолжить';
+  document.getElementById('pomoStartBtn').onclick = startPomodoro;
+}
+function finishPomodoro() {
+  clearInterval(pomoInterval); pomoInterval = null; pomoRunning = false;
+  document.getElementById('pomoLabel').textContent = 'готово!';
+  document.getElementById('pomoDigits').textContent = '🎉';
+  document.getElementById('pomoTitle').textContent = 'Сессия завершена!';
+  document.getElementById('pomoStartBtn').textContent = 'Ещё раз';
+  document.getElementById('pomoStartBtn').onclick = openPomodoro;
+  addMessageToSphere('focus', 'friend', 'Сессия завершена! 🎉 Ты молодец — 25 минут чистого фокуса. Сделай перерыв 5 минут: встань, потянись, выпей воды. Ты заслужил(а)!');
+  if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+  trackEvent('pomodoro_completed');
+}
+function stopPomodoro() {
+  clearInterval(pomoInterval); pomoInterval = null; pomoRunning = false;
+  document.getElementById('pomoOverlay').classList.remove('show');
+}
+function updatePomoDisplay() {
+  var m = Math.floor(pomoLeft / 60); var s = pomoLeft % 60;
+  document.getElementById('pomoDigits').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+// ===== SPHERE HINTS =====
+function updateHints() {
+  var h = document.getElementById('hints');
+  if (currentSphere === 'focus') {
+    h.innerHTML = '<div class="focus-actions">' +
+      '<div class="focus-action" onclick="openBreathing()">🫁 Дыхание</div>' +
+      '<div class="focus-action" onclick="openPomodoro()">⏱ Помодоро</div>' +
+      '<div class="focus-action" onclick="quickSend(\'Мне тревожно\')">😰 Тревога</div>' +
+      '<div class="focus-action" onclick="quickSend(\'Разгрузи мне голову\')">🧹 Разгрузка</div>' +
+      '</div>';
+  } else if (currentSphere === 'health') {
+    h.innerHTML = '<div class="hint-chip" onclick="document.getElementById(\'photoInput\').click()">📷 Фото еды</div>' +
+      '<div class="hint-chip" onclick="quickSend(\'Что приготовить на ужин?\')">🍳 Рецепт</div>' +
+      '<div class="hint-chip" onclick="quickSend(\'Посоветуй тренировку\')">💪 Тренировка</div>';
+  } else if (currentSphere === 'finance') {
+    h.innerHTML = '<div class="hint-chip" onclick="quickSend(\'Расскажи урок из Вавилона\')">📖 Урок дня</div>' +
+      '<div class="hint-chip" onclick="quickSend(\'Помоги с бюджетом\')">💰 Бюджет</div>' +
+      '<div class="hint-chip" onclick="quickSend(\'Хочу поставить финансовую цель\')">🎯 Цель</div>';
+  } else {
+    h.innerHTML = '<div class="hint-chip" onclick="quickSend(\'Что ты умеешь?\')">Что ты умеешь?</div>' +
+      '<div class="hint-chip" onclick="document.getElementById(\'photoInput\').click()">📷 Фото еды</div>' +
+      '<div class="hint-chip" onclick="quickSend(\'Мне тревожно\')">Мне тревожно</div>' +
+      '<div class="hint-chip" onclick="quickSend(\'Что приготовить на ужин?\')">Что на ужин?</div>';
+  }
 }
 
 // ===== ANALYTICS =====
