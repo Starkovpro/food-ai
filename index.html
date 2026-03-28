@@ -339,7 +339,11 @@ async function signInGoogle() {
   var { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
   if (error) { document.getElementById('authError').textContent = error.message; document.getElementById('googleBtn').disabled = false; }
 }
-async function signOut() { await supabase.auth.signOut(); localStorage.removeItem(HISTORY_KEY); location.reload(); }
+async function signOut() {
+  await supabase.auth.signOut();
+  ['general','health','focus','finance'].forEach(function(s) { localStorage.removeItem('bf_h_' + s); });
+  location.reload();
+}
 function showAuth() { document.getElementById('authScreen').classList.remove('hidden'); document.getElementById('onboarding').classList.add('hidden'); document.getElementById('app').classList.remove('visible'); }
 
 async function onAuthSuccess() {
@@ -394,7 +398,7 @@ function prepFinal() {
   document.getElementById('finalMessage').textContent = g[profile.friend_character] || g.warm;
 }
 async function startChat() {
-  // First 3 days bonus: 30 requests
+  // 25 запросов/день
   var maxReq = 25;
   try {
     await supabase.from('user_profiles').upsert({
@@ -506,9 +510,9 @@ function addMessageToSphere(sphere, role, text) {
   saveHistory(hist, sphere);
   // Only show in UI if we're still on that sphere
   if (sphere === currentSphere) {
-    var c = document.getElementById('messages'); var h = document.getElementById('hints');
+    var c = document.getElementById('messages'); var es = document.getElementById('emptyState');
     var d = document.createElement('div'); d.className = 'msg '+(role==='friend'?'msg-friend':'msg-user'); d.textContent = text;
-    c.insertBefore(d, h); scrollToBottom();
+    c.insertBefore(d, es); es.style.display = 'none'; scrollToBottom();
   }
 }
 
@@ -521,7 +525,9 @@ var sphereEmpty = {
   general:'Поговорим обо всём!'
 };
 function switchSphere(sphere) {
+  var prevSphere = currentSphere;
   currentSphere = sphere;
+  trackEvent('sphere_switched', { from: prevSphere, to: sphere });
   // Theme class
   var app = document.getElementById('app');
   app.className = 'app visible sphere-' + sphere;
