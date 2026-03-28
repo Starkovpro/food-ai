@@ -107,7 +107,8 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .header{display:flex;align-items:center;gap:10px;padding:10px 12px;padding-top:calc(env(safe-area-inset-top,6px)+6px);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
 .header-orb{width:36px;height:36px;border-radius:50%;flex-shrink:0;background:radial-gradient(circle at 40% 35%,#e8a838,#c47820 60%,#6b3410);box-shadow:0 0 12px rgba(232,168,56,.3)}
 .header-info{flex:1}.header-name{font-size:15px;font-weight:600}
-.header-status{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.header-status{font-size:11px;color:var(--success);display:flex;align-items:center;gap:6px}
+.header-status::before{content:'●';color:var(--success);font-size:8px}
 .header-sphere{color:var(--accent);font-weight:500}
 .header-menu{width:36px;height:36px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:16px}
 .messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
@@ -134,7 +135,6 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .sphere-btn{flex-shrink:0;padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-family:'Outfit',sans-serif;font-size:12px;color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap}
 .sphere-btn:hover,.sphere-btn:active{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
 .sphere-btn.active{border-color:var(--accent);color:var(--accent)}
-.sphere-btn.emergency{border-color:rgba(232,72,72,.4);color:#ff8888;background:rgba(232,72,72,.08)}
 
 .input-area{display:flex;align-items:flex-end;gap:8px;padding:8px 12px;padding-bottom:calc(env(safe-area-inset-bottom,6px)+6px);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
 .input-wrap{flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:24px;display:flex;align-items:flex-end;transition:border-color .2s}
@@ -244,7 +244,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 <div class="app" id="app">
   <div class="header">
     <div class="header-orb"></div>
-    <div class="header-info"><div class="header-name" id="headerName">Друг</div><div class="header-status">● онлайн · <span class="header-sphere" id="headerSphere">💬 Общий чат</span></div></div>
+    <div class="header-info"><div class="header-name" id="headerName">Друг</div><div class="header-status">онлайн · <span class="header-sphere" id="headerSphere">💬 Общий чат</span></div></div>
     <div class="req-counter" id="reqCounter">0 / 10</div>
     <div class="header-menu" onclick="toggleSettings()">☰</div>
   </div>
@@ -259,15 +259,9 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
   </div>
   <div class="bottom-bar">
     <div class="spheres-bar">
-      <button class="sphere-btn emergency" onclick="switchSphere('emergency')">🆘 Мне плохо</button>
       <button class="sphere-btn" data-sphere="health" onclick="switchSphere('health')">🍽 Здоровье</button>
-      <button class="sphere-btn" data-sphere="career" onclick="switchSphere('career')">💼 Карьера</button>
+      <button class="sphere-btn" data-sphere="focus" onclick="switchSphere('focus')">🧠 Фокус</button>
       <button class="sphere-btn" data-sphere="finance" onclick="switchSphere('finance')">💰 Финансы</button>
-      <button class="sphere-btn" data-sphere="growth" onclick="switchSphere('growth')">🌱 Развитие</button>
-      <button class="sphere-btn" data-sphere="social" onclick="switchSphere('social')">👥 Окружение</button>
-      <button class="sphere-btn" data-sphere="family" onclick="switchSphere('family')">❤️ Семья</button>
-      <button class="sphere-btn" data-sphere="leisure" onclick="switchSphere('leisure')">🎨 Отдых</button>
-      <button class="sphere-btn" data-sphere="self" onclick="switchSphere('self')">🌟 Яркость</button>
       <button class="sphere-btn" data-sphere="general" onclick="switchSphere('general')">💬 Чат</button>
     </div>
   </div>
@@ -447,45 +441,62 @@ async function sendMessage() {
   if (!text && !image) return;
   if (text) { addMessage('user', text); input.value = ''; input.style.height = 'auto'; }
   else if (image) addMessage('user', '📷 Фото');
+
+  // Capture sphere at send time — response must go here
+  var sendSphere = currentSphere;
+
   isLoading = true; showTyping(true); document.getElementById('sendBtn').disabled = true;
   try {
     var { data: sess } = await supabase.auth.getSession();
     if (sess.session) authToken = sess.session.access_token;
-    var hist = loadHistory().slice(-10);
-    var body = { message: text || '', sphere: currentSphere, history: hist };
+    var hist = loadHistory(sendSphere).slice(-10);
+    var body = { message: text || '', sphere: sendSphere, history: hist };
     if (image) body.imageBase64 = image;
     var res = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+authToken}, body:JSON.stringify(body) });
     var data = await res.json(); showTyping(false);
-    if (res.status === 401) addMessage('friend', 'Сессия истекла. Обнови страницу.');
-    else if (res.status === 429) { addMessage('friend', data.error || 'Запросы закончились. 🆘 работает всегда.'); if (data.count != null) updateCounter(data.count, data.max); }
-    else if (data.reply) { addMessage('friend', data.reply); if (data.count != null) updateCounter(data.count, data.max); }
-    else addMessage('friend', data.error || 'Что-то пошло не так.');
-  } catch (err) { showTyping(false); addMessage('friend', 'Не могу подключиться. Проверь интернет.'); console.error(err); }
+
+    // Save response to the sphere where question was asked
+    if (res.status === 401) {
+      addMessageToSphere(sendSphere, 'friend', 'Сессия истекла. Обнови страницу.');
+    } else if (res.status === 429) {
+      addMessageToSphere(sendSphere, 'friend', data.error || 'Запросы закончились.');
+      if (data.count != null) updateCounter(data.count, data.max);
+    } else if (data.reply) {
+      addMessageToSphere(sendSphere, 'friend', data.reply);
+      if (data.count != null) updateCounter(data.count, data.max);
+    } else {
+      addMessageToSphere(sendSphere, 'friend', data.error || 'Что-то пошло не так.');
+    }
+  } catch (err) { showTyping(false); addMessageToSphere(sendSphere, 'friend', 'Не могу подключиться. Проверь интернет.'); console.error(err); }
   isLoading = false; document.getElementById('sendBtn').disabled = false;
+}
+
+// Add message to specific sphere (even if user switched away)
+function addMessageToSphere(sphere, role, text) {
+  var hist = loadHistory(sphere); hist.push({ role: role, text: text, time: Date.now() });
+  if (hist.length > 100) hist.splice(0, hist.length - 100);
+  saveHistory(hist, sphere);
+  // Only show in UI if we're still on that sphere
+  if (sphere === currentSphere) {
+    var c = document.getElementById('messages'); var h = document.getElementById('hints');
+    var d = document.createElement('div'); d.className = 'msg '+(role==='friend'?'msg-friend':'msg-user'); d.textContent = text;
+    c.insertBefore(d, h); scrollToBottom();
+  }
 }
 
 // ===== SPHERES =====
 function switchSphere(sphere) {
-  if (sphere === 'emergency') { currentSphere = 'emergency'; document.getElementById('chatInput').value = 'Мне плохо'; sendMessage(); return; }
   currentSphere = sphere;
   updateSettings();
   document.querySelectorAll('.sphere-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.sphere === sphere); });
-
-  // Load this sphere's chat history
   renderHistory();
 
-  // Show greeting only if this sphere has no messages yet
   var hist = loadHistory();
   if (hist.length === 0) {
     var prompts = {
-      health: 'Ой, здоровье? Отлично! Кинь фото еды — посчитаю калории 📸 Или спроси что приготовить!',
-      career: 'Карьера, да? Расскажи что сейчас на работе — вместе найдём точки роста.',
-      finance: 'Деньги! Могу рассказать урок из «Вавилона», помочь с бюджетом или поставить цель.',
-      growth: 'Саморазвитие — люблю это! Какая цель? Или чему хочешь научиться?',
-      social: 'Расскажи что с людьми вокруг — разберёмся вместе.',
-      family: 'Семья — важно. Расскажи что происходит, помогу найти решение.',
-      leisure: 'Хочешь классно отдохнуть? Расскажи что нравится — подберём!',
-      self: 'Как ты? Могу провести дыхание, разгрузить голову или поработать с тревогой.',
+      health: 'Привет! Здесь всё про здоровье 🍽 Кинь фото еды — посчитаю калории. Или спроси рецепт, задай вопрос про тренировки!',
+      focus: 'Привет! Здесь про фокус и эмоции 🧠 Могу провести дыхание, помочь с тревогой, разгрузить голову или запустить фокус-сессию.',
+      finance: 'Привет! Здесь про деньги 💰 Могу рассказать урок из «Вавилона», помочь с бюджетом или поставить финансовую цель.',
       general: ''
     };
     if (prompts[sphere]) addMessage('friend', prompts[sphere]);
@@ -516,7 +527,7 @@ function closeSettings(e) { if (e.target === document.getElementById('settingsOv
 function updateSettings() {
   var gMap={female:'👩 Подруга',male:'👨 Друг',neutral:'🌟 Свой'};
   var cMap={warm:'🤗 Тёплый',direct:'⚡ Чёткий',funny:'😄 Весёлый',wise:'🧘 Мудрый'};
-  var sMap={health:'🍽 Здоровье',career:'💼 Карьера',finance:'💰 Финансы',growth:'🌱 Развитие',social:'👥 Окружение',family:'❤️ Семья',leisure:'🎨 Отдых',self:'🌟 Яркость',general:'💬 Общий чат',emergency:'🆘 Поддержка'};
+  var sMap={health:'🍽 Здоровье',focus:'🧠 Фокус',finance:'💰 Финансы',general:'💬 Общий чат'};
   document.getElementById('setName').textContent = profile.friend_name || '—';
   document.getElementById('setGender').textContent = gMap[profile.friend_gender] || '—';
   document.getElementById('setChar').textContent = cMap[profile.friend_character] || '—';
@@ -527,7 +538,7 @@ async function resetAll() {
   if (!confirm('Удалить все данные и начать заново?')) return;
   try { await supabase.from('user_profiles').delete().eq('user_id',currentUser.id); await supabase.from('friend_memory').delete().eq('user_id',currentUser.id); } catch(e){}
   // Clear all sphere histories
-  var spheres = ['general','health','career','finance','growth','social','family','leisure','self','emergency'];
+  var spheres = ['general','health','focus','finance'];
   spheres.forEach(function(s) { localStorage.removeItem('bf_h_' + s); });
   location.reload();
 }
