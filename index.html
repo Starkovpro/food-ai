@@ -107,8 +107,8 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .header{display:flex;align-items:center;gap:10px;padding:10px 12px;padding-top:calc(env(safe-area-inset-top,6px)+6px);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
 .header-orb{width:36px;height:36px;border-radius:50%;flex-shrink:0;background:radial-gradient(circle at 40% 35%,#e8a838,#c47820 60%,#6b3410);box-shadow:0 0 12px rgba(232,168,56,.3)}
 .header-info{flex:1}.header-name{font-size:15px;font-weight:600}
-.header-status{font-size:12px;color:var(--success);display:flex;align-items:center;gap:4px}
-.header-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--success)}
+.header-status{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.header-sphere{color:var(--accent);font-weight:500}
 .header-menu{width:36px;height:36px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:16px}
 .messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
 .msg{max-width:85%;padding:12px 16px;font-size:14px;line-height:1.5;animation:msgSlide .3s ease both;word-wrap:break-word}
@@ -244,7 +244,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 <div class="app" id="app">
   <div class="header">
     <div class="header-orb"></div>
-    <div class="header-info"><div class="header-name" id="headerName">Друг</div><div class="header-status">онлайн</div></div>
+    <div class="header-info"><div class="header-name" id="headerName">Друг</div><div class="header-status">● онлайн · <span class="header-sphere" id="headerSphere">💬 Общий чат</span></div></div>
     <div class="req-counter" id="reqCounter">0 / 10</div>
     <div class="header-menu" onclick="toggleSettings()">☰</div>
   </div>
@@ -301,10 +301,8 @@ var SUPABASE_URL = 'https://siwibqrykqlyxiwtukst.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpd2licXJ5a3FseXhpd3R1a3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNzMwODEsImV4cCI6MjA4OTY0OTA4MX0.hACYQJs1Il0IykGGvbJKisFxvSYukHB0a3Mtnh2I-T4';
 var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-var HISTORY_KEY = 'bf_history';
 var currentStep = 0, selectedGoals = [], currentSphere = 'general', pendingImage = null, isLoading = false;
 var currentUser = null, authToken = null, profile = {};
-var lastSphereMsg = ''; // prevent sphere spam
 
 // ===== OFFLINE =====
 window.addEventListener('online', function() { document.getElementById('offlineBanner').classList.remove('show'); });
@@ -406,8 +404,9 @@ async function startChat() {
 }
 
 // ===== CHAT =====
-function loadHistory() { try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch(e) { return []; } }
-function saveHistory(h) { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); }
+function historyKey(sphere) { return 'bf_h_' + (sphere || currentSphere); }
+function loadHistory(sphere) { try { return JSON.parse(localStorage.getItem(historyKey(sphere))) || []; } catch(e) { return []; } }
+function saveHistory(h, sphere) { localStorage.setItem(historyKey(sphere || currentSphere), JSON.stringify(h)); }
 function showApp() {
   document.getElementById('app').classList.add('visible');
   document.getElementById('headerName').textContent = profile.friend_name || 'Друг';
@@ -419,8 +418,8 @@ function renderHistory() {
   c.querySelectorAll('.msg').forEach(function(m) { m.remove(); });
   var hist = loadHistory();
   hist.forEach(function(m) { var d = document.createElement('div'); d.className = 'msg '+(m.role==='friend'?'msg-friend':'msg-user'); d.textContent = m.text; c.insertBefore(d, h); });
-  // Hide hints if there are user messages
-  if (hist.some(function(m) { return m.role === 'user'; })) h.style.display = 'none';
+  // Show hints only if no user messages in this sphere
+  h.style.display = hist.some(function(m) { return m.role === 'user'; }) ? 'none' : 'flex';
   scrollToBottom();
 }
 function addMessage(role, text) {
@@ -467,25 +466,30 @@ async function sendMessage() {
 
 // ===== SPHERES =====
 function switchSphere(sphere) {
+  if (sphere === 'emergency') { currentSphere = 'emergency'; document.getElementById('chatInput').value = 'Мне плохо'; sendMessage(); return; }
   currentSphere = sphere;
   updateSettings();
-  // Highlight active sphere
   document.querySelectorAll('.sphere-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.sphere === sphere); });
-  var prompts = {
-    health: 'Ой, здоровье? Отлично! Кинь фото еды — посчитаю калории 📸 Или спроси что приготовить, расскажи про тренировки — помогу!',
-    career: 'Карьера, да? Расскажи что сейчас на работе — вместе найдём точки роста.',
-    finance: 'Деньги! Могу рассказать крутой урок из «Вавилона», помочь с бюджетом или поставить финансовую цель.',
-    growth: 'Саморазвитие — люблю это! Какая цель? Или чему хочешь научиться?',
-    social: 'Расскажи что с людьми вокруг — разберёмся вместе.',
-    family: 'Семья — важно. Расскажи что происходит, помогу найти решение.',
-    leisure: 'Хочешь классно отдохнуть? Расскажи что нравится — подберём!',
-    self: 'Как ты? Могу провести дыхание, разгрузить голову или поработать с тревогой.',
-    general: '', emergency: ''
-  };
-  if (sphere === 'emergency') { document.getElementById('chatInput').value = 'Мне плохо'; sendMessage(); return; }
-  // Prevent sphere spam
-  var prompt = prompts[sphere];
-  if (prompt && prompt !== lastSphereMsg) { addMessage('friend', prompt); lastSphereMsg = prompt; }
+
+  // Load this sphere's chat history
+  renderHistory();
+
+  // Show greeting only if this sphere has no messages yet
+  var hist = loadHistory();
+  if (hist.length === 0) {
+    var prompts = {
+      health: 'Ой, здоровье? Отлично! Кинь фото еды — посчитаю калории 📸 Или спроси что приготовить!',
+      career: 'Карьера, да? Расскажи что сейчас на работе — вместе найдём точки роста.',
+      finance: 'Деньги! Могу рассказать урок из «Вавилона», помочь с бюджетом или поставить цель.',
+      growth: 'Саморазвитие — люблю это! Какая цель? Или чему хочешь научиться?',
+      social: 'Расскажи что с людьми вокруг — разберёмся вместе.',
+      family: 'Семья — важно. Расскажи что происходит, помогу найти решение.',
+      leisure: 'Хочешь классно отдохнуть? Расскажи что нравится — подберём!',
+      self: 'Как ты? Могу провести дыхание, разгрузить голову или поработать с тревогой.',
+      general: ''
+    };
+    if (prompts[sphere]) addMessage('friend', prompts[sphere]);
+  }
 }
 
 // ===== PHOTO =====
@@ -512,16 +516,20 @@ function closeSettings(e) { if (e.target === document.getElementById('settingsOv
 function updateSettings() {
   var gMap={female:'👩 Подруга',male:'👨 Друг',neutral:'🌟 Свой'};
   var cMap={warm:'🤗 Тёплый',direct:'⚡ Чёткий',funny:'😄 Весёлый',wise:'🧘 Мудрый'};
-  var sMap={health:'🍽 Здоровье',career:'💼 Карьера',finance:'💰 Финансы',growth:'🌱 Развитие',social:'👥 Окружение',family:'❤️ Семья',leisure:'🎨 Отдых',self:'🌟 Яркость',general:'💬 Общее',emergency:'🆘 Поддержка'};
+  var sMap={health:'🍽 Здоровье',career:'💼 Карьера',finance:'💰 Финансы',growth:'🌱 Развитие',social:'👥 Окружение',family:'❤️ Семья',leisure:'🎨 Отдых',self:'🌟 Яркость',general:'💬 Общий чат',emergency:'🆘 Поддержка'};
   document.getElementById('setName').textContent = profile.friend_name || '—';
   document.getElementById('setGender').textContent = gMap[profile.friend_gender] || '—';
   document.getElementById('setChar').textContent = cMap[profile.friend_character] || '—';
   document.getElementById('setSphere').textContent = sMap[currentSphere] || 'Общее';
+  document.getElementById('headerSphere').textContent = sMap[currentSphere] || '💬 Общий чат';
 }
 async function resetAll() {
   if (!confirm('Удалить все данные и начать заново?')) return;
   try { await supabase.from('user_profiles').delete().eq('user_id',currentUser.id); await supabase.from('friend_memory').delete().eq('user_id',currentUser.id); } catch(e){}
-  localStorage.removeItem(HISTORY_KEY); location.reload();
+  // Clear all sphere histories
+  var spheres = ['general','health','career','finance','growth','social','family','leisure','self','emergency'];
+  spheres.forEach(function(s) { localStorage.removeItem('bf_h_' + s); });
+  location.reload();
 }
 
 // ===== INIT =====
