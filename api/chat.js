@@ -210,7 +210,7 @@ module.exports = async function handler(req, res) {
     }
 
     // --- Call Claude ---
-    var result = await callClaude({ model: 'claude-sonnet-4-20250514', max_tokens: 1024, system: sp, messages: msgs });
+    var result = await callClaude({ model: 'claude-sonnet-4-6', max_tokens: 1024, system: sp, messages: msgs });
     var reply = (result.content && result.content[0] && result.content[0].text) || 'Прости, не смог ответить.';
 
     // --- Memory: update every 10 messages, not every time ---
@@ -246,7 +246,7 @@ async function updateMemory(userId, history, existingMemory) {
   var prompt = 'Вот последние сообщения пользователя:\n"' + combined.slice(0, 1000) + '"\n\nУже известные факты:\n' + (existingMemory || 'Пока ничего.') + '\n\nОбнови список фактов о пользователе. Добавь новое, убери дубли. Максимум 20 строк, кратко. ТОЛЬКО список фактов.';
 
   var data = await callClaude({
-    model: 'claude-sonnet-4-20250514', max_tokens: 512,
+    model: 'claude-sonnet-4-6', max_tokens: 512,
     system: 'Извлекай ключевые факты о человеке. Отвечай только списком фактов, по одному на строку.',
     messages: [{ role: 'user', content: prompt }]
   });
