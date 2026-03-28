@@ -27,12 +27,12 @@ export default async function handler(req, res) {
 
   const userData = await supabaseRes.json();
 
-  // 3. Trial period check (7 days)
+  // 3. Trial period check (3 days)
   const registeredAt = new Date(userData.created_at);
   const now = new Date();
   const daysPassed = Math.floor((now - registeredAt) / (1000 * 60 * 60 * 24));
 
-  if (daysPassed >= 7) {
+  if (daysPassed >= 3) {
     return res.status(403).json({ error: 'trial_expired' });
   }
 
