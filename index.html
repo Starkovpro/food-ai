@@ -128,13 +128,27 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .hint-chip{padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:13px;color:var(--text2);cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
 .hint-chip:hover{border-color:var(--accent);color:var(--accent)}
 
-/* SPHERES + EMERGENCY */
+/* SPHERES */
 .bottom-bar{flex-shrink:0;background:var(--bg);border-top:1px solid rgba(42,42,68,.5)}
-.spheres-bar{display:flex;gap:6px;padding:6px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;align-items:center}
-.spheres-bar::-webkit-scrollbar{display:none}
-.sphere-btn{flex-shrink:0;padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-family:'Outfit',sans-serif;font-size:12px;color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap}
+.spheres-bar{display:flex;gap:6px;padding:6px 12px;align-items:center}
+.sphere-btn{flex:1;padding:8px 4px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-family:'Outfit',sans-serif;font-size:12px;color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap;text-align:center}
 .sphere-btn:hover,.sphere-btn:active{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
 .sphere-btn.active{border-color:var(--accent);color:var(--accent)}
+/* Sphere color themes */
+.sphere-health .header{border-bottom-color:#2d6b3f}
+.sphere-health .header-sphere{color:#48c878}
+.sphere-health .sphere-btn.active{border-color:#48c878;color:#48c878}
+.sphere-focus .header{border-bottom-color:#2d4a6b}
+.sphere-focus .header-sphere{color:#48a0c8}
+.sphere-focus .sphere-btn.active{border-color:#48a0c8;color:#48a0c8}
+.sphere-finance .header{border-bottom-color:#6b5a2d}
+.sphere-finance .header-sphere{color:#e8a838}
+.sphere-finance .sphere-btn.active{border-color:#e8a838;color:#e8a838}
+.sphere-general .header-sphere{color:var(--accent)}
+/* Empty state */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;padding:20px;opacity:.5}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-text{font-size:14px;color:var(--text2);line-height:1.5}
 
 .input-area{display:flex;align-items:flex-end;gap:8px;padding:8px 12px;padding-bottom:calc(env(safe-area-inset-bottom,6px)+6px);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
 .input-wrap{flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:24px;display:flex;align-items:flex-end;transition:border-color .2s}
@@ -249,6 +263,10 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
     <div class="header-menu" onclick="toggleSettings()">☰</div>
   </div>
   <div class="messages" id="messages">
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="empty-icon" id="emptyIcon">💬</div>
+      <div class="empty-text" id="emptyText">Напиши что-нибудь — я отвечу!</div>
+    </div>
     <div class="hints" id="hints">
       <div class="hint-chip" onclick="quickSend('Что ты умеешь?')">Что ты умеешь?</div>
       <div class="hint-chip" onclick="document.getElementById('photoInput').click()">📷 Фото еды</div>
@@ -377,7 +395,7 @@ function prepFinal() {
 }
 async function startChat() {
   // First 3 days bonus: 30 requests
-  var maxReq = 30;
+  var maxReq = 25;
   try {
     await supabase.from('user_profiles').upsert({
       user_id: currentUser.id, friend_name: profile.friend_name, friend_gender: profile.friend_gender,
@@ -393,6 +411,7 @@ async function startChat() {
   var first = greet[profile.friend_character] || greet.warm;
   saveHistory([{ role: 'friend', text: first, time: Date.now() }]);
   try { await supabase.from('friend_memory').upsert({ user_id: currentUser.id, facts: '', updated_at: new Date().toISOString() }); } catch (e) {}
+  trackEvent('onboarding_complete', { character: profile.friend_character, gender: profile.friend_gender });
   document.getElementById('onboarding').classList.add('hidden');
   setTimeout(function() { document.getElementById('onboarding').style.display = 'none'; showApp(); }, 500);
 }
@@ -402,25 +421,33 @@ function historyKey(sphere) { return 'bf_h_' + (sphere || currentSphere); }
 function loadHistory(sphere) { try { return JSON.parse(localStorage.getItem(historyKey(sphere))) || []; } catch(e) { return []; } }
 function saveHistory(h, sphere) { localStorage.setItem(historyKey(sphere || currentSphere), JSON.stringify(h)); }
 function showApp() {
-  document.getElementById('app').classList.add('visible');
+  var app = document.getElementById('app');
+  app.className = 'app visible sphere-' + currentSphere;
   document.getElementById('headerName').textContent = profile.friend_name || 'Друг';
   if (currentUser) document.getElementById('setEmail').textContent = currentUser.email || '—';
+  document.querySelectorAll('.sphere-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.sphere === currentSphere); });
   renderHistory(); updateSettings(); fetchCount();
+  trackEvent('session_start');
 }
 function renderHistory() {
-  var c = document.getElementById('messages'); var t = document.getElementById('typing'); var h = document.getElementById('hints');
+  var c = document.getElementById('messages'); var h = document.getElementById('hints'); var es = document.getElementById('emptyState');
   c.querySelectorAll('.msg').forEach(function(m) { m.remove(); });
   var hist = loadHistory();
-  hist.forEach(function(m) { var d = document.createElement('div'); d.className = 'msg '+(m.role==='friend'?'msg-friend':'msg-user'); d.textContent = m.text; c.insertBefore(d, h); });
-  // Show hints only if no user messages in this sphere
+  hist.forEach(function(m) { var d = document.createElement('div'); d.className = 'msg '+(m.role==='friend'?'msg-friend':'msg-user'); d.textContent = m.text; c.insertBefore(d, es); });
   h.style.display = hist.some(function(m) { return m.role === 'user'; }) ? 'none' : 'flex';
+  es.style.display = hist.length === 0 ? 'flex' : 'none';
+  if (hist.length === 0) {
+    document.getElementById('emptyIcon').textContent = sphereEmoji[currentSphere] || '💬';
+    document.getElementById('emptyText').textContent = sphereEmpty[currentSphere] || 'Напиши что-нибудь!';
+  }
   scrollToBottom();
 }
 function addMessage(role, text) {
-  var c = document.getElementById('messages'); var t = document.getElementById('typing'); var h = document.getElementById('hints');
+  var c = document.getElementById('messages'); var h = document.getElementById('hints'); var es = document.getElementById('emptyState');
   var d = document.createElement('div'); d.className = 'msg '+(role==='friend'?'msg-friend':'msg-user'); d.textContent = text;
-  c.insertBefore(d, h);
+  c.insertBefore(d, es);
   if (role === 'user') h.style.display = 'none';
+  es.style.display = 'none';
   var hist = loadHistory(); hist.push({ role: role, text: text, time: Date.now() });
   if (hist.length > 100) hist.splice(0, hist.length - 100);
   saveHistory(hist); scrollToBottom();
@@ -431,7 +458,7 @@ function quickSend(text) { document.getElementById('chatInput').value = text; se
 
 async function fetchCount() {
   if (!authToken) return;
-  try { var { data } = await supabase.rpc('get_daily_count', { p_user_id: currentUser.id }); if (data) updateCounter(data.count||0, data.max||10); } catch(e) { updateCounter(0, 10); }
+  try { var { data } = await supabase.rpc('get_daily_count', { p_user_id: currentUser.id }); if (data) updateCounter(data.count||0, data.max||25); } catch(e) { updateCounter(0, 25); }
 }
 function updateCounter(count, max) { var el = document.getElementById('reqCounter'); el.textContent = count+' / '+max+' запросов'; el.style.color = count >= max ? '#e84848' : ''; }
 
@@ -446,6 +473,7 @@ async function sendMessage() {
   var sendSphere = currentSphere;
 
   isLoading = true; showTyping(true); document.getElementById('sendBtn').disabled = true;
+  trackEvent('message_sent', { sphere: sendSphere, has_image: !!image });
   try {
     var { data: sess } = await supabase.auth.getSession();
     if (sess.session) authToken = sess.session.access_token;
@@ -485,14 +513,30 @@ function addMessageToSphere(sphere, role, text) {
 }
 
 // ===== SPHERES =====
+var sphereEmoji = {health:'🍽',focus:'🧠',finance:'💰',general:'💬'};
+var sphereEmpty = {
+  health:'Здесь всё про здоровье и питание.\nКинь фото еды или спроси рецепт!',
+  focus:'Здесь про фокус и эмоции.\nДыхание, тревога, разгрузка головы.',
+  finance:'Здесь про деньги и финансы.\nБюджет, цели, уроки из Вавилона.',
+  general:'Поговорим обо всём!'
+};
 function switchSphere(sphere) {
   currentSphere = sphere;
+  // Theme class
+  var app = document.getElementById('app');
+  app.className = 'app visible sphere-' + sphere;
   updateSettings();
   document.querySelectorAll('.sphere-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.sphere === sphere); });
   renderHistory();
 
   var hist = loadHistory();
   if (hist.length === 0) {
+    // Show empty state
+    document.getElementById('emptyState').style.display = 'flex';
+    document.getElementById('emptyIcon').textContent = sphereEmoji[sphere] || '💬';
+    document.getElementById('emptyText').textContent = sphereEmpty[sphere] || 'Напиши что-нибудь!';
+    document.getElementById('hints').style.display = 'flex';
+    // Auto-send greeting
     var prompts = {
       health: 'Привет! Здесь всё про здоровье 🍽 Кинь фото еды — посчитаю калории. Или спроси рецепт, задай вопрос про тренировки!',
       focus: 'Привет! Здесь про фокус и эмоции 🧠 Могу провести дыхание, помочь с тревогой, разгрузить голову или запустить фокус-сессию.',
@@ -500,6 +544,9 @@ function switchSphere(sphere) {
       general: ''
     };
     if (prompts[sphere]) addMessage('friend', prompts[sphere]);
+    document.getElementById('emptyState').style.display = 'none';
+  } else {
+    document.getElementById('emptyState').style.display = 'none';
   }
 }
 
@@ -541,6 +588,12 @@ async function resetAll() {
   var spheres = ['general','health','focus','finance'];
   spheres.forEach(function(s) { localStorage.removeItem('bf_h_' + s); });
   location.reload();
+}
+
+// ===== ANALYTICS =====
+function trackEvent(type, data) {
+  if (!currentUser) return;
+  try { supabase.from('analytics_events').insert({ user_id: currentUser.id, event_type: type, event_data: data || {} }).then(); } catch(e) {}
 }
 
 // ===== INIT =====
