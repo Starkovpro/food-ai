@@ -135,7 +135,39 @@ module.exports = async function handler(req, res) {
     var imageBase64 = body.imageBase64;
     if (!message && !imageBase64) return res.status(400).json({ error: 'Пустое сообщение' });
 
-    // --- Rate limit ---
+    // --- Profile & memory (fetch first for trial check) ---
+    var profile = null, memory = '';
+    try {
+      var profiles = await supabaseGet('user_profiles', 'user_id=eq.' + userId);
+      if (Array.isArray(profiles) && profiles.length > 0) profile = profiles[0];
+      var memories = await supabaseGet('friend_memory', 'user_id=eq.' + userId);
+      if (Array.isArray(memories) && memories.length > 0) memory = memories[0].facts || '';
+    } catch (e) {}
+
+    // --- Trial / Subscription check ---
+    var subStatus = (profile && profile.subscription_status) || 'free';
+    var createdAt = (profile && profile.created_at) ? new Date(profile.created_at) : new Date();
+    var now = new Date();
+    var daysSinceCreation = (now - createdAt) / (1000 * 60 * 60 * 24);
+    var isTrialActive = daysSinceCreation <= 3;
+    var isPaid = (subStatus === 'paid');
+    var subEnd = (profile && profile.subscription_end) ? new Date(profile.subscription_end) : null;
+
+    // Check if subscription expired
+    if (isPaid && subEnd && subEnd < now) {
+      isPaid = false;
+      try { await supabaseUpsert('user_profiles', { user_id: userId, subscription_status: 'expired', updated_at: now.toISOString() }); } catch(e) {}
+    }
+
+    // Block if trial ended and not paid
+    if (!isTrialActive && !isPaid) {
+      return res.status(403).json({
+        error: 'Пробный период закончился. Оформи подписку за 2000₽/мес чтобы продолжить общение!',
+        trial_expired: true
+      });
+    }
+
+    // --- Rate limit (25/day) ---
     try {
       var limitResult = await supabaseRPC('increment_daily_requests', { p_user_id: userId });
       if (limitResult && limitResult.allowed === false) {
@@ -145,15 +177,6 @@ module.exports = async function handler(req, res) {
         });
       }
     } catch (e) { console.error('Rate limit err:', e.message); }
-
-    // --- Profile & memory ---
-    var profile = null, memory = '';
-    try {
-      var profiles = await supabaseGet('user_profiles', 'user_id=eq.' + userId);
-      if (Array.isArray(profiles) && profiles.length > 0) profile = profiles[0];
-      var memories = await supabaseGet('friend_memory', 'user_id=eq.' + userId);
-      if (Array.isArray(memories) && memories.length > 0) memory = memories[0].facts || '';
-    } catch (e) {}
 
     var friendName = (profile && profile.friend_name) || 'Друг';
     var friendGender = (profile && profile.friend_gender) || 'neutral';
