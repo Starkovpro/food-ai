@@ -2,6 +2,14 @@
   "version": 2,
   "rewrites": [
     { "source": "/api/chat", "destination": "/api/chat" },
-    { "source": "/api/analyze", "destination": "/api/analyze" }
+    { "source": "/api/analyze", "destination": "/api/analyze" },
+    { "source": "/api/telegram", "destination": "/api/telegram" },
+    { "source": "/api/morning", "destination": "/api/morning" }
+  ],
+  "crons": [
+    {
+      "path": "/api/morning",
+      "schedule": "0 5 * * *"
+    }
   ]
 }
