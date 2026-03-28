@@ -177,6 +177,24 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 /* OFFLINE */
 .offline-banner{display:none;padding:8px;background:var(--danger);color:#fff;text-align:center;font-size:12px;font-weight:500}
 .offline-banner.show{display:block}
+
+/* PAYWALL */
+.paywall{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
+.paywall.show{display:flex}
+.paywall-orb{width:80px;height:80px;border-radius:50%;margin-bottom:24px;background:radial-gradient(circle at 40% 35%,#e8a838,#c47820 60%,#6b3410);box-shadow:0 0 40px rgba(232,168,56,.3)}
+.paywall-title{font-size:22px;font-weight:600;margin-bottom:8px;color:var(--text)}
+.paywall-desc{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:28px;max-width:320px}
+.paywall-price{font-size:32px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.paywall-period{font-size:14px;color:var(--text2);margin-bottom:24px}
+.paywall-features{text-align:left;margin-bottom:28px;max-width:280px}
+.paywall-feat{font-size:14px;color:var(--text);padding:6px 0;display:flex;align-items:center;gap:8px}
+.paywall-feat::before{content:'✓';color:var(--success);font-weight:700}
+.paywall-btn{width:100%;max-width:300px;padding:16px;border:none;border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;cursor:pointer;color:var(--bg);background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 4px 20px rgba(232,168,56,.3);margin-bottom:12px}
+.paywall-btn:active{transform:scale(.97)}
+.paywall-close{background:none;border:none;color:var(--text2);font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;padding:8px}
+
+/* TRIAL BADGE */
+.trial-badge{padding:3px 8px;background:rgba(232,168,56,.15);border:1px solid rgba(232,168,56,.3);border-radius:8px;font-size:10px;color:var(--accent);font-weight:500;margin-left:6px}
 </style>
 </head>
 <body>
@@ -308,6 +326,24 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
   </div>
 </div>
 
+<!-- PAYWALL -->
+<div class="paywall" id="paywall">
+  <div class="paywall-orb"></div>
+  <div class="paywall-title">Пробный период закончился</div>
+  <div class="paywall-desc">Тебе понравилось? Оформи подписку и продолжай общение с другом!</div>
+  <div class="paywall-price">2 000 ₽</div>
+  <div class="paywall-period">в месяц</div>
+  <div class="paywall-features">
+    <div class="paywall-feat">25 запросов в день</div>
+    <div class="paywall-feat">4 экспертных направления</div>
+    <div class="paywall-feat">Друг помнит всё о тебе</div>
+    <div class="paywall-feat">Анализ еды по фото</div>
+    <div class="paywall-feat">Техники дыхания и фокуса</div>
+  </div>
+  <button class="paywall-btn" onclick="handleSubscribe()">Оформить подписку</button>
+  <button class="paywall-close" onclick="closePaywall()">Позже</button>
+</div>
+
 <script>
 var SUPABASE_URL = 'https://siwibqrykqlyxiwtukst.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpd2licXJ5a3FseXhpd3R1a3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNzMwODEsImV4cCI6MjA4OTY0OTA4MX0.hACYQJs1Il0IykGGvbJKisFxvSYukHB0a3Mtnh2I-T4';
@@ -404,7 +440,8 @@ async function startChat() {
     await supabase.from('user_profiles').upsert({
       user_id: currentUser.id, friend_name: profile.friend_name, friend_gender: profile.friend_gender,
       friend_character: profile.friend_character, user_goals: profile.user_goals,
-      max_requests: maxReq, subscription_status: 'free', message_count: 0, updated_at: new Date().toISOString()
+      max_requests: maxReq, subscription_status: 'free', message_count: 0,
+      created_at: new Date().toISOString(), updated_at: new Date().toISOString()
     });
   } catch (e) { console.error('Save:', e); }
   // First message + CTA hint
@@ -432,6 +469,15 @@ function showApp() {
   document.querySelectorAll('.sphere-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.sphere === currentSphere); });
   renderHistory(); updateSettings(); fetchCount();
   trackEvent('session_start');
+
+  // Check trial on load
+  if (profile && profile.created_at) {
+    var days = (new Date() - new Date(profile.created_at)) / (1000*60*60*24);
+    var isPaid = profile.subscription_status === 'paid';
+    if (!isPaid && days > 3) {
+      showPaywall();
+    }
+  }
 }
 function renderHistory() {
   var c = document.getElementById('messages'); var h = document.getElementById('hints'); var es = document.getElementById('emptyState');
@@ -464,7 +510,22 @@ async function fetchCount() {
   if (!authToken) return;
   try { var { data } = await supabase.rpc('get_daily_count', { p_user_id: currentUser.id }); if (data) updateCounter(data.count||0, data.max||25); } catch(e) { updateCounter(0, 25); }
 }
-function updateCounter(count, max) { var el = document.getElementById('reqCounter'); el.textContent = count+' / '+max+' запросов'; el.style.color = count >= max ? '#e84848' : ''; }
+function updateCounter(count, max) {
+  var el = document.getElementById('reqCounter');
+  var trialText = '';
+  if (profile && profile.created_at) {
+    var days = (new Date() - new Date(profile.created_at)) / (1000*60*60*24);
+    var isPaid = profile.subscription_status === 'paid';
+    if (!isPaid && days <= 3) {
+      var left = Math.ceil(3 - days);
+      trialText = ' · пробный ' + left + 'д';
+    } else if (isPaid) {
+      trialText = ' · подписка';
+    }
+  }
+  el.innerHTML = count + ' / ' + max + trialText;
+  el.style.color = count >= max ? '#e84848' : '';
+}
 
 async function sendMessage() {
   if (isLoading || !authToken) return;
@@ -490,6 +551,8 @@ async function sendMessage() {
     // Save response to the sphere where question was asked
     if (res.status === 401) {
       addMessageToSphere(sendSphere, 'friend', 'Сессия истекла. Обнови страницу.');
+    } else if (res.status === 403 && data.trial_expired) {
+      showPaywall();
     } else if (res.status === 429) {
       addMessageToSphere(sendSphere, 'friend', data.error || 'Запросы закончились.');
       if (data.count != null) updateCounter(data.count, data.max);
@@ -594,6 +657,18 @@ async function resetAll() {
   var spheres = ['general','health','focus','finance'];
   spheres.forEach(function(s) { localStorage.removeItem('bf_h_' + s); });
   location.reload();
+}
+
+// ===== PAYWALL =====
+function showPaywall() {
+  document.getElementById('paywall').classList.add('show');
+}
+function closePaywall() {
+  document.getElementById('paywall').classList.remove('show');
+}
+function handleSubscribe() {
+  // TODO: connect ЮKassa payment
+  alert('Оплата будет доступна совсем скоро! Напиши нам: info@neyrosheff.ru');
 }
 
 // ===== ANALYTICS =====
