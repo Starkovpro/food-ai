@@ -58,7 +58,9 @@ module.exports = async function handler(req, res) {
   if (req.method === 'GET') {
     // Setup webhook URL — call once: /api/telegram?setup=1
     if (req.query && req.query.setup === '1') {
-      var webhookUrl = 'https://neyrosheff.ru/api/telegram';
+      // First delete old webhook, then set new
+      await tgSend('deleteWebhook', {});
+      var webhookUrl = 'https://food-ai-omega.vercel.app/api/telegram';
       var result = await tgSend('setWebhook', { url: webhookUrl });
       return res.status(200).json({ webhook: result });
     }
