@@ -403,6 +403,14 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 /* SAVINGS */
 .savings-progress{position:relative;height:12px;background:var(--bg);border-radius:6px;overflow:hidden;margin:16px 0}
 .savings-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:6px;transition:width .5s}
+
+/* APPS LIST */
+.app-list-item{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.app-list-item:hover,.app-list-item:active{border-color:rgba(232,168,56,.3)}
+.app-list-icon{width:42px;height:42px;border-radius:12px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.app-list-info{flex:1;min-width:0}
+.app-list-name{font-size:15px;font-weight:500;margin-bottom:2px}
+.app-list-desc{font-size:12px;color:var(--text2);line-height:1.3}
 </style>
 </head>
 <body>
@@ -529,6 +537,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
     <div class="settings-label">Аккаунт</div>
     <div class="settings-value" id="setEmail">—</div>
 
+    <div class="settings-btn" onclick="openAppsPage()"><span class="btn-icon">📱</span> Приложения <span class="btn-arrow">›</span></div>
     <div class="settings-btn" onclick="openPage('goals')"><span class="btn-icon">🎯</span> Мои цели <span class="btn-arrow">›</span></div>
     <div class="settings-btn" onclick="openPage('subscription')"><span class="btn-icon">💳</span> Подписка <span class="btn-arrow">›</span></div>
     <div class="settings-btn" onclick="openPage('editFriend')"><span class="btn-icon">✏️</span> Изменить друга <span class="btn-arrow">›</span></div>
@@ -634,6 +643,17 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
   </div>
   <div class="page-body">
     <div class="ach-grid" id="achGrid"></div>
+  </div>
+</div>
+
+<!-- PAGE: APPS -->
+<div class="page-overlay" id="pageApps">
+  <div class="page-header">
+    <div class="page-back" onclick="closeAppsPage()">←</div>
+    <div class="page-title">📱 Приложения</div>
+  </div>
+  <div class="page-body">
+    <div id="appsGrid"></div>
   </div>
 </div>
 
@@ -1751,45 +1771,94 @@ function closeTools() {
   document.getElementById('toolsTray').classList.remove('show');
   document.getElementById('toolsToggle').classList.remove('active');
 }
-function toolAction(fn) { closeTools(); fn(); }
-function renderTools() {
-  var grid = document.getElementById('toolsGrid');
-  var tools = {
+var _toolFns = [];
+function execTool(i) { closeTools(); if (_toolFns[i]) _toolFns[i](); }
+function getToolsDef() {
+  return {
     health: [
-      { icon:'📷', label:'Фото еды', action:'document.getElementById("photoInput").click()' },
-      { icon:'🍳', label:'Рецепт', action:'quickSend("Что приготовить из того что есть дома?")' },
-      { icon:'💧', label:'Трекер воды', action:'openApp("appWater",initWater)' },
-      { icon:'📊', label:'Норма КБЖУ', action:'openApp("appKbju",initKbju)' },
-      { icon:'💪', label:'Тренировка', action:'quickSend("Посоветуй тренировку")' }
+      { icon:'📷', label:'Фото еды', fn:function(){ document.getElementById('photoInput').click(); } },
+      { icon:'🍳', label:'Рецепт', fn:function(){ quickSend('Что приготовить из того что есть дома?'); } },
+      { icon:'💧', label:'Трекер воды', fn:function(){ openApp('appWater',initWater); } },
+      { icon:'📊', label:'Норма КБЖУ', fn:function(){ openApp('appKbju',initKbju); } },
+      { icon:'💪', label:'Тренировка', fn:function(){ quickSend('Посоветуй тренировку'); } }
     ],
     focus: [
-      { icon:'🫁', label:'Дыхание', action:'openBreathing()' },
-      { icon:'⏱', label:'Помодоро', action:'openPomodoro()' },
-      { icon:'😊', label:'Настроение', action:'openApp("appMood",initMood)' },
-      { icon:'🙏', label:'Благодарность', action:'openApp("appGratitude",initGratitude)' },
-      { icon:'😰', label:'Тревога', action:'quickSend("Мне тревожно, помоги")' },
-      { icon:'🧹', label:'Разгрузка', action:'quickSend("Разгрузи мне голову")' },
-      { icon:'🌙', label:'Перед сном', action:'quickSend("Помоги разгрузить голову перед сном")' },
-      { icon:'🎯', label:'5-4-3-2-1', action:'quickSend("Проведи технику заземления 5-4-3-2-1")' }
+      { icon:'🫁', label:'Дыхание', fn:function(){ openBreathing(); } },
+      { icon:'⏱', label:'Помодоро', fn:function(){ openPomodoro(); } },
+      { icon:'😊', label:'Настроение', fn:function(){ openApp('appMood',initMood); } },
+      { icon:'🙏', label:'Благодарность', fn:function(){ openApp('appGratitude',initGratitude); } },
+      { icon:'😰', label:'Тревога', fn:function(){ quickSend('Мне тревожно, помоги'); } },
+      { icon:'🧹', label:'Разгрузка', fn:function(){ quickSend('Разгрузи мне голову'); } },
+      { icon:'🌙', label:'Перед сном', fn:function(){ quickSend('Помоги разгрузить голову перед сном'); } },
+      { icon:'🎯', label:'5-4-3-2-1', fn:function(){ quickSend('Проведи технику заземления 5-4-3-2-1'); } }
     ],
     finance: [
-      { icon:'💸', label:'Расходы', action:'openApp("appExpenses",initExpenses)' },
-      { icon:'🎯', label:'Накопления', action:'openApp("appSavings",initSavings)' },
-      { icon:'📖', label:'Урок дня', action:'quickSend("Расскажи урок из Самого богатого человека в Вавилоне")' },
-      { icon:'💰', label:'Бюджет', action:'quickSend("Помоги разобраться с бюджетом")' }
+      { icon:'💸', label:'Расходы', fn:function(){ openApp('appExpenses',initExpenses); } },
+      { icon:'🎯', label:'Накопления', fn:function(){ openApp('appSavings',initSavings); } },
+      { icon:'📖', label:'Урок дня', fn:function(){ quickSend('Расскажи урок из Самого богатого человека в Вавилоне'); } },
+      { icon:'💰', label:'Бюджет', fn:function(){ quickSend('Помоги разобраться с бюджетом'); } }
     ],
     general: [
-      { icon:'🔥', label:'Привычки', action:'openApp("appHabits",initHabits)' },
-      { icon:'😊', label:'Настроение', action:'openApp("appMood",initMood)' },
-      { icon:'📷', label:'Фото еды', action:'document.getElementById("photoInput").click()' },
-      { icon:'💬', label:'Поговорить', action:'quickSend("Просто хочу поговорить")' }
+      { icon:'🔥', label:'Привычки', fn:function(){ openApp('appHabits',initHabits); } },
+      { icon:'😊', label:'Настроение', fn:function(){ openApp('appMood',initMood); } },
+      { icon:'📷', label:'Фото еды', fn:function(){ document.getElementById('photoInput').click(); } },
+      { icon:'💬', label:'Поговорить', fn:function(){ quickSend('Просто хочу поговорить'); } }
     ]
   };
-  var items = tools[currentSphere] || tools.general;
-  grid.innerHTML = items.map(function(t) {
-    return '<div class="tool-btn" onclick="toolAction(function(){' + t.action + '})"><span class="tool-icon">' + t.icon + '</span>' + t.label + '</div>';
+}
+function renderTools() {
+  var grid = document.getElementById('toolsGrid');
+  var items = (getToolsDef()[currentSphere]) || getToolsDef().general;
+  _toolFns = items.map(function(t) { return t.fn; });
+  grid.innerHTML = items.map(function(t, i) {
+    return '<div class="tool-btn" onclick="execTool(' + i + ')"><span class="tool-icon">' + t.icon + '</span>' + t.label + '</div>';
   }).join('');
 }
+
+// ===== APPS PAGE =====
+var _appFns = [];
+function execAppFn(i) { if (_appFns[i]) _appFns[i](); }
+function openAppsPage() {
+  toggleSettings();
+  document.getElementById('pageApps').classList.add('show');
+  var grid = document.getElementById('appsGrid');
+  var sections = [
+    { title:'🍽 Здоровье', items:[
+      { icon:'💧', label:'Трекер воды', desc:'8 стаканов в день', fn:function(){ closeAppsPage(); openApp('appWater',initWater); } },
+      { icon:'📊', label:'Норма КБЖУ', desc:'Калории, белки, жиры, углеводы', fn:function(){ closeAppsPage(); openApp('appKbju',initKbju); } },
+      { icon:'📷', label:'Анализ еды по фото', desc:'Сфоткай — узнай калории', fn:function(){ closeAppsPage(); document.getElementById('photoInput').click(); } }
+    ]},
+    { title:'🧠 Фокус и эмоции', items:[
+      { icon:'🫁', label:'Дыхание', desc:'Бокс-дыхание 4-4-4, 1 минута', fn:function(){ closeAppsPage(); openBreathing(); } },
+      { icon:'⏱', label:'Помодоро', desc:'25 минут фокуса', fn:function(){ closeAppsPage(); openPomodoro(); } },
+      { icon:'😊', label:'Дневник настроения', desc:'Отслеживай каждый день', fn:function(){ closeAppsPage(); openApp('appMood',initMood); } },
+      { icon:'🙏', label:'Дневник благодарности', desc:'3 вещи за день', fn:function(){ closeAppsPage(); openApp('appGratitude',initGratitude); } }
+    ]},
+    { title:'💰 Финансы', items:[
+      { icon:'💸', label:'Трекер расходов', desc:'Куда уходят деньги', fn:function(){ closeAppsPage(); openApp('appExpenses',initExpenses); } },
+      { icon:'🎯', label:'Визуализатор накоплений', desc:'Цель, срок, прогресс', fn:function(){ closeAppsPage(); openApp('appSavings',initSavings); } }
+    ]},
+    { title:'⭐ Общие', items:[
+      { icon:'🔥', label:'Трекер привычек', desc:'Ежедневные привычки + streak', fn:function(){ closeAppsPage(); openApp('appHabits',initHabits); } },
+      { icon:'⚖️', label:'Колесо баланса', desc:'Оценка 8 сфер жизни', fn:function(){ closeAppsPage(); openWheel(); } }
+    ]}
+  ];
+  _appFns = [];
+  var html = '';
+  sections.forEach(function(sec) {
+    html += '<div style="font-size:14px;font-weight:600;color:var(--accent);margin:20px 0 10px;padding-left:4px">' + sec.title + '</div>';
+    sec.items.forEach(function(item) {
+      var idx = _appFns.length;
+      _appFns.push(item.fn);
+      html += '<div class="app-list-item" onclick="execAppFn(' + idx + ')">' +
+        '<div class="app-list-icon">' + item.icon + '</div>' +
+        '<div class="app-list-info"><div class="app-list-name">' + item.label + '</div><div class="app-list-desc">' + item.desc + '</div></div>' +
+        '<div style="color:var(--text2);font-size:14px">›</div></div>';
+    });
+  });
+  grid.innerHTML = html;
+}
+function closeAppsPage() { document.getElementById('pageApps').classList.remove('show'); }
 
 // ===== MINI-APP HELPERS =====
 function openApp(id, initFn) { document.getElementById(id).classList.add('show'); if (initFn) initFn(); }
