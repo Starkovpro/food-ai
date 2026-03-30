@@ -129,11 +129,6 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .typing-dot:nth-child(3){animation-delay:.3s}
 @keyframes bounce{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
 
-/* HINTS */
-.hints{align-self:center;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:auto;padding-bottom:8px}
-.hint-chip{padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:13px;color:var(--text2);cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
-.hint-chip:hover{border-color:var(--accent);color:var(--accent)}
-
 /* SPHERES */
 .bottom-bar{flex-shrink:0;background:var(--bg);border-top:1px solid rgba(42,42,68,.5)}
 .spheres-bar{display:flex;gap:6px;padding:6px 12px;align-items:center}
@@ -340,10 +335,16 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .pomo-btn.secondary{background:var(--surface);border:1px solid var(--border);color:var(--text2)}
 .pomo-btn:active{transform:scale(.97)}
 
-/* SPHERE-SPECIFIC HINTS */
-.focus-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:4px 0}
-.focus-action{padding:8px 14px;background:rgba(72,160,200,.08);border:1px solid rgba(72,160,200,.2);border-radius:20px;font-family:'Outfit',sans-serif;font-size:12px;color:#48a0c8;cursor:pointer;transition:all .2s;white-space:nowrap}
-.focus-action:hover,.focus-action:active{background:rgba(72,160,200,.15);border-color:#48a0c8}
+/* TOOLS TRAY */
+.tools-tray{display:none;padding:8px 12px;border-top:1px solid var(--border);background:var(--bg2);animation:traySlide .2s ease}
+.tools-tray.show{display:block}
+@keyframes traySlide{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+.tools-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.tool-btn{display:flex;align-items:center;gap:6px;padding:9px 14px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-family:'Outfit',sans-serif;font-size:12px;color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap}
+.tool-btn:hover,.tool-btn:active{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
+.tool-btn .tool-icon{font-size:15px}
+.tools-toggle{color:var(--accent)!important;font-size:16px!important;transition:transform .2s}
+.tools-toggle.active{transform:rotate(45deg);color:var(--danger)!important}
 </style>
 </head>
 <body>
@@ -436,12 +437,6 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
       <div class="empty-icon" id="emptyIcon">💬</div>
       <div class="empty-text" id="emptyText">Напиши что-нибудь — я отвечу!</div>
     </div>
-    <div class="hints" id="hints">
-      <div class="hint-chip" onclick="quickSend('Что ты умеешь?')">Что ты умеешь?</div>
-      <div class="hint-chip" onclick="document.getElementById('photoInput').click()">📷 Фото еды</div>
-      <div class="hint-chip" onclick="quickSend('Мне тревожно')">Мне тревожно</div>
-      <div class="hint-chip" onclick="quickSend('Что приготовить на ужин?')">Что на ужин?</div>
-    </div>
     <div class="typing" id="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
   </div>
   <div class="bottom-bar">
@@ -451,10 +446,14 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
       <button class="sphere-btn" data-sphere="finance" onclick="switchSphere('finance')">💰 Финансы</button>
       <button class="sphere-btn" data-sphere="general" onclick="switchSphere('general')">💬 Чат</button>
     </div>
+    <div class="tools-tray" id="toolsTray">
+      <div class="tools-grid" id="toolsGrid"></div>
+    </div>
   </div>
   <div class="input-area">
     <div class="input-wrap">
       <button class="attach-btn" onclick="document.getElementById('photoInput').click()">📷</button>
+      <button class="attach-btn tools-toggle" id="toolsToggle" onclick="toggleTools()">⚡</button>
       <textarea class="chat-input" id="chatInput" rows="1" placeholder="Напиши сообщение..." enterkeyhint="send"></textarea>
     </div>
     <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
@@ -771,7 +770,7 @@ function showApp() {
   document.getElementById('headerName').textContent = profile.friend_name || 'Друг';
   if (currentUser) document.getElementById('setEmail').textContent = currentUser.email || '—';
   document.querySelectorAll('.sphere-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.sphere === currentSphere); });
-  renderHistory(); updateSettings(); fetchCount(); updateHints();
+  renderHistory(); updateSettings(); fetchCount(); renderTools();
   trackEvent('session_start');
   updateRefUI();
   applyReferral();
@@ -779,8 +778,9 @@ function showApp() {
   if (localStorage.getItem('bf_push_enabled') === 'true') scheduleMorningCheck();
 
   // Check trial on load
-  if (profile && profile.created_at) {
-    var days = (new Date() - new Date(profile.created_at)) / (1000*60*60*24);
+  var regDate = (currentUser && currentUser.created_at) ? new Date(currentUser.created_at) : ((profile && profile.created_at) ? new Date(profile.created_at) : null);
+  if (regDate) {
+    var days = (new Date() - regDate) / (1000*60*60*24);
     var isPaid = profile.subscription_status === 'paid';
     if (!isPaid && days > 3) {
       showPaywall();
@@ -788,11 +788,10 @@ function showApp() {
   }
 }
 function renderHistory() {
-  var c = document.getElementById('messages'); var h = document.getElementById('hints'); var es = document.getElementById('emptyState');
+  var c = document.getElementById('messages'); var es = document.getElementById('emptyState');
   c.querySelectorAll('.msg').forEach(function(m) { m.remove(); });
   var hist = loadHistory();
   hist.forEach(function(m) { var d = document.createElement('div'); d.className = 'msg '+(m.role==='friend'?'msg-friend':'msg-user'); d.textContent = m.text; c.insertBefore(d, es); });
-  h.style.display = hist.some(function(m) { return m.role === 'user'; }) ? 'none' : 'flex';
   es.style.display = hist.length === 0 ? 'flex' : 'none';
   if (hist.length === 0) {
     document.getElementById('emptyIcon').textContent = sphereEmoji[currentSphere] || '💬';
@@ -801,10 +800,9 @@ function renderHistory() {
   scrollToBottom();
 }
 function addMessage(role, text) {
-  var c = document.getElementById('messages'); var h = document.getElementById('hints'); var es = document.getElementById('emptyState');
+  var c = document.getElementById('messages'); var es = document.getElementById('emptyState');
   var d = document.createElement('div'); d.className = 'msg '+(role==='friend'?'msg-friend':'msg-user'); d.textContent = text;
   c.insertBefore(d, es);
-  if (role === 'user') h.style.display = 'none';
   es.style.display = 'none';
   var hist = loadHistory(); hist.push({ role: role, text: text, time: Date.now() });
   if (hist.length > 100) hist.splice(0, hist.length - 100);
@@ -821,8 +819,9 @@ async function fetchCount() {
 function updateCounter(count, max) {
   var el = document.getElementById('reqCounter');
   var trialText = '';
-  if (profile && profile.created_at) {
-    var days = (new Date() - new Date(profile.created_at)) / (1000*60*60*24);
+  var regDate = (currentUser && currentUser.created_at) ? new Date(currentUser.created_at) : ((profile && profile.created_at) ? new Date(profile.created_at) : null);
+  if (regDate) {
+    var days = (new Date() - regDate) / (1000*60*60*24);
     var isPaid = profile.subscription_status === 'paid';
     if (!isPaid && days <= 3) {
       var left = Math.ceil(3 - days);
@@ -912,26 +911,18 @@ function switchSphere(sphere) {
   updateSettings();
   document.querySelectorAll('.sphere-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.sphere === sphere); });
   renderHistory();
-  updateHints();
+  closeTools(); renderTools();
 
   var hist = loadHistory();
   if (hist.length === 0) {
-    // Show empty state
-    document.getElementById('emptyState').style.display = 'flex';
-    document.getElementById('emptyIcon').textContent = sphereEmoji[sphere] || '💬';
-    document.getElementById('emptyText').textContent = sphereEmpty[sphere] || 'Напиши что-нибудь!';
-    document.getElementById('hints').style.display = 'flex';
-    // Auto-send greeting
+    // Auto-send greeting with tool hint
     var prompts = {
-      health: 'Привет! Здесь всё про здоровье 🍽 Кинь фото еды — посчитаю калории. Или спроси рецепт, задай вопрос про тренировки!',
-      focus: 'Привет! Здесь про фокус и эмоции 🧠 Могу провести дыхание, помочь с тревогой, разгрузить голову или запустить фокус-сессию.',
-      finance: 'Привет! Здесь про деньги 💰 Могу рассказать урок из «Вавилона», помочь с бюджетом или поставить финансовую цель.',
+      health: 'Привет! Здесь всё про здоровье 🍽 Кинь фото еды — посчитаю калории. Нажми ⚡ для быстрых инструментов!',
+      focus: 'Привет! Здесь про фокус и эмоции 🧠 Нажми ⚡ чтобы открыть дыхание, помодоро и другие инструменты.',
+      finance: 'Привет! Здесь про деньги 💰 Нажми ⚡ для быстрых инструментов — уроки, бюджет, цели.',
       general: ''
     };
     if (prompts[sphere]) addMessage('friend', prompts[sphere]);
-    document.getElementById('emptyState').style.display = 'none';
-  } else {
-    document.getElementById('emptyState').style.display = 'none';
   }
 }
 
@@ -1033,7 +1024,7 @@ function renderSubscription() {
   var daysEl = document.getElementById('subDays');
   var labelEl = document.getElementById('subDaysLabel');
   var subStatus = (profile && profile.subscription_status) || 'free';
-  var createdAt = (profile && profile.created_at) ? new Date(profile.created_at) : new Date();
+  var createdAt = (currentUser && currentUser.created_at) ? new Date(currentUser.created_at) : ((profile && profile.created_at) ? new Date(profile.created_at) : new Date());
   var days = (new Date() - createdAt) / (1000*60*60*24);
   var subEnd = (profile && profile.subscription_end) ? new Date(profile.subscription_end) : null;
 
@@ -1547,30 +1538,53 @@ function updatePomoDisplay() {
   document.getElementById('pomoDigits').textContent = m + ':' + (s < 10 ? '0' : '') + s;
 }
 
-// ===== SPHERE HINTS =====
-function updateHints() {
-  var h = document.getElementById('hints');
-  if (currentSphere === 'focus') {
-    h.innerHTML = '<div class="focus-actions">' +
-      '<div class="focus-action" onclick="openBreathing()">🫁 Дыхание</div>' +
-      '<div class="focus-action" onclick="openPomodoro()">⏱ Помодоро</div>' +
-      '<div class="focus-action" onclick="quickSend(\'Мне тревожно\')">😰 Тревога</div>' +
-      '<div class="focus-action" onclick="quickSend(\'Разгрузи мне голову\')">🧹 Разгрузка</div>' +
-      '</div>';
-  } else if (currentSphere === 'health') {
-    h.innerHTML = '<div class="hint-chip" onclick="document.getElementById(\'photoInput\').click()">📷 Фото еды</div>' +
-      '<div class="hint-chip" onclick="quickSend(\'Что приготовить на ужин?\')">🍳 Рецепт</div>' +
-      '<div class="hint-chip" onclick="quickSend(\'Посоветуй тренировку\')">💪 Тренировка</div>';
-  } else if (currentSphere === 'finance') {
-    h.innerHTML = '<div class="hint-chip" onclick="quickSend(\'Расскажи урок из Вавилона\')">📖 Урок дня</div>' +
-      '<div class="hint-chip" onclick="quickSend(\'Помоги с бюджетом\')">💰 Бюджет</div>' +
-      '<div class="hint-chip" onclick="quickSend(\'Хочу поставить финансовую цель\')">🎯 Цель</div>';
-  } else {
-    h.innerHTML = '<div class="hint-chip" onclick="quickSend(\'Что ты умеешь?\')">Что ты умеешь?</div>' +
-      '<div class="hint-chip" onclick="document.getElementById(\'photoInput\').click()">📷 Фото еды</div>' +
-      '<div class="hint-chip" onclick="quickSend(\'Мне тревожно\')">Мне тревожно</div>' +
-      '<div class="hint-chip" onclick="quickSend(\'Что приготовить на ужин?\')">Что на ужин?</div>';
-  }
+// ===== TOOLS TRAY =====
+var toolsOpen = false;
+function toggleTools() {
+  toolsOpen = !toolsOpen;
+  document.getElementById('toolsTray').classList.toggle('show', toolsOpen);
+  document.getElementById('toolsToggle').classList.toggle('active', toolsOpen);
+  if (toolsOpen) renderTools();
+}
+function closeTools() {
+  toolsOpen = false;
+  document.getElementById('toolsTray').classList.remove('show');
+  document.getElementById('toolsToggle').classList.remove('active');
+}
+function toolAction(fn) { closeTools(); fn(); }
+function renderTools() {
+  var grid = document.getElementById('toolsGrid');
+  var tools = {
+    health: [
+      { icon:'📷', label:'Фото еды', action:'document.getElementById("photoInput").click()' },
+      { icon:'🍳', label:'Рецепт', action:'quickSend("Что приготовить из того что есть дома?")' },
+      { icon:'💪', label:'Тренировка', action:'quickSend("Посоветуй тренировку")' },
+      { icon:'💧', label:'Вода', action:'quickSend("Сколько воды пить в день?")' }
+    ],
+    focus: [
+      { icon:'🫁', label:'Дыхание', action:'openBreathing()' },
+      { icon:'⏱', label:'Помодоро', action:'openPomodoro()' },
+      { icon:'😰', label:'Тревога', action:'quickSend("Мне тревожно, помоги")' },
+      { icon:'🧹', label:'Разгрузка', action:'quickSend("Разгрузи мне голову")' },
+      { icon:'🌙', label:'Перед сном', action:'quickSend("Помоги разгрузить голову перед сном")' },
+      { icon:'🎯', label:'5-4-3-2-1', action:'quickSend("Проведи технику заземления 5-4-3-2-1")' }
+    ],
+    finance: [
+      { icon:'📖', label:'Урок дня', action:'quickSend("Расскажи урок из Самого богатого человека в Вавилоне")' },
+      { icon:'💰', label:'Бюджет', action:'quickSend("Помоги разобраться с бюджетом")' },
+      { icon:'🎯', label:'Фин. цель', action:'quickSend("Хочу поставить финансовую цель")' },
+      { icon:'🧾', label:'Расходы', action:'quickSend("Помоги посчитать расходы за неделю")' }
+    ],
+    general: [
+      { icon:'📷', label:'Фото еды', action:'document.getElementById("photoInput").click()' },
+      { icon:'❓', label:'Что умеешь?', action:'quickSend("Что ты умеешь?")' },
+      { icon:'💬', label:'Поговорить', action:'quickSend("Просто хочу поговорить")' }
+    ]
+  };
+  var items = tools[currentSphere] || tools.general;
+  grid.innerHTML = items.map(function(t) {
+    return '<div class="tool-btn" onclick="toolAction(function(){' + t.action + '})"><span class="tool-icon">' + t.icon + '</span>' + t.label + '</div>';
+  }).join('');
 }
 
 // ===== ANALYTICS =====
