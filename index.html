@@ -345,6 +345,64 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .tool-btn .tool-icon{font-size:15px}
 .tools-toggle{color:var(--accent)!important;font-size:16px!important;transition:transform .2s}
 .tools-toggle.active{transform:rotate(45deg);color:var(--danger)!important}
+
+/* MINI-APPS SHARED */
+.mini-app{position:fixed;inset:0;z-index:260;background:var(--bg);display:none;flex-direction:column;overflow-y:auto}
+.mini-app.show{display:flex}
+.mini-header{display:flex;align-items:center;gap:12px;padding:14px 16px;padding-top:calc(env(safe-area-inset-top,8px)+8px);background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.mini-back{width:36px;height:36px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:16px}
+.mini-title{font-size:17px;font-weight:600;flex:1}
+.mini-body{flex:1;padding:20px 16px;padding-bottom:env(safe-area-inset-bottom,20px)}
+.mini-card{padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:16px;margin-bottom:12px;text-align:center}
+.mini-label{font-size:13px;color:var(--text2);margin-bottom:8px}
+.mini-value{font-size:32px;font-weight:700;color:var(--accent)}
+.mini-input{width:100%;padding:12px 16px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;outline:none;margin-bottom:8px}
+.mini-input:focus{border-color:var(--accent)}
+.mini-select{width:100%;padding:12px 16px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;outline:none;margin-bottom:8px;-webkit-appearance:none}
+.mini-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);border:none;border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}
+.mini-btn:active{transform:scale(.97)}
+.mini-row{display:flex;gap:8px;margin-bottom:8px}
+.mini-row>*{flex:1}
+
+/* WATER TRACKER */
+.water-glasses{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.water-glass{aspect-ratio:1;border-radius:16px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;transition:all .2s;background:var(--bg)}
+.water-glass.filled{border-color:#48a0c8;background:rgba(72,160,200,.1);transform:scale(1.05)}
+.water-bar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin-top:12px}
+.water-bar-fill{height:100%;background:linear-gradient(90deg,#48a0c8,#60d0f0);border-radius:4px;transition:width .3s}
+
+/* MOOD */
+.mood-emojis{display:flex;gap:8px;justify-content:center;margin:16px 0}
+.mood-emoji{width:52px;height:52px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;transition:all .2s;background:var(--bg)}
+.mood-emoji.selected{border-color:var(--accent);background:var(--accent-glow);transform:scale(1.15)}
+.mood-history{display:flex;gap:4px;justify-content:center;margin-top:16px}
+.mood-day{display:flex;flex-direction:column;align-items:center;gap:4px}
+.mood-day-label{font-size:10px;color:var(--text2)}
+.mood-day-val{font-size:20px}
+
+/* HABITS */
+.habit-row{display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:8px}
+.habit-check{width:26px;height:26px;border-radius:8px;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;transition:all .2s}
+.habit-check.done{background:var(--success);border-color:var(--success);color:#fff}
+.habit-name{flex:1;font-size:14px}
+.habit-streak{font-size:12px;color:var(--accent);white-space:nowrap}
+.habit-del{background:none;border:none;color:var(--text2);font-size:14px;cursor:pointer;padding:4px}
+
+/* EXPENSES */
+.exp-cats{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.exp-cat{padding:8px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg);font-family:'Outfit',sans-serif;font-size:13px;color:var(--text2);cursor:pointer;transition:all .2s}
+.exp-cat.selected{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
+.exp-list{max-height:200px;overflow-y:auto;margin-top:12px}
+.exp-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.exp-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.exp-bar-label{font-size:12px;color:var(--text2);width:70px}
+.exp-bar{flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+.exp-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+.exp-bar-val{font-size:12px;color:var(--text2);width:60px;text-align:right}
+
+/* SAVINGS */
+.savings-progress{position:relative;height:12px;background:var(--bg);border-radius:6px;overflow:hidden;margin:16px 0}
+.savings-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:6px;transition:width .5s}
 </style>
 </head>
 <body>
@@ -643,6 +701,148 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
   <div class="pomo-btns" id="pomoBtns">
     <button class="pomo-btn primary" id="pomoStartBtn" onclick="startPomodoro()">Старт</button>
     <button class="pomo-btn secondary" onclick="stopPomodoro()">Отмена</button>
+  </div>
+</div>
+
+<!-- WATER TRACKER -->
+<div class="mini-app" id="appWater">
+  <div class="mini-header"><div class="mini-back" onclick="closeApp('appWater')">←</div><div class="mini-title">💧 Трекер воды</div></div>
+  <div class="mini-body">
+    <div class="mini-card">
+      <div class="mini-label">Выпито сегодня</div>
+      <div class="mini-value" id="waterCount">0 / 8</div>
+      <div class="mini-label">стаканов (250 мл)</div>
+      <div class="water-bar"><div class="water-bar-fill" id="waterBar" style="width:0%"></div></div>
+    </div>
+    <div class="water-glasses" id="waterGlasses"></div>
+    <button class="mini-btn" onclick="resetWater()">Сбросить</button>
+  </div>
+</div>
+
+<!-- KBJU CALCULATOR -->
+<div class="mini-app" id="appKbju">
+  <div class="mini-header"><div class="mini-back" onclick="closeApp('appKbju')">←</div><div class="mini-title">📊 Норма КБЖУ</div></div>
+  <div class="mini-body">
+    <div class="mini-row">
+      <div><div class="mini-label">Пол</div><select class="mini-select" id="kbjuGender"><option value="f">Женский</option><option value="m">Мужской</option></select></div>
+      <div><div class="mini-label">Возраст</div><input class="mini-input" id="kbjuAge" type="number" placeholder="28" min="14" max="80"></div>
+    </div>
+    <div class="mini-row">
+      <div><div class="mini-label">Вес (кг)</div><input class="mini-input" id="kbjuWeight" type="number" placeholder="65" min="30" max="250"></div>
+      <div><div class="mini-label">Рост (см)</div><input class="mini-input" id="kbjuHeight" type="number" placeholder="165" min="100" max="250"></div>
+    </div>
+    <div class="mini-label">Активность</div>
+    <select class="mini-select" id="kbjuActivity">
+      <option value="1.2">Сидячий образ жизни</option>
+      <option value="1.375" selected>Лёгкие тренировки 1-3 раза/нед</option>
+      <option value="1.55">Тренировки 3-5 раз/нед</option>
+      <option value="1.725">Интенсивные 6-7 раз/нед</option>
+    </select>
+    <div class="mini-label">Цель</div>
+    <select class="mini-select" id="kbjuGoal">
+      <option value="-0.15">Похудение (−15%)</option>
+      <option value="0" selected>Поддержание веса</option>
+      <option value="0.1">Набор массы (+10%)</option>
+    </select>
+    <button class="mini-btn" onclick="calcKbju()">Рассчитать</button>
+    <div id="kbjuResult" style="display:none;margin-top:16px">
+      <div class="mini-card"><div class="mini-label">Твоя дневная норма</div><div class="mini-value" id="kbjuKcal">—</div><div class="mini-label">ккал в день</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div class="mini-card"><div class="mini-label">Белки</div><div style="font-size:20px;font-weight:600;color:#48c878" id="kbjuP">—</div></div>
+        <div class="mini-card"><div class="mini-label">Жиры</div><div style="font-size:20px;font-weight:600;color:#e8a838" id="kbjuF">—</div></div>
+        <div class="mini-card"><div class="mini-label">Углеводы</div><div style="font-size:20px;font-weight:600;color:#48a0c8" id="kbjuC">—</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOOD DIARY -->
+<div class="mini-app" id="appMood">
+  <div class="mini-header"><div class="mini-back" onclick="closeApp('appMood')">←</div><div class="mini-title">😊 Дневник настроения</div></div>
+  <div class="mini-body">
+    <div class="mini-card">
+      <div class="mini-label">Как ты себя чувствуешь?</div>
+      <div class="mood-emojis" id="moodEmojis">
+        <div class="mood-emoji" onclick="selectMood(5,this)">😄</div>
+        <div class="mood-emoji" onclick="selectMood(4,this)">🙂</div>
+        <div class="mood-emoji" onclick="selectMood(3,this)">😐</div>
+        <div class="mood-emoji" onclick="selectMood(2,this)">😔</div>
+        <div class="mood-emoji" onclick="selectMood(1,this)">😢</div>
+      </div>
+      <input class="mini-input" id="moodNote" type="text" placeholder="Одним словом (опционально)" maxlength="30">
+      <button class="mini-btn" id="moodSaveBtn" onclick="saveMood()" disabled>Сохранить</button>
+    </div>
+    <div class="mini-label" style="margin-top:16px;text-align:center">Последние 7 дней</div>
+    <div class="mood-history" id="moodHistory"></div>
+  </div>
+</div>
+
+<!-- GRATITUDE DIARY -->
+<div class="mini-app" id="appGratitude">
+  <div class="mini-header"><div class="mini-back" onclick="closeApp('appGratitude')">←</div><div class="mini-title">🙏 Дневник благодарности</div></div>
+  <div class="mini-body">
+    <div class="mini-card">
+      <div class="mini-label">3 вещи за которые благодарна сегодня</div>
+      <div style="margin-top:12px">
+        <input class="mini-input" id="grat1" type="text" placeholder="1. За что ты благодарна?" maxlength="80">
+        <input class="mini-input" id="grat2" type="text" placeholder="2. Что хорошего случилось?" maxlength="80">
+        <input class="mini-input" id="grat3" type="text" placeholder="3. Что тебя порадовало?" maxlength="80">
+      </div>
+      <button class="mini-btn" onclick="saveGratitude()">Сохранить</button>
+    </div>
+    <div id="gratHistory" style="margin-top:16px"></div>
+  </div>
+</div>
+
+<!-- HABIT TRACKER -->
+<div class="mini-app" id="appHabits">
+  <div class="mini-header"><div class="mini-back" onclick="closeApp('appHabits')">←</div><div class="mini-title">🔥 Трекер привычек</div></div>
+  <div class="mini-body">
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <input class="mini-input" id="habitInput" type="text" placeholder="Новая привычка..." maxlength="40" style="margin:0">
+      <button style="padding:12px 20px;background:var(--accent);color:var(--bg);border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer" onclick="addHabit()">+</button>
+    </div>
+    <div id="habitList"></div>
+    <div id="habitEmpty" style="text-align:center;padding:40px 20px;color:var(--text2);font-size:14px">Добавь привычку — и отмечай каждый день!</div>
+  </div>
+</div>
+
+<!-- EXPENSE TRACKER -->
+<div class="mini-app" id="appExpenses">
+  <div class="mini-header"><div class="mini-back" onclick="closeApp('appExpenses')">←</div><div class="mini-title">💸 Трекер расходов</div></div>
+  <div class="mini-body">
+    <div class="mini-card">
+      <div class="mini-label">Добавить расход</div>
+      <div class="exp-cats" id="expCats"></div>
+      <input class="mini-input" id="expAmount" type="number" placeholder="Сумма в ₽" min="1">
+      <button class="mini-btn" onclick="addExpense()">Добавить</button>
+    </div>
+    <div class="mini-card">
+      <div class="mini-label">Расходы за неделю</div>
+      <div class="mini-value" id="expTotal">0 ₽</div>
+      <div id="expBars" style="margin-top:16px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SAVINGS VISUALIZER -->
+<div class="mini-app" id="appSavings">
+  <div class="mini-header"><div class="mini-back" onclick="closeApp('appSavings')">←</div><div class="mini-title">🎯 Визуализатор накоплений</div></div>
+  <div class="mini-body">
+    <div class="mini-card">
+      <input class="mini-input" id="savName" type="text" placeholder="На что копишь? (отпуск, телефон)" maxlength="30">
+      <input class="mini-input" id="savGoalAmt" type="number" placeholder="Сумма цели (₽)" min="1000">
+      <input class="mini-input" id="savMonthly" type="number" placeholder="Откладываю в месяц (₽)" min="100">
+      <button class="mini-btn" onclick="calcSavings()">Рассчитать</button>
+    </div>
+    <div id="savResult" style="display:none">
+      <div class="mini-card">
+        <div class="mini-label" id="savLabel">—</div>
+        <div class="savings-progress"><div class="savings-fill" id="savFill" style="width:0%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2)"><span>0 ₽</span><span id="savGoalLabel">—</span></div>
+        <div style="margin-top:16px;font-size:14px;color:var(--text);line-height:1.6" id="savText"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1558,26 +1758,30 @@ function renderTools() {
     health: [
       { icon:'📷', label:'Фото еды', action:'document.getElementById("photoInput").click()' },
       { icon:'🍳', label:'Рецепт', action:'quickSend("Что приготовить из того что есть дома?")' },
-      { icon:'💪', label:'Тренировка', action:'quickSend("Посоветуй тренировку")' },
-      { icon:'💧', label:'Вода', action:'quickSend("Сколько воды пить в день?")' }
+      { icon:'💧', label:'Трекер воды', action:'openApp("appWater",initWater)' },
+      { icon:'📊', label:'Норма КБЖУ', action:'openApp("appKbju",initKbju)' },
+      { icon:'💪', label:'Тренировка', action:'quickSend("Посоветуй тренировку")' }
     ],
     focus: [
       { icon:'🫁', label:'Дыхание', action:'openBreathing()' },
       { icon:'⏱', label:'Помодоро', action:'openPomodoro()' },
+      { icon:'😊', label:'Настроение', action:'openApp("appMood",initMood)' },
+      { icon:'🙏', label:'Благодарность', action:'openApp("appGratitude",initGratitude)' },
       { icon:'😰', label:'Тревога', action:'quickSend("Мне тревожно, помоги")' },
       { icon:'🧹', label:'Разгрузка', action:'quickSend("Разгрузи мне голову")' },
       { icon:'🌙', label:'Перед сном', action:'quickSend("Помоги разгрузить голову перед сном")' },
       { icon:'🎯', label:'5-4-3-2-1', action:'quickSend("Проведи технику заземления 5-4-3-2-1")' }
     ],
     finance: [
+      { icon:'💸', label:'Расходы', action:'openApp("appExpenses",initExpenses)' },
+      { icon:'🎯', label:'Накопления', action:'openApp("appSavings",initSavings)' },
       { icon:'📖', label:'Урок дня', action:'quickSend("Расскажи урок из Самого богатого человека в Вавилоне")' },
-      { icon:'💰', label:'Бюджет', action:'quickSend("Помоги разобраться с бюджетом")' },
-      { icon:'🎯', label:'Фин. цель', action:'quickSend("Хочу поставить финансовую цель")' },
-      { icon:'🧾', label:'Расходы', action:'quickSend("Помоги посчитать расходы за неделю")' }
+      { icon:'💰', label:'Бюджет', action:'quickSend("Помоги разобраться с бюджетом")' }
     ],
     general: [
+      { icon:'🔥', label:'Привычки', action:'openApp("appHabits",initHabits)' },
+      { icon:'😊', label:'Настроение', action:'openApp("appMood",initMood)' },
       { icon:'📷', label:'Фото еды', action:'document.getElementById("photoInput").click()' },
-      { icon:'❓', label:'Что умеешь?', action:'quickSend("Что ты умеешь?")' },
       { icon:'💬', label:'Поговорить', action:'quickSend("Просто хочу поговорить")' }
     ]
   };
@@ -1585,6 +1789,277 @@ function renderTools() {
   grid.innerHTML = items.map(function(t) {
     return '<div class="tool-btn" onclick="toolAction(function(){' + t.action + '})"><span class="tool-icon">' + t.icon + '</span>' + t.label + '</div>';
   }).join('');
+}
+
+// ===== MINI-APP HELPERS =====
+function openApp(id, initFn) { document.getElementById(id).classList.add('show'); if (initFn) initFn(); }
+function closeApp(id) { document.getElementById(id).classList.remove('show'); }
+function today() { return new Date().toISOString().slice(0,10); }
+
+// ===== WATER TRACKER =====
+function initWater() {
+  var key = 'bf_water_' + today();
+  var count = parseInt(localStorage.getItem(key) || '0');
+  renderWater(count);
+}
+function renderWater(count) {
+  var gl = document.getElementById('waterGlasses'); gl.innerHTML = '';
+  for (var i = 0; i < 8; i++) {
+    var d = document.createElement('div');
+    d.className = 'water-glass' + (i < count ? ' filled' : '');
+    d.textContent = i < count ? '💧' : '🥛';
+    d.onclick = (function(idx) { return function() { toggleWater(idx + 1); }; })(i);
+    gl.appendChild(d);
+  }
+  document.getElementById('waterCount').textContent = count + ' / 8';
+  document.getElementById('waterBar').style.width = (count / 8 * 100) + '%';
+}
+function toggleWater(n) {
+  var key = 'bf_water_' + today();
+  var cur = parseInt(localStorage.getItem(key) || '0');
+  var val = (cur === n) ? n - 1 : n;
+  localStorage.setItem(key, val);
+  renderWater(val);
+  if (val >= 8) addMessageToSphere('health', 'friend', '💧 Норма воды выполнена! 8 стаканов — отлично, организм скажет спасибо!');
+}
+function resetWater() { localStorage.setItem('bf_water_' + today(), '0'); renderWater(0); }
+
+// ===== KBJU CALCULATOR =====
+function initKbju() {
+  var saved = JSON.parse(localStorage.getItem('bf_kbju') || 'null');
+  if (saved) {
+    document.getElementById('kbjuGender').value = saved.gender || 'f';
+    document.getElementById('kbjuAge').value = saved.age || '';
+    document.getElementById('kbjuWeight').value = saved.weight || '';
+    document.getElementById('kbjuHeight').value = saved.height || '';
+    document.getElementById('kbjuActivity').value = saved.activity || '1.375';
+    document.getElementById('kbjuGoal').value = saved.goal || '0';
+    if (saved.age && saved.weight && saved.height) calcKbju();
+  }
+}
+function calcKbju() {
+  var g = document.getElementById('kbjuGender').value;
+  var age = parseFloat(document.getElementById('kbjuAge').value);
+  var w = parseFloat(document.getElementById('kbjuWeight').value);
+  var h = parseFloat(document.getElementById('kbjuHeight').value);
+  var act = parseFloat(document.getElementById('kbjuActivity').value);
+  var goal = parseFloat(document.getElementById('kbjuGoal').value);
+  if (!age || !w || !h) return;
+  // Mifflin-St Jeor
+  var bmr = (g === 'm') ? (10 * w + 6.25 * h - 5 * age + 5) : (10 * w + 6.25 * h - 5 * age - 161);
+  var tdee = Math.round(bmr * act);
+  var kcal = Math.round(tdee * (1 + goal));
+  var protein = Math.round(kcal * 0.3 / 4);
+  var fat = Math.round(kcal * 0.25 / 9);
+  var carbs = Math.round(kcal * 0.45 / 4);
+  document.getElementById('kbjuKcal').textContent = kcal;
+  document.getElementById('kbjuP').textContent = protein + ' г';
+  document.getElementById('kbjuF').textContent = fat + ' г';
+  document.getElementById('kbjuC').textContent = carbs + ' г';
+  document.getElementById('kbjuResult').style.display = 'block';
+  localStorage.setItem('bf_kbju', JSON.stringify({ gender:g, age:age, weight:w, height:h, activity:act, goal:goal, kcal:kcal }));
+}
+
+// ===== MOOD DIARY =====
+var selectedMoodVal = 0;
+function initMood() { selectedMoodVal = 0; document.querySelectorAll('.mood-emoji').forEach(function(e){e.classList.remove('selected');}); document.getElementById('moodNote').value = ''; document.getElementById('moodSaveBtn').disabled = true; renderMoodHistory(); }
+function selectMood(val, el) {
+  selectedMoodVal = val;
+  document.querySelectorAll('.mood-emoji').forEach(function(e) { e.classList.remove('selected'); });
+  el.classList.add('selected');
+  document.getElementById('moodSaveBtn').disabled = false;
+}
+function saveMood() {
+  if (!selectedMoodVal) return;
+  var entries = JSON.parse(localStorage.getItem('bf_mood') || '[]');
+  entries.push({ date: today(), val: selectedMoodVal, note: document.getElementById('moodNote').value.trim(), time: Date.now() });
+  if (entries.length > 60) entries.splice(0, entries.length - 60);
+  localStorage.setItem('bf_mood', JSON.stringify(entries));
+  document.getElementById('moodSaveBtn').textContent = '✓ Сохранено!';
+  setTimeout(function() { document.getElementById('moodSaveBtn').textContent = 'Сохранить'; }, 2000);
+  renderMoodHistory();
+  var emoMap = {5:'😄',4:'🙂',3:'😐',2:'😔',1:'😢'};
+  addMessageToSphere('focus', 'friend', 'Записала настроение: ' + emoMap[selectedMoodVal] + (document.getElementById('moodNote').value ? ' — ' + document.getElementById('moodNote').value : '') + '. Спасибо что делишься!');
+}
+function renderMoodHistory() {
+  var entries = JSON.parse(localStorage.getItem('bf_mood') || '[]');
+  var h = document.getElementById('moodHistory'); h.innerHTML = '';
+  var emoMap = {5:'😄',4:'🙂',3:'😐',2:'😔',1:'😢'};
+  var days = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+  for (var i = 6; i >= 0; i--) {
+    var d = new Date(); d.setDate(d.getDate() - i);
+    var ds = d.toISOString().slice(0,10);
+    var entry = entries.filter(function(e) { return e.date === ds; }).pop();
+    var div = document.createElement('div'); div.className = 'mood-day';
+    div.innerHTML = '<div class="mood-day-val">' + (entry ? emoMap[entry.val] : '·') + '</div><div class="mood-day-label">' + days[d.getDay()] + '</div>';
+    h.appendChild(div);
+  }
+}
+
+// ===== GRATITUDE DIARY =====
+function initGratitude() {
+  document.getElementById('grat1').value = '';
+  document.getElementById('grat2').value = '';
+  document.getElementById('grat3').value = '';
+  // Load today's if exists
+  var entries = JSON.parse(localStorage.getItem('bf_gratitude') || '[]');
+  var todayEntry = entries.filter(function(e) { return e.date === today(); }).pop();
+  if (todayEntry) {
+    document.getElementById('grat1').value = todayEntry.items[0] || '';
+    document.getElementById('grat2').value = todayEntry.items[1] || '';
+    document.getElementById('grat3').value = todayEntry.items[2] || '';
+  }
+  renderGratHistory();
+}
+function saveGratitude() {
+  var items = [document.getElementById('grat1').value.trim(), document.getElementById('grat2').value.trim(), document.getElementById('grat3').value.trim()].filter(Boolean);
+  if (items.length === 0) return;
+  var entries = JSON.parse(localStorage.getItem('bf_gratitude') || '[]');
+  entries = entries.filter(function(e) { return e.date !== today(); });
+  entries.push({ date: today(), items: items, time: Date.now() });
+  if (entries.length > 30) entries.splice(0, entries.length - 30);
+  localStorage.setItem('bf_gratitude', JSON.stringify(entries));
+  renderGratHistory();
+  addMessageToSphere('focus', 'friend', '🙏 Дневник благодарности обновлён! ' + items.length + ' пункт(а) — здорово. Благодарность тренирует мозг замечать хорошее.');
+}
+function renderGratHistory() {
+  var entries = JSON.parse(localStorage.getItem('bf_gratitude') || '[]').slice(-5).reverse();
+  var el = document.getElementById('gratHistory'); el.innerHTML = '';
+  entries.forEach(function(e) {
+    var d = document.createElement('div'); d.className = 'mini-card'; d.style.textAlign = 'left';
+    d.innerHTML = '<div class="mini-label">' + new Date(e.date).toLocaleDateString('ru', {day:'numeric',month:'short'}) + '</div>' +
+      e.items.map(function(it) { return '<div style="font-size:14px;padding:2px 0">✨ ' + it + '</div>'; }).join('');
+    el.appendChild(d);
+  });
+}
+
+// ===== HABIT TRACKER =====
+function initHabits() {
+  renderHabits();
+  document.getElementById('habitInput').onkeydown = function(e) { if (e.key === 'Enter') addHabit(); };
+}
+function loadHabitsData() { return JSON.parse(localStorage.getItem('bf_habits') || '{"habits":[],"checks":{}}'); }
+function saveHabitsData(d) { localStorage.setItem('bf_habits', JSON.stringify(d)); }
+function addHabit() {
+  var input = document.getElementById('habitInput');
+  var name = input.value.trim(); if (!name) return;
+  var d = loadHabitsData();
+  if (d.habits.length >= 7) return;
+  d.habits.push({ id: Date.now(), name: name });
+  saveHabitsData(d); input.value = '';
+  renderHabits();
+}
+function toggleHabitCheck(id) {
+  var d = loadHabitsData();
+  var key = id + '_' + today();
+  d.checks[key] = !d.checks[key];
+  saveHabitsData(d);
+  renderHabits();
+}
+function deleteHabit(id) {
+  var d = loadHabitsData();
+  d.habits = d.habits.filter(function(h) { return h.id !== id; });
+  saveHabitsData(d);
+  renderHabits();
+}
+function getHabitStreak(id) {
+  var d = loadHabitsData();
+  var streak = 0;
+  for (var i = 0; i < 30; i++) {
+    var dt = new Date(); dt.setDate(dt.getDate() - i);
+    var key = id + '_' + dt.toISOString().slice(0,10);
+    if (d.checks[key]) streak++; else if (i > 0) break;
+  }
+  return streak;
+}
+function renderHabits() {
+  var d = loadHabitsData();
+  var list = document.getElementById('habitList');
+  var empty = document.getElementById('habitEmpty');
+  list.innerHTML = '';
+  empty.style.display = d.habits.length === 0 ? 'block' : 'none';
+  d.habits.forEach(function(h) {
+    var checked = d.checks[h.id + '_' + today()];
+    var streak = getHabitStreak(h.id);
+    var div = document.createElement('div'); div.className = 'habit-row';
+    div.innerHTML = '<div class="habit-check' + (checked ? ' done' : '') + '" onclick="toggleHabitCheck(' + h.id + ')">' + (checked ? '✓' : '') + '</div>' +
+      '<div class="habit-name">' + h.name + '</div>' +
+      (streak > 0 ? '<div class="habit-streak">🔥 ' + streak + '</div>' : '') +
+      '<button class="habit-del" onclick="deleteHabit(' + h.id + ')">×</button>';
+    list.appendChild(div);
+  });
+}
+
+// ===== EXPENSE TRACKER =====
+var expCats = ['🍽 Еда','☕ Кафе','🚗 Транспорт','💄 Красота','👗 Одежда','🎬 Развлечения','🏥 Здоровье','📦 Другое'];
+var selectedExpCat = '';
+function initExpenses() {
+  selectedExpCat = '';
+  var cats = document.getElementById('expCats'); cats.innerHTML = '';
+  expCats.forEach(function(c) {
+    var btn = document.createElement('div'); btn.className = 'exp-cat'; btn.textContent = c;
+    btn.onclick = function() { document.querySelectorAll('.exp-cat').forEach(function(b){b.classList.remove('selected');}); btn.classList.add('selected'); selectedExpCat = c; };
+    cats.appendChild(btn);
+  });
+  document.getElementById('expAmount').value = '';
+  renderExpenses();
+}
+function addExpense() {
+  var amount = parseFloat(document.getElementById('expAmount').value);
+  if (!amount || !selectedExpCat) return;
+  var entries = JSON.parse(localStorage.getItem('bf_expenses') || '[]');
+  entries.push({ date: today(), cat: selectedExpCat, amount: amount, time: Date.now() });
+  if (entries.length > 200) entries.splice(0, entries.length - 200);
+  localStorage.setItem('bf_expenses', JSON.stringify(entries));
+  document.getElementById('expAmount').value = '';
+  renderExpenses();
+}
+function renderExpenses() {
+  var entries = JSON.parse(localStorage.getItem('bf_expenses') || '[]');
+  var weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+  var week = entries.filter(function(e) { return new Date(e.date) >= weekAgo; });
+  var total = week.reduce(function(s, e) { return s + e.amount; }, 0);
+  document.getElementById('expTotal').textContent = total.toLocaleString('ru') + ' ₽';
+  // Bars by category
+  var byCat = {};
+  week.forEach(function(e) { byCat[e.cat] = (byCat[e.cat] || 0) + e.amount; });
+  var bars = document.getElementById('expBars'); bars.innerHTML = '';
+  var colors = ['#48c878','#e8a838','#48a0c8','#fb7185','#a78bfa','#60a5fa','#f59e0b','#94a3b8'];
+  var sorted = Object.entries(byCat).sort(function(a,b) { return b[1] - a[1]; });
+  var maxVal = sorted.length > 0 ? sorted[0][1] : 1;
+  sorted.forEach(function(item, idx) {
+    bars.innerHTML += '<div class="exp-bar-row"><div class="exp-bar-label">' + item[0] + '</div><div class="exp-bar"><div class="exp-bar-fill" style="width:' + (item[1]/maxVal*100) + '%;background:' + colors[idx%colors.length] + '"></div></div><div class="exp-bar-val">' + item[1].toLocaleString('ru') + ' ₽</div></div>';
+  });
+}
+
+// ===== SAVINGS VISUALIZER =====
+function initSavings() {
+  var saved = JSON.parse(localStorage.getItem('bf_savings') || 'null');
+  if (saved) {
+    document.getElementById('savName').value = saved.name || '';
+    document.getElementById('savGoalAmt').value = saved.goal || '';
+    document.getElementById('savMonthly').value = saved.monthly || '';
+    if (saved.goal && saved.monthly) calcSavings();
+  }
+}
+function calcSavings() {
+  var name = document.getElementById('savName').value.trim() || 'цель';
+  var goal = parseFloat(document.getElementById('savGoalAmt').value);
+  var monthly = parseFloat(document.getElementById('savMonthly').value);
+  if (!goal || !monthly) return;
+  var months = Math.ceil(goal / monthly);
+  var years = Math.floor(months / 12);
+  var remMonths = months % 12;
+  var timeText = years > 0 ? years + ' г. ' + remMonths + ' мес.' : months + ' мес.';
+  document.getElementById('savLabel').textContent = '📌 ' + name;
+  document.getElementById('savGoalLabel').textContent = goal.toLocaleString('ru') + ' ₽';
+  document.getElementById('savText').innerHTML = 'Откладывая <b>' + monthly.toLocaleString('ru') + ' ₽/мес</b>, накопишь за <b>' + timeText + '</b>.<br><br>' +
+    '💡 Правило 10%: если откладывать 10% дохода — это ' + Math.round(monthly/0.1).toLocaleString('ru') + ' ₽ дохода в месяц.';
+  // Animated fill
+  document.getElementById('savFill').style.width = '0%';
+  setTimeout(function() { document.getElementById('savFill').style.width = Math.min(monthly / goal * 100 * 3, 100) + '%'; }, 100);
+  document.getElementById('savResult').style.display = 'block';
+  localStorage.setItem('bf_savings', JSON.stringify({ name:name, goal:goal, monthly:monthly }));
 }
 
 // ===== ANALYTICS =====
