@@ -144,9 +144,9 @@ module.exports = async function handler(req, res) {
       if (Array.isArray(memories) && memories.length > 0) memory = memories[0].facts || '';
     } catch (e) {}
 
-    // --- Trial / Subscription check ---
+    // --- Trial / Subscription check (use Auth date — never resets) ---
     var subStatus = (profile && profile.subscription_status) || 'free';
-    var createdAt = (profile && profile.created_at) ? new Date(profile.created_at) : new Date();
+    var createdAt = (user && user.created_at) ? new Date(user.created_at) : ((profile && profile.created_at) ? new Date(profile.created_at) : new Date());
     var now = new Date();
     var daysSinceCreation = (now - createdAt) / (1000 * 60 * 60 * 24);
     var isTrialActive = daysSinceCreation <= 3;
