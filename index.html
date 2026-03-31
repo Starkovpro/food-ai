@@ -388,6 +388,26 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 .habit-streak{font-size:12px;color:var(--accent);white-space:nowrap}
 .habit-del{background:none;border:none;color:var(--text2);font-size:14px;cursor:pointer;padding:4px}
 
+/* HABIT TABLE */
+.habit-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.habit-table th{padding:6px 4px;font-weight:500;color:var(--text2);font-size:11px;text-align:center;border-bottom:1px solid var(--border)}
+.habit-table th:first-child{text-align:left;padding-left:0;min-width:90px}
+.habit-table td{padding:8px 4px;text-align:center;border-bottom:1px solid rgba(42,42,68,.3)}
+.habit-table td:first-child{text-align:left;padding-left:0;font-size:13px;color:var(--text)}
+.habit-table .today{background:rgba(232,168,56,.05);border-radius:4px}
+.habit-cell{width:28px;height:28px;border-radius:8px;border:2px solid var(--border);margin:0 auto;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s}
+.habit-cell.done{background:var(--success);border-color:var(--success);color:#fff}
+.habit-cell.future{opacity:.4}
+.habit-name-cell{display:flex;align-items:center;gap:6px}
+.habit-streak-badge{font-size:11px;color:var(--accent)}
+
+/* BREATH TECHNIQUES */
+.breath-techniques{display:flex;flex-direction:column;gap:8px;width:100%;max-width:280px}
+
+/* POMO DURATION */
+.pomo-duration{display:flex;gap:10px;margin-bottom:16px;justify-content:center}
+.pomo-dur-btn.selected{border-color:var(--accent)!important;color:var(--accent)!important;background:var(--accent-glow)!important}
+
 /* EXPENSES */
 .exp-cats{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .exp-cat{padding:8px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg);font-family:'Outfit',sans-serif;font-size:13px;color:var(--text2);cursor:pointer;transition:all .2s}
@@ -693,13 +713,18 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
   <div class="breath-close" onclick="stopBreathing()">✕</div>
   <div class="breath-ring">
     <div class="breath-circle" id="breathCircle">
-      <div class="breath-phase" id="breathPhase">Приготовься</div>
+      <div class="breath-phase" id="breathPhase">Выбери технику</div>
     </div>
   </div>
-  <div class="breath-timer" id="breathTimer">1:00</div>
+  <div class="breath-timer" id="breathTimer">—</div>
   <div id="breathUI">
-    <div class="breath-sub">Бокс-дыхание 4-4-4 · 1 минута</div>
-    <button class="breath-start-btn" id="breathStartBtn" onclick="startBreathing()">Начать дыхание</button>
+    <div class="breath-techniques" id="breathTechniques">
+      <div class="tool-btn" onclick="selectBreathTech('box')" style="justify-content:center;width:100%"><span class="tool-icon">🟦</span> Бокс 4-4-4 · 1 мин</div>
+      <div class="tool-btn" onclick="selectBreathTech('relax')" style="justify-content:center;width:100%"><span class="tool-icon">🌙</span> Расслабление 4-7-8 · 2 мин</div>
+      <div class="tool-btn" onclick="selectBreathTech('quick')" style="justify-content:center;width:100%"><span class="tool-icon">⚡</span> Быстрое 2-4 · 30 сек</div>
+    </div>
+    <div class="breath-sub" id="breathSub" style="display:none"></div>
+    <button class="breath-start-btn" id="breathStartBtn" style="display:none" onclick="startBreathing()">Начать дыхание</button>
   </div>
 </div>
 
@@ -707,7 +732,11 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
 <div class="pomo-overlay" id="pomoOverlay">
   <div class="pomo-close" onclick="stopPomodoro()">✕</div>
   <div class="pomo-title" id="pomoTitle">Фокус-сессия</div>
-  <div class="pomo-desc" id="pomoDesc">25 минут полного фокуса. Друг провожает и встречает.</div>
+  <div class="pomo-desc" id="pomoDesc">Выбери длительность и сосредоточься на одной задаче.</div>
+  <div class="pomo-duration" id="pomoDuration">
+    <div class="tool-btn pomo-dur-btn" onclick="setPomoTime(25)" style="flex:1;justify-content:center">25 мин</div>
+    <div class="tool-btn pomo-dur-btn" onclick="setPomoTime(55)" style="flex:1;justify-content:center">55 мин</div>
+  </div>
   <div class="pomo-ring">
     <svg viewBox="0 0 200 200">
       <circle class="bg" cx="100" cy="100" r="90"/>
@@ -715,7 +744,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
     </svg>
     <div class="pomo-time">
       <div class="pomo-digits" id="pomoDigits">25:00</div>
-      <div class="pomo-label" id="pomoLabel">нажми старт</div>
+      <div class="pomo-label" id="pomoLabel">выбери время</div>
     </div>
   </div>
   <div class="pomo-btns" id="pomoBtns">
@@ -819,10 +848,12 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
   <div class="mini-header"><div class="mini-back" onclick="closeApp('appHabits')">←</div><div class="mini-title">🔥 Трекер привычек</div></div>
   <div class="mini-body">
     <div style="display:flex;gap:8px;margin-bottom:16px">
-      <input class="mini-input" id="habitInput" type="text" placeholder="Новая привычка..." maxlength="40" style="margin:0">
+      <input class="mini-input" id="habitInput" type="text" placeholder="Новая привычка..." maxlength="25" style="margin:0">
       <button style="padding:12px 20px;background:var(--accent);color:var(--bg);border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer" onclick="addHabit()">+</button>
     </div>
-    <div id="habitList"></div>
+    <div style="overflow-x:auto">
+      <table class="habit-table" id="habitTable"></table>
+    </div>
     <div id="habitEmpty" style="text-align:center;padding:40px 20px;color:var(--text2);font-size:14px">Добавь привычку — и отмечай каждый день!</div>
   </div>
 </div>
@@ -834,6 +865,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
     <div class="mini-card">
       <div class="mini-label">Добавить расход</div>
       <div class="exp-cats" id="expCats"></div>
+      <input class="mini-input" id="expCustom" type="text" placeholder="Или напиши своё (до 15 букв)" maxlength="15" style="margin-top:4px">
       <input class="mini-input" id="expAmount" type="number" placeholder="Сумма в ₽" min="1">
       <button class="mini-btn" onclick="addExpense()">Добавить</button>
     </div>
@@ -842,6 +874,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
       <div class="mini-value" id="expTotal">0 ₽</div>
       <div id="expBars" style="margin-top:16px"></div>
     </div>
+    <div id="expHistory" style="margin-top:8px"></div>
   </div>
 </div>
 
@@ -850,18 +883,20 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-fam
   <div class="mini-header"><div class="mini-back" onclick="closeApp('appSavings')">←</div><div class="mini-title">🎯 Визуализатор накоплений</div></div>
   <div class="mini-body">
     <div class="mini-card">
-      <input class="mini-input" id="savName" type="text" placeholder="На что копишь? (отпуск, телефон)" maxlength="30">
-      <input class="mini-input" id="savGoalAmt" type="number" placeholder="Сумма цели (₽)" min="1000">
+      <input class="mini-input" id="savName" type="text" placeholder="На что копишь? (отпуск, iPhone...)" maxlength="30">
+      <input class="mini-input" id="savGoalAmt" type="number" placeholder="Цель — сколько нужно (₽)" min="1000">
+      <input class="mini-input" id="savCurrent" type="number" placeholder="Уже накоплено (₽)" min="0" value="0">
       <input class="mini-input" id="savMonthly" type="number" placeholder="Откладываю в месяц (₽)" min="100">
       <button class="mini-btn" onclick="calcSavings()">Рассчитать</button>
     </div>
     <div id="savResult" style="display:none">
       <div class="mini-card">
-        <div class="mini-label" id="savLabel">—</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:12px" id="savTitle">—</div>
         <div class="savings-progress"><div class="savings-fill" id="savFill" style="width:0%"></div></div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2)"><span>0 ₽</span><span id="savGoalLabel">—</span></div>
-        <div style="margin-top:16px;font-size:14px;color:var(--text);line-height:1.6" id="savText"></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2)"><span id="savCurrentLabel">0 ₽</span><span id="savGoalLabel">—</span></div>
+        <div style="font-size:13px;color:var(--text2);margin-top:8px" id="savPercent"></div>
       </div>
+      <div class="mini-card" id="savTimeline"></div>
     </div>
   </div>
 </div>
@@ -1645,42 +1680,62 @@ function scheduleMorningCheck() {
 
 // ===== BREATHING TIMER =====
 var breathInterval = null, breathTimeout = null, breathSeconds = 60;
+var breathTechs = {
+  box: { name:'Бокс 4-4-4', dur:60, phases:['inhale','hold','exhale'], labels:['Вдох...','Пауза...','Выдох...'], times:[4000,4000,4000] },
+  relax: { name:'Расслабление 4-7-8', dur:120, phases:['inhale','hold','exhale'], labels:['Вдох...','Задержка...','Выдох...'], times:[4000,7000,8000] },
+  quick: { name:'Быстрое 2-4', dur:30, phases:['inhale','exhale'], labels:['Вдох...','Выдох...'], times:[2000,4000] }
+};
+var currentBreathTech = null;
 function openBreathing() {
   document.getElementById('breathOverlay').classList.add('show');
-  document.getElementById('breathPhase').textContent = 'Приготовься';
-  document.getElementById('breathTimer').textContent = '1:00';
+  document.getElementById('breathPhase').textContent = 'Выбери технику';
+  document.getElementById('breathTimer').textContent = '—';
   document.getElementById('breathCircle').className = 'breath-circle';
-  document.getElementById('breathStartBtn').textContent = 'Начать дыхание';
-  document.getElementById('breathStartBtn').className = 'breath-start-btn';
-  document.getElementById('breathStartBtn').onclick = startBreathing;
-  breathSeconds = 60;
+  document.getElementById('breathTechniques').style.display = 'flex';
+  document.getElementById('breathStartBtn').style.display = 'none';
+  document.getElementById('breathSub').style.display = 'none';
+  currentBreathTech = null;
   trackEvent('breathing_opened');
 }
+function selectBreathTech(key) {
+  currentBreathTech = breathTechs[key];
+  breathSeconds = currentBreathTech.dur;
+  var m = Math.floor(breathSeconds / 60); var s = breathSeconds % 60;
+  document.getElementById('breathTimer').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  document.getElementById('breathPhase').textContent = 'Приготовься';
+  document.getElementById('breathTechniques').style.display = 'none';
+  document.getElementById('breathSub').textContent = currentBreathTech.name;
+  document.getElementById('breathSub').style.display = 'block';
+  document.getElementById('breathStartBtn').style.display = 'block';
+  document.getElementById('breathStartBtn').textContent = 'Начать';
+  document.getElementById('breathStartBtn').className = 'breath-start-btn';
+  document.getElementById('breathStartBtn').onclick = startBreathing;
+}
 function startBreathing() {
+  if (!currentBreathTech) return;
+  var tech = currentBreathTech;
   document.getElementById('breathStartBtn').textContent = 'Остановить';
   document.getElementById('breathStartBtn').className = 'breath-start-btn stop';
   document.getElementById('breathStartBtn').onclick = stopBreathing;
-  breathSeconds = 60;
-  var phases = ['inhale','hold','exhale'];
-  var labels = ['Вдох...','Пауза...','Выдох...'];
+  breathSeconds = tech.dur;
   var idx = 0;
   function nextPhase() {
     if (breathSeconds <= 0) { finishBreathing(); return; }
     var circle = document.getElementById('breathCircle');
-    circle.className = 'breath-circle ' + phases[idx];
-    document.getElementById('breathPhase').textContent = labels[idx];
-    idx = (idx + 1) % 3;
-    breathTimeout = setTimeout(nextPhase, 4000);
+    circle.className = 'breath-circle ' + tech.phases[idx];
+    document.getElementById('breathPhase').textContent = tech.labels[idx];
+    var wait = tech.times[idx];
+    idx = (idx + 1) % tech.phases.length;
+    breathTimeout = setTimeout(nextPhase, wait);
   }
   nextPhase();
   breathInterval = setInterval(function() {
     breathSeconds--;
     if (breathSeconds <= 0) { clearInterval(breathInterval); return; }
-    var m = Math.floor(breathSeconds / 60);
-    var s = breathSeconds % 60;
+    var m = Math.floor(breathSeconds / 60); var s = breathSeconds % 60;
     document.getElementById('breathTimer').textContent = m + ':' + (s < 10 ? '0' : '') + s;
   }, 1000);
-  trackEvent('breathing_started');
+  trackEvent('breathing_started', { tech: tech.name });
 }
 function finishBreathing() {
   clearInterval(breathInterval); clearTimeout(breathTimeout);
@@ -1706,23 +1761,30 @@ function stopBreathing() {
 var pomoInterval = null, pomoTotal = 25 * 60, pomoLeft = 0, pomoRunning = false;
 function openPomodoro() {
   document.getElementById('pomoOverlay').classList.add('show');
-  pomoLeft = pomoTotal;
   pomoRunning = false;
-  updatePomoDisplay();
-  document.getElementById('pomoLabel').textContent = 'нажми старт';
+  setPomoTime(25);
+  document.getElementById('pomoLabel').textContent = 'выбери время';
   document.getElementById('pomoTitle').textContent = 'Фокус-сессия';
-  document.getElementById('pomoDesc').textContent = '25 минут полного фокуса. Убери отвлечения и сосредоточься на одной задаче.';
+  document.getElementById('pomoDuration').style.display = 'flex';
   document.getElementById('pomoStartBtn').textContent = 'Старт';
   document.getElementById('pomoStartBtn').onclick = startPomodoro;
   document.getElementById('pomoProgress').style.strokeDashoffset = '0';
   trackEvent('pomodoro_opened');
 }
+function setPomoTime(min) {
+  pomoTotal = min * 60; pomoLeft = pomoTotal;
+  updatePomoDisplay();
+  document.querySelectorAll('.pomo-dur-btn').forEach(function(b) { b.classList.remove('selected'); });
+  event.target.classList.add('selected');
+}
 function startPomodoro() {
   pomoRunning = true;
   document.getElementById('pomoLabel').textContent = 'осталось';
+  document.getElementById('pomoDuration').style.display = 'none';
   document.getElementById('pomoStartBtn').textContent = 'Пауза';
   document.getElementById('pomoStartBtn').onclick = pausePomodoro;
-  addMessageToSphere('focus', 'friend', 'Фокус-сессия началась! 🎯 25 минут — ты справишься. Убери телефон и начинай. Я буду ждать тебя здесь.');
+  var min = Math.round(pomoTotal / 60);
+  addMessageToSphere('focus', 'friend', 'Фокус-сессия ' + min + ' мин началась! 🎯 Убери отвлечения и начинай. Я жду тебя здесь.');
   pomoInterval = setInterval(function() {
     pomoLeft--;
     updatePomoDisplay();
@@ -1730,7 +1792,7 @@ function startPomodoro() {
     document.getElementById('pomoProgress').style.strokeDashoffset = (565.5 * pct).toFixed(1);
     if (pomoLeft <= 0) { finishPomodoro(); }
   }, 1000);
-  trackEvent('pomodoro_started');
+  trackEvent('pomodoro_started', { minutes: Math.round(pomoTotal/60) });
 }
 function pausePomodoro() {
   clearInterval(pomoInterval); pomoInterval = null;
@@ -1992,7 +2054,7 @@ function saveGratitude() {
   addMessageToSphere('focus', 'friend', '🙏 Дневник благодарности обновлён! ' + items.length + ' пункт(а) — здорово. Благодарность тренирует мозг замечать хорошее.');
 }
 function renderGratHistory() {
-  var entries = JSON.parse(localStorage.getItem('bf_gratitude') || '[]').slice(-5).reverse();
+  var entries = JSON.parse(localStorage.getItem('bf_gratitude') || '[]').slice(-7).reverse();
   var el = document.getElementById('gratHistory'); el.innerHTML = '';
   entries.forEach(function(e) {
     var d = document.createElement('div'); d.className = 'mini-card'; d.style.textAlign = 'left';
@@ -2018,9 +2080,9 @@ function addHabit() {
   saveHabitsData(d); input.value = '';
   renderHabits();
 }
-function toggleHabitCheck(id) {
+function toggleHabitDay(id, dateStr) {
   var d = loadHabitsData();
-  var key = id + '_' + today();
+  var key = id + '_' + dateStr;
   d.checks[key] = !d.checks[key];
   saveHabitsData(d);
   renderHabits();
@@ -2032,31 +2094,46 @@ function deleteHabit(id) {
   renderHabits();
 }
 function getHabitStreak(id) {
-  var d = loadHabitsData();
-  var streak = 0;
+  var d = loadHabitsData(); var streak = 0;
   for (var i = 0; i < 30; i++) {
     var dt = new Date(); dt.setDate(dt.getDate() - i);
-    var key = id + '_' + dt.toISOString().slice(0,10);
-    if (d.checks[key]) streak++; else if (i > 0) break;
+    if (d.checks[id + '_' + dt.toISOString().slice(0,10)]) streak++; else if (i > 0) break;
   }
   return streak;
 }
 function renderHabits() {
   var d = loadHabitsData();
-  var list = document.getElementById('habitList');
+  var table = document.getElementById('habitTable');
   var empty = document.getElementById('habitEmpty');
-  list.innerHTML = '';
-  empty.style.display = d.habits.length === 0 ? 'block' : 'none';
-  d.habits.forEach(function(h) {
-    var checked = d.checks[h.id + '_' + today()];
-    var streak = getHabitStreak(h.id);
-    var div = document.createElement('div'); div.className = 'habit-row';
-    div.innerHTML = '<div class="habit-check' + (checked ? ' done' : '') + '" onclick="toggleHabitCheck(' + h.id + ')">' + (checked ? '✓' : '') + '</div>' +
-      '<div class="habit-name">' + h.name + '</div>' +
-      (streak > 0 ? '<div class="habit-streak">🔥 ' + streak + '</div>' : '') +
-      '<button class="habit-del" onclick="deleteHabit(' + h.id + ')">×</button>';
-    list.appendChild(div);
+  if (d.habits.length === 0) { table.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  // Build 7-day columns: today + 6 forward
+  var days = []; var dayNames = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+  for (var i = 0; i < 7; i++) {
+    var dt = new Date(); dt.setDate(dt.getDate() + i);
+    days.push({ date: dt.toISOString().slice(0,10), label: dayNames[dt.getDay()], day: dt.getDate(), isToday: i === 0 });
+  }
+  var html = '<thead><tr><th>Привычка</th>';
+  days.forEach(function(day) {
+    html += '<th' + (day.isToday ? ' style="color:var(--accent)"' : '') + '>' + day.label + '<br>' + day.day + '</th>';
   });
+  html += '</tr></thead><tbody>';
+  d.habits.forEach(function(h) {
+    var streak = getHabitStreak(h.id);
+    html += '<tr><td><div class="habit-name-cell"><span>' + h.name + '</span>' +
+      (streak > 0 ? '<span class="habit-streak-badge">🔥' + streak + '</span>' : '') +
+      '<button class="habit-del" onclick="deleteHabit(' + h.id + ')">×</button></div></td>';
+    days.forEach(function(day) {
+      var checked = d.checks[h.id + '_' + day.date];
+      var isPast = new Date(day.date) < new Date(today());
+      html += '<td' + (day.isToday ? ' class="today"' : '') + '>' +
+        '<div class="habit-cell' + (checked ? ' done' : '') + '" onclick="toggleHabitDay(' + h.id + ',\'' + day.date + '\')">' +
+        (checked ? '✓' : '') + '</div></td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
 }
 
 // ===== EXPENSE TRACKER =====
@@ -2075,12 +2152,17 @@ function initExpenses() {
 }
 function addExpense() {
   var amount = parseFloat(document.getElementById('expAmount').value);
-  if (!amount || !selectedExpCat) return;
+  var custom = document.getElementById('expCustom').value.trim();
+  var cat = custom || selectedExpCat;
+  if (!amount || !cat) return;
   var entries = JSON.parse(localStorage.getItem('bf_expenses') || '[]');
-  entries.push({ date: today(), cat: selectedExpCat, amount: amount, time: Date.now() });
+  entries.push({ date: today(), cat: cat, amount: amount, time: Date.now() });
   if (entries.length > 200) entries.splice(0, entries.length - 200);
   localStorage.setItem('bf_expenses', JSON.stringify(entries));
   document.getElementById('expAmount').value = '';
+  document.getElementById('expCustom').value = '';
+  selectedExpCat = '';
+  document.querySelectorAll('.exp-cat').forEach(function(b){b.classList.remove('selected');});
   renderExpenses();
 }
 function renderExpenses() {
@@ -2107,28 +2189,49 @@ function initSavings() {
   if (saved) {
     document.getElementById('savName').value = saved.name || '';
     document.getElementById('savGoalAmt').value = saved.goal || '';
+    document.getElementById('savCurrent').value = saved.current || 0;
     document.getElementById('savMonthly').value = saved.monthly || '';
     if (saved.goal && saved.monthly) calcSavings();
   }
 }
 function calcSavings() {
-  var name = document.getElementById('savName').value.trim() || 'цель';
+  var name = document.getElementById('savName').value.trim() || 'Цель';
   var goal = parseFloat(document.getElementById('savGoalAmt').value);
+  var current = parseFloat(document.getElementById('savCurrent').value) || 0;
   var monthly = parseFloat(document.getElementById('savMonthly').value);
   if (!goal || !monthly) return;
-  var months = Math.ceil(goal / monthly);
-  var years = Math.floor(months / 12);
-  var remMonths = months % 12;
-  var timeText = years > 0 ? years + ' г. ' + remMonths + ' мес.' : months + ' мес.';
-  document.getElementById('savLabel').textContent = '📌 ' + name;
+  var remaining = Math.max(goal - current, 0);
+  var months = remaining > 0 ? Math.ceil(remaining / monthly) : 0;
+  var pct = Math.min(current / goal * 100, 100);
+  // Title & progress
+  document.getElementById('savTitle').textContent = '📌 ' + name;
+  document.getElementById('savCurrentLabel').textContent = current.toLocaleString('ru') + ' ₽';
   document.getElementById('savGoalLabel').textContent = goal.toLocaleString('ru') + ' ₽';
-  document.getElementById('savText').innerHTML = 'Откладывая <b>' + monthly.toLocaleString('ru') + ' ₽/мес</b>, накопишь за <b>' + timeText + '</b>.<br><br>' +
-    '💡 Правило 10%: если откладывать 10% дохода — это ' + Math.round(monthly/0.1).toLocaleString('ru') + ' ₽ дохода в месяц.';
+  document.getElementById('savPercent').textContent = Math.round(pct) + '% накоплено' + (months > 0 ? ' · осталось ' + months + ' мес.' : ' · цель достигнута! 🎉');
   // Animated fill
   document.getElementById('savFill').style.width = '0%';
-  setTimeout(function() { document.getElementById('savFill').style.width = Math.min(monthly / goal * 100 * 3, 100) + '%'; }, 100);
+  setTimeout(function() { document.getElementById('savFill').style.width = pct + '%'; }, 100);
+  // Monthly timeline
+  var timeline = document.getElementById('savTimeline');
+  var html = '<div class="mini-label" style="text-align:left;margin-bottom:12px">Прогноз по месяцам</div>';
+  var accumulated = current;
+  var monthNames = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+  var now = new Date();
+  var showMonths = Math.min(months, 12);
+  for (var i = 0; i <= showMonths; i++) {
+    var d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    var val = Math.min(accumulated, goal);
+    var w = (val / goal * 100);
+    var isGoal = val >= goal;
+    html += '<div class="exp-bar-row"><div class="exp-bar-label" style="width:50px;font-size:11px">' + monthNames[d.getMonth()] + ' ' + (d.getFullYear() % 100) + '</div>' +
+      '<div class="exp-bar"><div class="exp-bar-fill" style="width:' + w + '%;background:' + (isGoal ? 'var(--success)' : 'var(--accent)') + '"></div></div>' +
+      '<div class="exp-bar-val" style="width:70px;font-size:11px">' + Math.round(val).toLocaleString('ru') + ' ₽</div></div>';
+    accumulated += monthly;
+  }
+  if (months > 12) html += '<div style="font-size:12px;color:var(--text2);text-align:center;margin-top:8px">... ещё ' + (months - 12) + ' мес.</div>';
+  timeline.innerHTML = html;
   document.getElementById('savResult').style.display = 'block';
-  localStorage.setItem('bf_savings', JSON.stringify({ name:name, goal:goal, monthly:monthly }));
+  localStorage.setItem('bf_savings', JSON.stringify({ name:name, goal:goal, current:current, monthly:monthly }));
 }
 
 // ===== ANALYTICS =====
